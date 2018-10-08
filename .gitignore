@@ -7,3 +7,4 @@ coverage/
 # files
 package-lock.json
 *.bak
+TODO.md
