@@ -4,7 +4,7 @@ import * as HtmlWebpackPlugin from 'html-webpack-plugin'
 
 const config: Configuration = {
   devtool: 'source-map',
-  entry:   './index.tsx',
+  entry:   './src/index.tsx',
   module:  {
     rules: [
       {

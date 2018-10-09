@@ -9,11 +9,7 @@
     "no-undef": "off",
     "space-before-function-paren": [
       "error",
-      {
-        "anonymous": "always",
-        "named": "never",
-        "asyncArrow": "always"
-      }
+      { "anonymous": "always", "named": "never", "asyncArrow": "always" }
     ],
     "comma-dangle": "off",
     "key-spacing": [
@@ -28,11 +24,7 @@
     "arca/import-align": "error",
     "no-multi-spaces": [
       "error",
-      {
-        "exceptions": {
-          "ImportDeclaration": true
-        }
-      }
+      { "exceptions": { "ImportDeclaration": true } }
     ],
     "no-dupe-class-members": "off"
   }

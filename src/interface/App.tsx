@@ -1,7 +1,8 @@
-import * as React   from 'react'
-import { Controls } from './Controls'
-import * as model   from '../models/leet.mdl'
-import { Canvas }   from './Canvas'
+import * as model                         from '../../models/leet.mdl'
+import * as React                         from 'react'
+import { Controls }                       from './Controls'
+import { Canvas }                         from './Canvas'
+import { createModelParser, ModelParser } from '../modelParser'
 
 /**
  * State of the app
@@ -10,6 +11,7 @@ type State = {
   width: number
   height: number
   bgColor: number
+  modelParser: ModelParser | null
   modelBuffer: ArrayBuffer | null
 }
 
@@ -21,14 +23,21 @@ export class App extends React.Component<{}, State> {
     width:       window.innerWidth,
     height:      window.innerHeight,
     bgColor:     0x4d7f7e,
-    modelBuffer: null
+    modelBuffer: null,
+    modelParser: null
   }
 
   public async componentDidMount() {
     const resp = await fetch(model)
     const modelBuffer = await resp.arrayBuffer()
+    const modelParser = createModelParser(modelBuffer)
 
-    this.setState({ modelBuffer })
+    this.setState({
+      modelBuffer,
+      modelParser
+    })
+
+    console.log(modelParser.parseModel())
   }
 
   public render() {
