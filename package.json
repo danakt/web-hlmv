@@ -6,6 +6,25 @@
   },
   "author": "Danakt Frost <danakt@protonmail.com>",
   "license": "MIT",
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": "ts-jest"
+    },
+    "globals": {
+      "ts-jest": {
+        "tsConfig": "tsconfig.json"
+      }
+    },
+    "testMatch": [
+      "**/tests/*.+(ts|tsx|js)"
+    ],
+    "collectCoverage": true
+  },
   "devDependencies": {
     "@types/core-decorators": "^0.20.0",
     "@types/gl-matrix": "^2.4.0",
@@ -47,7 +66,6 @@
     "webpack-dev-server": "^3.1.4"
   },
   "dependencies": {
-    "core-decorators": "^0.20.0",
     "gl-matrix": "^2.7.1",
     "multi-array-view": "^0.1.0",
     "ramda": "^0.25.0",
