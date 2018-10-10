@@ -2,12 +2,25 @@
  * Type of struct data type description
  */
 // eslint-disable-next-line space-infix-ops
-export type DataType<T> = {
-  /** Byte length of the data type */
+export type DataType<T, A extends TypedArray | T[] = T[]> = {
+  /**
+   * Byte length of the data type
+   */
   byteLength: number
 
-  /** Value getter */
+  /**
+   * Value getter
+   * @param dataView The DataView object
+   * @param byteOffset Offset from the start of the DataView object
+   * @param byteLength
+   */
   getValue(dataView: DataView, byteOffset: number, byteLength?: number): T
+
+  /**
+   * Constructor of array of the values. Required to create a typed array of
+   * values of this type to increase performance.
+   */
+  arrayConstructor?: A extends T[] ? never : { new (length: number): A }
 }
 
 /**
@@ -15,7 +28,7 @@ export type DataType<T> = {
  */
 // eslint-disable-next-line space-infix-ops
 export type Struct<T = any> = {
-  [entry: string]: DataType<T>
+  [entry: string]: DataType<T, any>
 }
 
 /**
@@ -29,9 +42,10 @@ export type StructResult<T extends Struct<any>> = { [K in keyof T]: ReturnType<T
  * start of the DataView object. It has a minimum value of -128 and a
  * maximum value of 127 (inclusive).
  */
-export const int8: DataType<number> = {
-  byteLength: 1,
-  getValue:   (dataView, offset) => dataView.getInt8(offset)
+export const int8: DataType<number, Int8Array> = {
+  byteLength:       1,
+  getValue:         (dataView, offset) => dataView.getInt8(offset),
+  arrayConstructor: Int8Array
 }
 
 /**
@@ -39,9 +53,10 @@ export const int8: DataType<number> = {
  * start of the DataView object. It has a minimum value of 0 and a
  * maximum value of 255 (inclusive).
  */
-export const uint8: DataType<number> = {
-  byteLength: 1,
-  getValue:   (dataView, offset) => dataView.getUint8(offset)
+export const uint8: DataType<number, Uint8Array> = {
+  byteLength:       1,
+  getValue:         (dataView, offset) => dataView.getUint8(offset),
+  arrayConstructor: Uint8Array
 }
 
 /**
@@ -49,54 +64,60 @@ export const uint8: DataType<number> = {
  * start of the DataView object. It has a minimum value of -32 768 and a
  * maximum value of 32 767 (inclusive).
  */
-export const int16: DataType<number> = {
-  byteLength: 2,
-  getValue:   (dataView, offset) => dataView.getInt16(offset, true)
+export const int16: DataType<number, Int16Array> = {
+  byteLength:       2,
+  getValue:         (dataView, offset) => dataView.getInt16(offset, true),
+  arrayConstructor: Int16Array
 }
 
 /**
  * Creates reader of the Uint16 value at the specified byte offset from the
  * start of the DataView object.
  */
-export const uint16: DataType<number> = {
-  byteLength: 2,
-  getValue:   (dataView, offset) => dataView.getUint16(offset, true)
+export const uint16: DataType<number, Int16Array> = {
+  byteLength:       2,
+  getValue:         (dataView, offset) => dataView.getUint16(offset, true),
+  arrayConstructor: Int16Array
 }
 
 /**
  * Creates reader of the Int32 value at the specified byte offset from the
  * start of the DataView object.
  */
-export const int32: DataType<number> = {
-  byteLength: 4,
-  getValue:   (dataView, offset) => dataView.getInt32(offset, true)
+export const int32: DataType<number, Int32Array> = {
+  byteLength:       4,
+  getValue:         (dataView, offset) => dataView.getInt32(offset, true),
+  arrayConstructor: Int32Array
 }
 
 /**
  * Creates reader of the Uint32 value at the specified byte offset from the
  * start of the DataView object.
  */
-export const uint32: DataType<number> = {
-  byteLength: 4,
-  getValue:   (dataView, offset) => dataView.getUint32(offset, true)
+export const uint32: DataType<number, Uint32Array> = {
+  byteLength:       4,
+  getValue:         (dataView, offset) => dataView.getUint32(offset, true),
+  arrayConstructor: Uint32Array
 }
 
 /**
  * Creates reader of the Float32 value at the specified byte offset from the
  * start of the DataView object.
  */
-export const float32: DataType<number> = {
-  byteLength: 4,
-  getValue:   (dataView, offset) => dataView.getFloat32(offset, true)
+export const float32: DataType<number, Float32Array> = {
+  byteLength:       4,
+  getValue:         (dataView, offset) => dataView.getFloat32(offset, true),
+  arrayConstructor: Float32Array
 }
 
 /**
  * Creates reader of the Float64 value at the specified byte offset from the
  * start of the DataView object.
  */
-export const float64: DataType<number> = {
-  byteLength: 8,
-  getValue:   (dataView, offset) => dataView.getFloat64(offset, true)
+export const float64: DataType<number, Float64Array> = {
+  byteLength:       8,
+  getValue:         (dataView, offset) => dataView.getFloat64(offset, true),
+  arrayConstructor: Float64Array
 }
 
 /**
@@ -128,11 +149,11 @@ export const string = (length: number): DataType<string> => ({
  * Creates reader of the array of the specified type values at the specified
  * byte offset from the start of the DataView object.
  */
-// Fix eslint parsing error: «Identifier expected».
-export const array = <T extends any>(arrayLength: number, structType: DataType<T>): DataType<T[]> => ({
+export const array = <T, A extends TypedArray | T[]>(arrayLength: number, structType: DataType<T, A>): DataType<A> => ({
   byteLength: structType.byteLength * arrayLength,
-  getValue(dataView, byteOffset): T[] {
-    const out: T[] = []
+  getValue(dataView, byteOffset): A {
+    const TypedArrayConstructor = structType.arrayConstructor
+    const out = (TypedArrayConstructor ? new TypedArrayConstructor(arrayLength) : Array<T>(arrayLength)) as A
 
     for (let i = 0; i < arrayLength; i++) {
       const itemByteLength = i * structType.byteLength

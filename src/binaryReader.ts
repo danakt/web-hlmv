@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import { Struct, StructResult } from './DataTypes'
+import { Struct, StructResult } from './dataTypes' // FIXME
 
 /**
  * Parses binary buffer (wrapped to DataView) according to a structure
@@ -11,21 +11,40 @@ import { Struct, StructResult } from './DataTypes'
  * @param byteOffset Offset in buffer to read, "0" by default
  * @returns The structure applying result
  */
-export const readStruct = function readStruct<T extends Struct>(
+export const readStruct = function<T, S extends Struct<T>> (
   dataView: DataView,
-  struct: T,
+  struct: S,
   byteOffset: number = 0
-): StructResult<T> {
+): StructResult<S> {
   let offset: number = byteOffset
-  const result = {} as StructResult<T>
+  const result = {} as StructResult<S>
 
   for (const key in struct) {
-    if (struct[key].getValue) {
-      ;(result as any)[key] = struct[key].getValue(dataView, offset, struct[key].byteLength)
-    }
+    ;(result as any)[key] = struct[key].getValue(dataView, offset)
 
     offset += struct[key].byteLength
   }
 
   return result
+}
+
+/**
+ * Reads values of a structure in binary buffer without creating object
+ * @param dataView The DataView object
+ * @param struct Structure description
+ * @param byteOffset Offset in buffer to read, "0" by default
+ * @returns Iterator of struct values
+ */
+export const readStructValues = function * <T, S extends Struct<T>>(
+  dataView: DataView,
+  struct: S,
+  byteOffset: number = 0
+): IterableIterator<T> {
+  let offset: number = byteOffset
+
+  for (const key in struct) {
+    yield struct[key].getValue(dataView, offset)
+
+    offset += struct[key].byteLength
+  }
 }
