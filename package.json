@@ -21,7 +21,7 @@
       }
     },
     "testMatch": [
-      "**/tests/*.+(ts|tsx|js)"
+      "**/tests/*.spec.+(ts|tsx|js)"
     ],
     "collectCoverage": true
   },
