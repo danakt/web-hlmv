@@ -91,6 +91,12 @@ export const int32: DataType<number, Int32Array> = {
 }
 
 /**
+ * Alias for int32. Creates reader of the Int32 value at the specified byte
+ * offset from the start of the DataView object.
+ */
+export const int = int32
+
+/**
  * Creates reader of the Uint32 value at the specified byte offset from the
  * start of the DataView object.
  */
@@ -165,3 +171,8 @@ export const array = <T, A extends TypedArray | T[]>(arrayLength: number, struct
     return out
   }
 })
+
+/**
+ * Alias for float32-vector with 3 elements
+ */
+export const vec3 = array(3, float32)
