@@ -1,4 +1,4 @@
-import { StructResult, int32, float32, string, array } from './dataTypes'
+import { StructResult, int32, float32, string, array, uint32 } from './dataTypes'
 
 /**
  * Head of mdl-file
@@ -82,3 +82,21 @@ export const header = {
 }
 
 export type Header = StructResult<typeof header>
+
+/**
+ * Texture info
+ */
+export const texture = {
+  /** Texture name */
+  name:   string(64),
+  /** Flags */
+  flags:  uint32,
+  /** Texture width */
+  width:  uint32,
+  /** Texture height */
+  height: uint32,
+  /** Texture data offset */
+  index:  uint32
+}
+
+export type Texture = StructResult<typeof texture>

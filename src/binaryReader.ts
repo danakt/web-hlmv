@@ -17,12 +17,35 @@ export const readStruct = function<T, S extends Struct<T>> (
   byteOffset: number = 0
 ): StructResult<S> {
   let offset: number = byteOffset
-  const result = {} as StructResult<S>
+  const structResult = {} as StructResult<S>
 
   for (const key in struct) {
-    ;(result as any)[key] = struct[key].getValue(dataView, offset)
+    ;(structResult as any)[key] = struct[key].getValue(dataView, offset)
 
     offset += struct[key].byteLength
+  }
+
+  return structResult
+}
+
+export const readStructMultiple = function<T, S extends Struct<T>> (
+  dataView: DataView,
+  struct: S,
+  byteOffset: number = 0,
+  times: number = 1
+): StructResult<S>[] {
+  let offset: number = byteOffset
+  const result: StructResult<S>[] = []
+
+  for (let i = 0; i < times; i++) {
+    const structResult = {} as StructResult<S>
+
+    for (const key in struct) {
+      ;(structResult as any)[key] = struct[key].getValue(dataView, offset)
+      offset += struct[key].byteLength
+    }
+
+    result[i] = structResult
   }
 
   return result

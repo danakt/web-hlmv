@@ -12,12 +12,7 @@
       { "anonymous": "always", "named": "never", "asyncArrow": "always" }
     ],
     "comma-dangle": "off",
-    "key-spacing": [
-      "error",
-      {
-        "align": "value"
-      }
-    ],
+    "key-spacing": ["error", { "align": "value" }],
     "operator-linebreak": ["error", "before"],
     "no-unused-vars": "error",
     "typescript/no-unused-vars": "error",

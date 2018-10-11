@@ -37,3 +37,10 @@ export const leetHeder = {
   numtransitions:      0,
   transitionindex:     2094732
 }
+
+/** Leet textures info */
+export const leetTexturesInfo = [
+  { flags: 0, height: 512, index: 2117064, name: 'Arab_dmbase1.bmp', width: 512 },
+  { flags: 3, height: 64, index: 2379976, name: 'Chrome3.bmp', width: 64 },
+  { flags: 0, height: 128, index: 2384840, name: 'Backpack1.BMP', width: 128 }
+]
