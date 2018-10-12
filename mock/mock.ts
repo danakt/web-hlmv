@@ -3,7 +3,7 @@
  */
 
 /** Header */
-export const leetHeder = {
+export const leetHeader = {
   id:                  1414743113,
   version:             10,
   name:                'leet\\leet.mdl',
@@ -69,6 +69,16 @@ export const leetAttachments = [
     bone:    12,
     org:     new Float32Array([10.854999542236328, -0.41671499609947205, 1.8706799745559692]),
     vectors: [new Float32Array([0, 0, 0]), new Float32Array([0, 0, 0]), new Float32Array([0, 0, 0])]
+  }
+]
+
+/** Sequence groups */
+export const leetSequenceGroups = [
+  {
+    label:   'default',
+    name:    '',
+    unused1: 0,
+    unused2: 0
   }
 ]
 

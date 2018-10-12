@@ -212,6 +212,22 @@ export const seqdesc = {
 export type SequenceDesc = StructResult<typeof seqdesc>
 
 /**
+ * Demand loaded sequence groups
+ */
+export const seqgroup = {
+  /** Textual name */
+  label:   string(32),
+  /** File name */
+  name:    string(64),
+  /** Was "cache" - index pointer */
+  unused1: int,
+  /** Was "data" - hack for group 0 */
+  unused2: int
+}
+
+export type SequenceGroup = StructResult<typeof seqgroup>
+
+/**
  * Texture info
  */
 export const texture = {
