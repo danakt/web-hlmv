@@ -180,3 +180,13 @@ export const array = <T, A extends TypedArray | T[]>(arrayLength: number, struct
  * Alias for float32-vector with 3 elements
  */
 export const vec3 = array(3, float32)
+
+/**
+ * Creates an element to skip a specified number of bytes or number of bytes in
+ * accordance with the specified data type.
+ * @param lengthOrDataType Length in bytes to skip or data type
+ */
+export const skip = (lengthOrDataType: number | DataType<any, any>): DataType<any, any> => ({
+  byteLength: typeof lengthOrDataType === 'number' ? lengthOrDataType : lengthOrDataType.byteLength,
+  getValue() {}
+})
