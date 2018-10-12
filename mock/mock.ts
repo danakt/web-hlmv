@@ -82,6 +82,12 @@ export const leetSequenceGroups = [
   }
 ]
 
+/** Body parts */
+export const leetBodyParts = [
+  { name: 'studio', nummodels: 1, base: 1, modelindex: 2094884 },
+  { name: 'backpack', nummodels: 2, base: 1, modelindex: 2094996 }
+]
+
 /** Textures info */
 export const leetTexturesInfo = [
   {

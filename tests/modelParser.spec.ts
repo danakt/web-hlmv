@@ -7,7 +7,8 @@ import {
   leetAttachments,
   leetTexturesInfo,
   leetSkinRef,
-  leetSequenceGroups
+  leetSequenceGroups,
+  leetBodyParts
 } from '../mock/mock'
 import { leetBones }     from '../mock/mock-bones'
 import { leetHitBoxes }  from '../mock/mock-hitboxes'
@@ -65,6 +66,11 @@ test('should parse sequences', () => {
 test('should parse sequence groups', () => {
   const sequenceGroups = modelParser.parseSequenceGroups(header.seqgroupindex, header.numseqgroups)
   expect(sequenceGroups).toEqual(leetSequenceGroups)
+})
+
+test('should parse bodyparts', () => {
+  const bodyParts = modelParser.parseBodyParts(header.bodypartindex, header.numbodyparts)
+  expect(bodyParts).toEqual(leetBodyParts)
 })
 
 test('should parse textures', () => {

@@ -19,69 +19,41 @@ export const createModelParser = (modelBuffer: ArrayBuffer) => {
      */
     parseHeader: (): structs.Header => readStruct(dataView, structs.header),
 
-    /**
-     * Parses textures info
-     * @param texturesOffset Offset of textures info
-     * @param texturesNum Number of textures
-     */
+    /** Parses textures info */
     parseTextures: (texturesOffset: number, texturesNum: number): structs.Texture[] =>
       readStructMultiple(dataView, structs.texture, texturesOffset, texturesNum),
 
-    /**
-     * Parses skin references
-     * @param skinRefOffset Offset of skin references
-     * @param numSkinRef Number of skin references
-     */
+    /** Parses skin references */
     parseSkinRef: (skinRefOffset: number, numSkinRef: number) =>
       new Int16Array(dataView.buffer, skinRefOffset, numSkinRef),
 
-    /**
-     * Parses bones
-     * @param boneIndex Offset of start bones data
-     * @param numBones Number of bones
-     */
+    /** Parses bones */
     parseBones: (boneIndex: number, numBones: number): structs.Bone[] =>
       readStructMultiple(dataView, structs.bone, boneIndex, numBones),
 
-    /**
-     * Parses bone controllers
-     * @param boneControllerIndex Offset of start bone controllers
-     * @param numBoneControllers Number of bone controllers
-     */
+    /** Parses bone controllers */
     parseBoneControllers: (boneControllerIndex: number, numBoneControllers: number): structs.BoneController[] =>
       readStructMultiple(dataView, structs.bonecontroller, boneControllerIndex, numBoneControllers),
 
-    /**
-     * Parses attachments
-     * @param attachmentOffset Offset of attachments in buffer
-     * @param numAttachments Number of attachments
-     */
+    /** Parses attachments */
     parseAttachments: (attachmentOffset: number, numAttachments: number): structs.Attachment[] =>
       readStructMultiple(dataView, structs.attachment, attachmentOffset, numAttachments),
 
-    /**
-     * Parses bounding boxes
-     * @param bboxOffset Offset of hitboxes
-     * @param numBboxes Number of hitboxes
-     */
+    /** Parses bounding boxes */
     parseHitboxes: (bboxOffset: number, numBboxes: number): structs.BoundingBox[] =>
       readStructMultiple(dataView, structs.bbox, bboxOffset, numBboxes),
 
-    /**
-     * Parses sequences
-     * @param seqIndex Offset of sequences
-     * @param numSeq Number of sequences
-     */
+    /** Parses sequences */
     parseSequences: (seqIndex: number, numSeq: number): structs.SequenceDesc[] =>
       readStructMultiple(dataView, structs.seqdesc, seqIndex, numSeq),
 
-    /**
-     * Parses sequence groups
-     * @param seqIndex Offset of sequence groups
-     * @param numSeq Number of sequence groups
-     */
+    /** Parses sequence groups */
     parseSequenceGroups: (seqGroupIndex: number, numSeqGrops: number): structs.SequenceGroup[] =>
       readStructMultiple(dataView, structs.seqgroup, seqGroupIndex, numSeqGrops),
+
+    /** Parses body parts */
+    parseBodyParts: (bodyPartIndex: number, numBodyParts: number): structs.BodyPart[] =>
+      readStructMultiple(dataView, structs.bodypart, bodyPartIndex, numBodyParts),
 
     /**
      * Returns parsed data of the MDL file
@@ -116,6 +88,7 @@ export const createModelParser = (modelBuffer: ArrayBuffer) => {
         hitBoxes:        this.parseHitboxes(header.hitboxindex, header.numhitboxes),
         sequences:       this.parseSequences(header.seqindex, header.numseq),
         sequenceGroups:  this.parseSequenceGroups(header.seqgroupindex, header.numseqgroups),
+        bodyParts:       this.parseBodyParts(header.bodypartindex, header.numbodyparts),
 
         textures: this.parseTextures(header.textureindex, header.numtextures),
         skinRef:  this.parseSkinRef(header.skinindex, header.numskinref)
@@ -132,9 +105,9 @@ export type ModelParser = ReturnType<typeof createModelParser>
 // ["attachmentindex", 6428]
 // ["hitboxindex", 6604]
 // ["seqindex", 2072508]
-
 // ["seqgroupindex", 2094628]
 // ["bodypartindex", 2094732]
+
 // ["transitionindex", 2094732]
 // ["textureindex", 2116816]
 // ["skinindex", 2117056]

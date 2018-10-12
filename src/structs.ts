@@ -228,6 +228,19 @@ export const seqgroup = {
 export type SequenceGroup = StructResult<typeof seqgroup>
 
 /**
+ * Body part index
+ */
+export const bodypart = {
+  name:       string(64),
+  nummodels:  int,
+  base:       int,
+  /** Index into models array */
+  modelindex: int
+}
+
+export type BodyPart = StructResult<typeof bodypart>
+
+/**
  * Texture info
  */
 export const texture = {
