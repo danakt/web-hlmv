@@ -1,6 +1,6 @@
-import * as fs               from 'fs'
-import * as path             from 'path'
-import { createModelParser } from '../src/modelParser'
+import * as fs                               from 'fs'
+import * as path                             from 'path'
+import { createModelDataParser, parseModel } from '../src/modelParser'
 import {
   leetHeader,
   leetBoneControllers,
@@ -21,19 +21,16 @@ const leetBuffer: ArrayBuffer = fs.readFileSync(leetPath).buffer
 const ratamahattaPath = path.resolve(__dirname, '../mock/ratamahatta.md2')
 const ratamahattaBuffer: ArrayBuffer = fs.readFileSync(ratamahattaPath).buffer
 
-const modelParser = createModelParser(leetBuffer)
+const modelParser = createModelDataParser(leetBuffer)
 const header = modelParser.parseHeader()
 
 test('should detect wrong version of model', () => {
-  const modelParser = createModelParser(ratamahattaBuffer)
-
   expect(() => {
-    modelParser.parseModel()
+    parseModel(ratamahattaBuffer)
   }).toThrowError('Unsupported version of the MDL file')
 })
 
 test('should parse header', () => {
-  const modelParser = createModelParser(leetBuffer)
   const header = modelParser.parseHeader()
   expect(header).toEqual(leetHeader)
 })

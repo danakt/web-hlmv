@@ -1,114 +1,113 @@
 import * as structs                       from './structs'
 import { VERSION }                        from './constants'
 import { readStruct, readStructMultiple } from './binaryReader'
+// eslint-disable-next-line no-unused-vars
+import { Struct, StructResult }           from './dataTypes'
 
 /**
- * Creates API for parsing MDL file. A MDL file is a binary buffer divided in
- * two part: header and data. Information about the data and their position is
- * in the header.
+ * Creates API for parsing data of MDL file. A MDL file is a binary buffer
+ * divided in two part: header and data. Information about the data and their
+ * position is in the header
  * @param buffer The MDL-file buffer
- * @returns {ModelParser}
+ * @returns {ModelDataParser}
  */
-export const createModelParser = (modelBuffer: ArrayBuffer) => {
+export const createModelDataParser = (modelBuffer: ArrayBuffer) => {
   // Create the DataView object from buffer of a MDL file for parsing
   const dataView = new DataView(modelBuffer)
 
+  /**
+   * Creates multiple reader
+   */
+  const createMultipleParser = <T, S extends Struct<T>>(struct: S) => (
+    offsetIndex: number,
+    number: number
+  ): StructResult<S>[] => readStructMultiple(dataView, struct, offsetIndex, number)
+
   return {
-    /**
-     * Parses header of the MDL file
-     */
+    /** Parses header of the MDL file */
     parseHeader: (): structs.Header => readStruct(dataView, structs.header),
 
+    /** Parses bones */
+    parseBones: createMultipleParser(structs.bone),
+
+    /** Parses bone controllers */
+    parseBoneControllers: createMultipleParser(structs.bonecontroller),
+
+    /** Parses attachments */
+    parseAttachments: createMultipleParser(structs.attachment),
+
+    /** Parses bounding boxes */
+    parseHitboxes: createMultipleParser(structs.bbox),
+
+    /** Parses sequences */
+    parseSequences: createMultipleParser(structs.seqdesc),
+
+    /** Parses sequence groups */
+    parseSequenceGroups: createMultipleParser(structs.seqgroup),
+
+    /** Parses body parts */
+    parseBodyParts: createMultipleParser(structs.bodypart),
+
+    // TODO
+    // parseTransitions: (transitionIndex: number, numTransitions: number) =>
+    //   new Int32Array(dataView.buffer, transitionIndex, numTransitions * int32.byteLength),
+
     /** Parses textures info */
-    parseTextures: (texturesOffset: number, texturesNum: number): structs.Texture[] =>
-      readStructMultiple(dataView, structs.texture, texturesOffset, texturesNum),
+    parseTextures: createMultipleParser(structs.texture),
 
     /** Parses skin references */
     parseSkinRef: (skinRefOffset: number, numSkinRef: number) =>
-      new Int16Array(dataView.buffer, skinRefOffset, numSkinRef),
+      new Int16Array(dataView.buffer, skinRefOffset, numSkinRef)
 
-    /** Parses bones */
-    parseBones: (boneIndex: number, numBones: number): structs.Bone[] =>
-      readStructMultiple(dataView, structs.bone, boneIndex, numBones),
-
-    /** Parses bone controllers */
-    parseBoneControllers: (boneControllerIndex: number, numBoneControllers: number): structs.BoneController[] =>
-      readStructMultiple(dataView, structs.bonecontroller, boneControllerIndex, numBoneControllers),
-
-    /** Parses attachments */
-    parseAttachments: (attachmentOffset: number, numAttachments: number): structs.Attachment[] =>
-      readStructMultiple(dataView, structs.attachment, attachmentOffset, numAttachments),
-
-    /** Parses bounding boxes */
-    parseHitboxes: (bboxOffset: number, numBboxes: number): structs.BoundingBox[] =>
-      readStructMultiple(dataView, structs.bbox, bboxOffset, numBboxes),
-
-    /** Parses sequences */
-    parseSequences: (seqIndex: number, numSeq: number): structs.SequenceDesc[] =>
-      readStructMultiple(dataView, structs.seqdesc, seqIndex, numSeq),
-
-    /** Parses sequence groups */
-    parseSequenceGroups: (seqGroupIndex: number, numSeqGrops: number): structs.SequenceGroup[] =>
-      readStructMultiple(dataView, structs.seqgroup, seqGroupIndex, numSeqGrops),
-
-    /** Parses body parts */
-    parseBodyParts: (bodyPartIndex: number, numBodyParts: number): structs.BodyPart[] =>
-      readStructMultiple(dataView, structs.bodypart, bodyPartIndex, numBodyParts),
-
-    /**
-     * Returns parsed data of the MDL file
-     */
-    parseModel() {
-      // Reading header of the model
-      const header = readStruct(dataView, structs.header)
-
-      // Checking version of MDL file
-      if (header.version !== VERSION) {
-        throw new Error('Unsupported version of the MDL file')
-      }
-
-      // Checking textures of the model
-      // TODO: Handle model without textures
-      if (!header.textureindex || !header.numtextures) {
-        throw new Error('No textures in the MDL file')
-      }
-
-      // console.log(
-      //   Object.keys(header)
-      //     .filter(key => key.includes('index'))
-      //     .map(key => [key, header[key as keyof typeof header]])
-      //     .filter(entry => !!entry[1])
-      //     .sort((a, b) => (a[1] > b[1] ? 1 : -1))
-      // )
-
-      return {
-        bones:           this.parseBones(header.boneindex, header.numbones),
-        boneControllers: this.parseBoneControllers(header.bonecontrollerindex, header.numbonecontrollers),
-        attachments:     this.parseAttachments(header.attachmentindex, header.numattachments),
-        hitBoxes:        this.parseHitboxes(header.hitboxindex, header.numhitboxes),
-        sequences:       this.parseSequences(header.seqindex, header.numseq),
-        sequenceGroups:  this.parseSequenceGroups(header.seqgroupindex, header.numseqgroups),
-        bodyParts:       this.parseBodyParts(header.bodypartindex, header.numbodyparts),
-
-        textures: this.parseTextures(header.textureindex, header.numtextures),
-        skinRef:  this.parseSkinRef(header.skinindex, header.numskinref)
-      }
-    }
+    // /** Parses textures info */
+    // parseSkins: (skinOffset: number, offsetNum: number): structs.Texture[] =>
+    //   readStructMultiple(dataView, structs.texture, skinOffset, offsetNum),
   }
 }
 
-/** Parser API interface */
-export type ModelParser = ReturnType<typeof createModelParser>
+/**
+ * Parser API interface
+ */
+export type ModelDataParser = ReturnType<typeof createModelDataParser>
 
-// ["boneindex", 244]
-// ["bonecontrollerindex", 6404]
-// ["attachmentindex", 6428]
-// ["hitboxindex", 6604]
-// ["seqindex", 2072508]
-// ["seqgroupindex", 2094628]
-// ["bodypartindex", 2094732]
+/**
+ * Returns parsed data of the MDL file
+ */
+export const parseModel = (modelBuffer: ArrayBuffer) => {
+  // Create API for parsing model data
+  const parser = createModelDataParser(modelBuffer)
 
-// ["transitionindex", 2094732]
-// ["textureindex", 2116816]
-// ["skinindex", 2117056]
-// ["texturedataindex", 2117064]
+  // Reading header of the model
+  const header = parser.parseHeader()
+
+  // Checking version of MDL file
+  if (header.version !== VERSION) {
+    throw new Error('Unsupported version of the MDL file')
+  }
+
+  // Checking textures of the model
+  // TODO: Handle model without textures
+  if (!header.textureindex || !header.numtextures) {
+    throw new Error('No textures in the MDL file')
+  }
+
+  return {
+    bones:           parser.parseBones(header.boneindex, header.numbones),
+    boneControllers: parser.parseBoneControllers(header.bonecontrollerindex, header.numbonecontrollers),
+    attachments:     parser.parseAttachments(header.attachmentindex, header.numattachments),
+    hitBoxes:        parser.parseHitboxes(header.hitboxindex, header.numhitboxes),
+    sequences:       parser.parseSequences(header.seqindex, header.numseq),
+    sequenceGroups:  parser.parseSequenceGroups(header.seqgroupindex, header.numseqgroups),
+    bodyParts:       parser.parseBodyParts(header.bodypartindex, header.numbodyparts),
+    // transitions
+    textures:        parser.parseTextures(header.textureindex, header.numtextures),
+    // skins
+    skinRef:         parser.parseSkinRef(header.skinindex, header.numskinref)
+    // texturedata
+  }
+}
+
+/**
+ * Type of model parsing result
+ */
+export type ModelData = ReturnType<typeof parseModel>

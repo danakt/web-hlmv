@@ -1,9 +1,9 @@
-import * as model                         from '../../mock/leet.mdl'
-// import * as model                         from '../../mock/jpngirl01.mdl'
-import * as React                         from 'react'
-import { Controls }                       from './Controls'
-import { Canvas }                         from './Canvas'
-import { createModelParser, ModelParser } from '../modelParser'
+import * as model     from '../../mock/leet.mdl'
+// import * as model     from '../../mock/jpngirl01.mdl'
+import * as React     from 'react'
+import { Controls }   from './Controls'
+import { Canvas }     from './Canvas'
+import { parseModel } from '../modelParser'
 
 /**
  * State of the app
@@ -12,7 +12,6 @@ type State = {
   width: number
   height: number
   bgColor: number
-  modelParser: ModelParser | null
   modelBuffer: ArrayBuffer | null
 }
 
@@ -24,21 +23,18 @@ export class App extends React.Component<{}, State> {
     width:       window.innerWidth,
     height:      window.innerHeight,
     bgColor:     0x4d7f7e,
-    modelBuffer: null,
-    modelParser: null
+    modelBuffer: null
   }
 
   public async componentDidMount() {
     const resp = await fetch(model)
     const modelBuffer = await resp.arrayBuffer()
-    const modelParser = createModelParser(modelBuffer)
 
     this.setState({
-      modelBuffer,
-      modelParser
+      modelBuffer
     })
 
-    console.log(modelParser.parseModel())
+    console.log(parseModel(modelBuffer))
   }
 
   public render() {
