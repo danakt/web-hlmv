@@ -68,6 +68,14 @@ export const createModelParser = (modelBuffer: ArrayBuffer) => {
       readStructMultiple(dataView, structs.bbox, bboxOffset, numBboxes),
 
     /**
+     * Parses sequences
+     * @param seqIndex Offset of sequences
+     * @param numSeq Number of sequences
+     */
+    parseSequences: (seqIndex: number, numSeq: number): structs.SequenceDesc[] =>
+      readStructMultiple(dataView, structs.seqdesc, seqIndex, numSeq),
+
+    /**
      * Returns parsed data of the MDL file
      */
     parseModel() {
@@ -98,6 +106,7 @@ export const createModelParser = (modelBuffer: ArrayBuffer) => {
         boneControllers: this.parseBoneControllers(header.bonecontrollerindex, header.numbonecontrollers),
         attachments:     this.parseAttachments(header.attachmentindex, header.numattachments),
         hitBoxes:        this.parseHitboxes(header.hitboxindex, header.numhitboxes),
+        sequences:       this.parseSequences(header.seqindex, header.numseq),
 
         textures: this.parseTextures(header.textureindex, header.numtextures),
         skinRef:  this.parseSkinRef(header.skinindex, header.numskinref)
@@ -112,8 +121,8 @@ export type ModelParser = ReturnType<typeof createModelParser>
 // ["boneindex", 244]
 // ["bonecontrollerindex", 6404]
 // ["attachmentindex", 6428]
-
 // ["hitboxindex", 6604]
+
 // ["seqindex", 2072508]
 // ["seqgroupindex", 2094628]
 // ["bodypartindex", 2094732]

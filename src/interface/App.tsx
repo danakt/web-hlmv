@@ -1,5 +1,5 @@
-import * as model                         from '../../models/leet.mdl'
-// import * as model                         from '../../models/jpngirl01.mdl'
+import * as model                         from '../../mock/leet.mdl'
+// import * as model                         from '../../mock/jpngirl01.mdl'
 import * as React                         from 'react'
 import { Controls }                       from './Controls'
 import { Canvas }                         from './Canvas'

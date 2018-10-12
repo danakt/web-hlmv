@@ -3,10 +3,10 @@ import * as path                          from 'path'
 import * as structs                       from '../src/structs'
 import { readStruct, readStructMultiple } from '../src/BinaryReader'
 import { getPerformance }                 from './tools'
-import { leetHeder, leetTexturesInfo }    from './mock'
+import { leetHeder, leetTexturesInfo }    from '../mock/mock'
 
 // Loading model for testing
-const leetPath = path.resolve(__dirname, '../models/leet.mdl')
+const leetPath = path.resolve(__dirname, '../mock/leet.mdl')
 const leetBuffer: ArrayBuffer = fs.readFileSync(leetPath).buffer
 
 test('parsing some struct in binary file', () => {

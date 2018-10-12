@@ -1,5 +1,5 @@
-import { StructResult, int, float32, string, array, uint32, vec3 } from './dataTypes'
-import { MAX_PER_BONE_CONTROLLERS }                                from './constants'
+import { StructResult, int, float, string, array, vec3 } from './dataTypes'
+import { MAX_PER_BONE_CONTROLLERS }                      from './constants'
 
 /**
  * Head of mdl-file
@@ -29,6 +29,7 @@ export const header = {
    * 0, 30, and 31 are set. Set model flags section for more information
    */
   flags:       int,
+
   // After this point, the header contains many references to offsets
   // within the MDL file and the number of items at those offsets.
   // Offsets are from the very beginning of the file.
@@ -97,9 +98,9 @@ export const bone = {
   /** Bone controller index, -1 == none */
   bonecontroller: array(MAX_PER_BONE_CONTROLLERS, int),
   /** Default DoF values */
-  value:          array(MAX_PER_BONE_CONTROLLERS, float32),
+  value:          array(MAX_PER_BONE_CONTROLLERS, float),
   /** Scale for delta DoF values */
-  scale:          array(MAX_PER_BONE_CONTROLLERS, float32)
+  scale:          array(MAX_PER_BONE_CONTROLLERS, float)
 }
 
 export type Bone = StructResult<typeof bone>
@@ -110,8 +111,8 @@ export type Bone = StructResult<typeof bone>
 export const bonecontroller = {
   bone:  int,
   type:  int,
-  start: float32,
-  end:   float32,
+  start: float,
+  end:   float,
   rest:  int,
   index: int
 }
@@ -147,19 +148,83 @@ export const bbox = {
 export type BoundingBox = StructResult<typeof bbox>
 
 /**
+ * Sequence description
+ */
+export const seqdesc = {
+  /** Sequence label */
+  label: string(32),
+
+  /** Frames per second */
+  fps:   float,
+  /** Looping/non-looping flags */
+  flags: int,
+
+  activity:  int,
+  actweight: int,
+
+  numevents:  int,
+  eventindex: int,
+
+  /** Number of frames per sequence */
+  numframes: int,
+
+  /** Number of foot pivots */
+  numpivots:  int,
+  pivotindex: int,
+
+  motiontype:         int,
+  motionbone:         int,
+  linearmovement:     vec3,
+  automoveposindex:   int,
+  automoveangleindex: int,
+
+  /** Per sequence bounding box */
+  bbmin: vec3,
+  bbmax: vec3,
+
+  numblends: int,
+  /** "anim" pointer relative to start of sequence group data */
+  animindex: int,
+
+  // [blend][bone][X, Y, Z, XR, YR, ZR]
+  /** X, Y, Z, XR, YR, ZR */
+  blendtype:   array(2, int),
+  /** Starting value */
+  blendstart:  array(2, float),
+  /** Ending value */
+  blendend:    array(2, float),
+  blendparent: int,
+
+  /** Sequence group for demand loading */
+  seqgroup: int,
+
+  /** Transition node at entry */
+  entrynode: int,
+  /** Transition node at exit */
+  exitnode:  int,
+  /** Transition rules */
+  nodeflags: int,
+
+  /** Auto advancing sequences */
+  nextseq: int
+}
+
+export type SequenceDesc = StructResult<typeof seqdesc>
+
+/**
  * Texture info
  */
 export const texture = {
   /** Texture name */
   name:   string(64),
   /** Flags */
-  flags:  uint32,
+  flags:  int,
   /** Texture width */
-  width:  uint32,
+  width:  int,
   /** Texture height */
-  height: uint32,
+  height: int,
   /** Texture data offset */
-  index:  uint32
+  index:  int
 }
 
 export type Texture = StructResult<typeof texture>
