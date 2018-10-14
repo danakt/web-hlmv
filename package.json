@@ -23,7 +23,11 @@
     "testMatch": [
       "**/tests/*.spec.+(ts|tsx|js)"
     ],
-    "collectCoverage": true
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "lib/**",
+      "ui/**"
+    ]
   },
   "devDependencies": {
     "@types/core-decorators": "^0.20.0",
