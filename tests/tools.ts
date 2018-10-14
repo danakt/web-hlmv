@@ -8,3 +8,10 @@ export const getPerformance = (func: (...args: any[]) => any) => {
   func()
   return performance.now() - now
 }
+
+/**
+ * ImageData class for running tests in node.js
+ */
+export class MockImageData {
+  constructor(public data: Uint8ClampedArray, public width: number, public height: number) {}
+}

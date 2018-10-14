@@ -1,7 +1,7 @@
 import * as fs                            from 'fs'
 import * as path                          from 'path'
-import * as structs                       from '../src/structs'
-import { readStruct, readStructMultiple } from '../src/BinaryReader'
+import * as structs                       from '../const/structs'
+import { readStruct, readStructMultiple } from '../lib/BinaryReader'
 import { getPerformance }                 from './tools'
 import { leetData }                       from '../mock'
 

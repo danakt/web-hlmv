@@ -1,9 +1,9 @@
-import * as model      from '../../models/leet.mdl'
-// import * as model      from '../../models/jpngirl01.mdl'
+import * as model      from '../models/leet.mdl'
+// import * as model      from '../models/jpngirl01.mdl'
 import * as React      from 'react'
 import { Controls }    from './Controls'
 import { Canvas }      from './Canvas'
-import { renderModel } from '../modelRenderer'
+import { renderModel } from '../lib/modelRenderer'
 
 /**
  * State of the app

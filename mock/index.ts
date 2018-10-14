@@ -1,4 +1,4 @@
-import { ModelData }     from '../src/modelParser'
+import { ModelData }     from '../lib/modelParser'
 import { leetBones }     from './bones'
 import { leetHitBoxes }  from './hitboxes'
 import { leetSequences } from './seq'

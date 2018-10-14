@@ -1,6 +1,6 @@
 import { ModelData, parseModel } from './modelParser'
-import { Texture }               from './structs'
-import * as constants            from './constants'
+import { Texture }               from '../const/structs'
+import * as constants            from '../const/constants'
 
 /**
  * Build image data from buffer
@@ -65,9 +65,9 @@ export const buildTexture = (buffer: ArrayBuffer, texture: Texture): ImageData =
 export const renderModel = (modelBuffer: ArrayBuffer) => {
   const modelData: ModelData = parseModel(modelBuffer)
 
-  for (const texture of modelData.textures) {
-    console.log(buildTexture(modelBuffer, texture))
-  }
+  // for (const texture of modelData.textures) {
+  //   console.log(buildTexture(modelBuffer, texture))
+  // }
 
   return modelData // temp
 }

@@ -1,4 +1,4 @@
-import { StructResult, int, float, string, array, vec3 } from './dataTypes'
+import { StructResult, int, float, string, array, vec3 } from '../lib/dataTypes'
 import { MAX_PER_BONE_CONTROLLERS }                      from './constants'
 
 /**

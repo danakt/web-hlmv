@@ -1,5 +1,5 @@
-import * as structs                       from './structs'
-import { VERSION }                        from './constants'
+import * as structs                       from '../const/structs'
+import { VERSION }                        from '../const/constants'
 import { readStruct, readStructMultiple } from './binaryReader'
 // eslint-disable-next-line no-unused-vars
 import { Struct, StructResult }           from './dataTypes'

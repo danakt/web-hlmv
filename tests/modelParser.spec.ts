@@ -1,6 +1,6 @@
 import * as fs                                          from 'fs'
 import * as path                                        from 'path'
-import { createModelDataParser, parseModel, ModelData } from '../src/modelParser'
+import { createModelDataParser, parseModel, ModelData } from '../lib/modelParser'
 import { leetData }                                     from '../mock'
 
 // Loading model for testing
