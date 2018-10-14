@@ -1,9 +1,13 @@
-import * as fs           from 'fs'
-import * as path         from 'path'
-import * as png          from 'fast-png'
-import { parseModel }    from '../lib/modelParser'
-import { buildTexture }  from '../lib/modelRenderer'
-import { MockImageData } from './tools'
+import * as fs                  from 'fs'
+import * as path                from 'path'
+import * as png                 from 'fast-png'
+import { parseModel }           from '../lib/modelParser'
+import { buildTexture }         from '../lib/modelRenderer'
+import { MockImageData }        from './tools'
+import { toMatchImageSnapshot } from 'jest-image-snapshot'
+
+// Extending jest's expect
+expect.extend({ toMatchImageSnapshot })
 
 // Mock of ImageData
 Object.defineProperty(global, 'ImageData', { value: MockImageData })
@@ -13,16 +17,24 @@ const leetBuffer: ArrayBuffer = fs.readFileSync(leetPath).buffer
 const modelData = parseModel(leetBuffer)
 
 describe('test building functions', () => {
-  test('just building texture without errors', () => {
-    const texture = modelData.textures[0]
-    buildTexture(leetBuffer, texture)
-  })
+  describe('test textures building', () => {
+    test('just building texture without errors', () => {
+      const texture = modelData.textures[0]
+      buildTexture(leetBuffer, texture)
+    })
 
-  test('building valid texture', () => {
-    const texture = modelData.textures[0]
-    const buildedSkin = png.encode(buildTexture(leetBuffer, texture))
-    const leetSkin = fs.readFileSync('./mock/skin.png')
+    test('should build valid skin texture', () => {
+      const texture = modelData.textures[0]
+      const buildedSkin: Uint8Array = png.encode(buildTexture(leetBuffer, texture))
 
-    expect(buildedSkin).toEqual(Uint8Array.from(leetSkin))
+      expect(Buffer.from(buildedSkin)).toMatchImageSnapshot()
+    })
+
+    test('should build valid backpack texture', () => {
+      const texture = modelData.textures[2]
+      const buildedSkin: Uint8Array = png.encode(buildTexture(leetBuffer, texture))
+
+      expect(Buffer.from(buildedSkin)).toMatchImageSnapshot()
+    })
   })
 })
