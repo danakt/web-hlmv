@@ -1,13 +1,14 @@
+import * as THREE                from 'three'
 import { ModelData, parseModel } from './modelParser'
-import { Texture }               from '../const/structs'
 import * as constants            from '../const/constants'
+import * as structs              from '../const/structs'
 
 /**
  * Build image data from buffer
  * @param buffer The model buffer
  * @param texture Texture description
  */
-export const buildTexture = (buffer: ArrayBuffer, texture: Texture): ImageData => {
+export const buildTexture = (buffer: ArrayBuffer, texture: structs.Texture): ImageData => {
   const textureArea: number = texture.width * texture.height
   const isTextureMasked: number = texture.flags & constants.NF_MASKED
 
@@ -25,7 +26,7 @@ export const buildTexture = (buffer: ArrayBuffer, texture: Texture): ImageData =
   // Create new image buffer
   const imageBuffer = new Uint8ClampedArray(textureArea * constants.RGBA_SIZE)
 
-  // Parsing indexed color. Every item in texture data is index of color in
+  // Parsing indexed color: every item in texture data is index of color in
   // colors palette
   for (let i = 0; i < textureData.length; i++) {
     const item = textureData[i]
@@ -59,15 +60,40 @@ export const buildTexture = (buffer: ArrayBuffer, texture: Texture): ImageData =
 }
 
 /**
+ * Creates model skeleton
+ * @param bonesData Bones data
+ */
+export const createSkeleton = (bonesData: structs.Bone[]): THREE.Skeleton => {
+  const bones: THREE.Bone[] = []
+
+  for (let i = 0; i < bonesData.length; i++) {
+    const bone = new THREE.Bone()
+    bone.position.x = bonesData[i].value[0]
+    bone.position.y = bonesData[i].value[1]
+    bone.position.z = bonesData[i].value[2]
+
+    // bone.scale.x = bonesData[i].scale[0]
+    // bone.scale.y = bonesData[i].scale[1]
+    // bone.scale.z = bonesData[i].scale[2]
+
+    if (bonesData[i].parent > -1) {
+      bones[bonesData[i].parent].add(bone)
+    }
+
+    bones[i] = bone
+  }
+
+  return new THREE.Skeleton(bones)
+}
+
+/**
  * Creates THREE.js object for render on the page
  * @param modelBuffer Source buffer of MDL file
  */
 export const renderModel = (modelBuffer: ArrayBuffer) => {
   const modelData: ModelData = parseModel(modelBuffer)
 
-  // for (const texture of modelData.textures) {
-  //   console.log(buildTexture(modelBuffer, texture))
-  // }
+  createSkeleton(modelData.bones)
 
   return modelData // temp
 }
