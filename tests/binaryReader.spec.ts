@@ -1,9 +1,9 @@
 import * as fs                            from 'fs'
 import * as path                          from 'path'
+import { leetData }                       from './__mock__'
 import * as structs                       from '../const/structs'
 import { readStruct, readStructMultiple } from '../lib/BinaryReader'
 import { getPerformance }                 from './tools'
-import { leetData }                       from '../mock'
 
 // Loading model for testing
 const leetPath = path.resolve(__dirname, '../models/leet.mdl')

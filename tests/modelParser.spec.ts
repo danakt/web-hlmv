@@ -1,7 +1,7 @@
 import * as fs                                          from 'fs'
 import * as path                                        from 'path'
 import { createModelDataParser, parseModel, ModelData } from '../lib/modelParser'
-import { leetData }                                     from '../mock'
+import { leetData }                                     from './__mock__'
 
 // Loading model for testing
 const leetPath = path.resolve(__dirname, '../models/leet.mdl')
