@@ -1,6 +1,3 @@
-/** Allowing import MDL-files */
-declare module '*.mdl'
-
 /** Type of typed array instance */
 declare type TypedArray
   = | Int8Array

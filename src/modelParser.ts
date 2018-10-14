@@ -92,6 +92,7 @@ export const parseModel = (modelBuffer: ArrayBuffer) => {
   }
 
   return {
+    header,
     bones:           parser.parseBones(header.boneindex, header.numbones),
     boneControllers: parser.parseBoneControllers(header.bonecontrollerindex, header.numbonecontrollers),
     attachments:     parser.parseAttachments(header.attachmentindex, header.numattachments),

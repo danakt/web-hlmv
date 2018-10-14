@@ -21,6 +21,7 @@
       "error",
       { "exceptions": { "ImportDeclaration": true } }
     ],
-    "no-dupe-class-members": "off"
+    "no-dupe-class-members": "off",
+    "no-useless-constructor": "off"
   }
 }
