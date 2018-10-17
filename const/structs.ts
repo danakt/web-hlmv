@@ -257,3 +257,51 @@ export const texture = {
 }
 
 export type Texture = StructResult<typeof texture>
+
+/**
+ * Sub models
+ */
+export const subModel = {
+  name: string(64),
+
+  type: int,
+
+  boundingradius: float,
+
+  nummesh:   int,
+  meshindex: int,
+
+  /** Number of unique vertices */
+  numverts:      int,
+  /** Vertex bone info */
+  vertinfoindex: int,
+  /** Vertex vec3 */
+  vertindex:     int,
+  /** Number of unique surface normals */
+  numnorms:      int,
+  /** Normal bone info */
+  norminfoindex: int,
+  /** Normal vec3 */
+  normindex:     int,
+
+  /** Deformation groups */
+  numgroups:  int,
+  groupindex: int
+}
+
+export type SubModel = StructResult<typeof subModel>
+
+/**
+ * Mesh info
+ */
+export const mesh = {
+  numtris:   int,
+  triindex:  int,
+  skinref:   int,
+  /** Per mesh normals */
+  numnorms:  int,
+  /** Normal vec3_t */
+  normindex: int
+}
+
+export type Mesh = StructResult<typeof mesh>

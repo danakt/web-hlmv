@@ -1,12 +1,13 @@
-import { ModelData }     from '../lib/modelParser'
+import { ModelData }     from '../../lib/modelParser'
 import { leetBones }     from './bones'
 import { leetHitBoxes }  from './hitboxes'
 import { leetSequences } from './seq'
+import { subModels }     from './subModels'
 
 /**
  * This file contains mock data of "leet.mdl"
  */
-export const leetData: ModelData = {
+export const leetData: Partial<ModelData> = {
   header: {
     id:                  1414743113,
     version:             10,
@@ -109,5 +110,6 @@ export const leetData: ModelData = {
       width:  128
     }
   ],
-  skinRef: new Int16Array([0, 1, 2])
+  skinRef: new Int16Array([0, 1, 2]),
+  subModels
 }

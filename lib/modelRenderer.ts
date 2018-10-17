@@ -4,6 +4,16 @@ import * as constants            from '../const/constants'
 import * as structs              from '../const/structs'
 
 /**
+ * Type of description of face vertices
+ */
+type VertexDesc = {
+  origin: THREE.Vector3
+  light: number
+  uv: THREE.Vector2 // Coordinates of UV-mapping
+  index: number
+}
+
+/**
  * Build image data from buffer
  * @param buffer The model buffer
  * @param texture Texture description
@@ -87,11 +97,112 @@ export const createSkeleton = (bonesData: structs.Bone[]): THREE.Skeleton => {
 }
 
 /**
+ * Returns face vertices of the mesh
+ */
+export const getFaceVertices = (trisBuffer: Int16Array, vertices: Float32Array, texture: ImageData): VertexDesc[] => {
+  // List of vertices of faces
+  const faceVertices: VertexDesc[] = []
+
+  // Position in mesh triangles buffer
+  let i = 0
+
+  while (trisBuffer[i]) {
+    const isTriangleStrip: boolean = trisBuffer[i] >= 0
+    const isTriangleFan: boolean = trisBuffer[i] < 0
+
+    let startVert = null
+    let stripCount = 0
+    let len = 0
+
+    // Number of following triangles
+    const trisNum = Math.abs(trisBuffer[i])
+
+    // This index is no longer needed,
+    // we proceed to the following
+    i++
+
+    for (let j = trisNum; j > 0; j--, i += 4) {
+      const vertIndex: number = trisBuffer[i]
+      const vert: number = trisBuffer[i] * 3
+      const light: number = trisBuffer[i + 1] // ?
+
+      // Vertex coordinate
+      const vertOrigin = new THREE.Vector3(vertices[vert + 0], vertices[vert + 1], vertices[vert + 2])
+
+      // Vertex x and y coordinates on texture (from 0.0 to 1.0)
+      const uv = new THREE.Vector2(trisBuffer[i + 2] / texture.width, 1 - trisBuffer[i + 3] / texture.height)
+
+      const vertProps: VertexDesc = {
+        index:  vertIndex,
+        origin: vertOrigin,
+        light,
+        uv
+      }
+
+      // Triangle strip. Draw the associated group of triangles.
+      // Each next vertex, beginning with the third, forms a triangle with the last and the penultimate vertex.
+      //       2 ________4 ________ 6
+      //       ╱╲        ╱╲        ╱╲
+      //     ╱    ╲    ╱    ╲    ╱    ╲
+      //   ╱________╲╱________╲╱________╲
+      // 1          3         5          7
+      if (isTriangleStrip) {
+        if (len > 2) {
+          stripCount++
+
+          if (stripCount % 2 === 0) {
+            // even
+            faceVertices.push(
+              faceVertices[faceVertices.length - 3], // previously first one
+              faceVertices[faceVertices.length - 1] // last one
+            )
+          } else {
+            // odd
+            faceVertices.push(
+              faceVertices[faceVertices.length - 1], // last one
+              faceVertices[faceVertices.length - 2] // second to last
+            )
+          }
+
+          faceVertices.push(vertProps) // new one
+        } else {
+          faceVertices.push(vertProps)
+          len += 1
+        }
+      }
+
+      // Triangle fan. Draw a connected fan-shaped group of triangles.
+      // Each next vertex, beginning with the third, forms a triangle with the last and first vertex.
+      //       3 ____4 ____ 5
+      //       ╱╲    |    ╱╲
+      //     ╱    ╲  |  ╱    ╲
+      //   ╱________╲|╱________╲
+      // 2          1            6
+      if (isTriangleFan) {
+        if (!startVert) {
+          startVert = vertProps
+        }
+
+        if (len > 2) {
+          faceVertices.push(startVert, faceVertices[faceVertices.length - 1])
+        }
+
+        faceVertices.push(vertProps)
+        len += 1
+      }
+    }
+  }
+
+  return faceVertices
+}
+
+/**
  * Creates THREE.js object for render on the page
  * @param modelBuffer Source buffer of MDL file
  */
 export const renderModel = (modelBuffer: ArrayBuffer) => {
   const modelData: ModelData = parseModel(modelBuffer)
+  console.log(modelData)
 
   createSkeleton(modelData.bones)
 
