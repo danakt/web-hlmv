@@ -1,21 +1,7 @@
 import * as fs           from 'fs'
 import * as path         from 'path'
 import * as FastDataView from 'fast-dataview'
-import {
-  parseModel,
-  // ModelData,
-  parseHeader,
-  parseBones,
-  parseBoneControllers,
-  parseAttachments,
-  parseHitboxes,
-  parseSequences,
-  parseSequenceGroups,
-  parseBodyParts,
-  parseTextures,
-  parseSkinRef
-} from '../lib/modelParser'
-import { leetData } from './__mock__'
+import * as ModelParser  from '../lib/modelParser'
 
 // Loading model for testing
 const leetPath = path.resolve(__dirname, '../models/leet.mdl')
@@ -25,76 +11,89 @@ const ratamahattaPath = path.resolve(__dirname, '../models/ratamahatta.md2')
 const ratamahattaBuffer: ArrayBuffer = fs.readFileSync(ratamahattaPath).buffer
 
 const dataView = new FastDataView(leetBuffer)
-const header = parseHeader(dataView)
+const header = ModelParser.parseHeader(dataView)
 
 describe('parsing model parts', () => {
   test('should parse header', () => {
-    const header = parseHeader(dataView)
-    expect(header).toEqual(leetData.header)
+    const header = ModelParser.parseHeader(dataView)
+    expect(header).toMatchSnapshot('leet header')
   })
 
   test('should parse bones', () => {
-    const bones = parseBones(dataView, header.boneindex, header.numbones)
-    expect(bones).toEqual(leetData.bones)
+    const bones = ModelParser.parseBones(dataView, header.boneindex, header.numbones)
+    expect(bones).toMatchSnapshot('leet bones')
   })
 
   test('should parse bone controllers', () => {
-    const boneControllers = parseBoneControllers(dataView, header.bonecontrollerindex, header.numbonecontrollers)
-    expect(boneControllers).toEqual(leetData.boneControllers)
+    const boneControllers = ModelParser.parseBoneControllers(
+      dataView,
+      header.bonecontrollerindex,
+      header.numbonecontrollers
+    )
+    expect(boneControllers).toMatchSnapshot('leet bone controllers')
   })
 
   test('should parse attachments', () => {
-    const attachments = parseAttachments(dataView, header.attachmentindex, header.numattachments)
-    expect(attachments).toEqual(leetData.attachments)
+    const attachments = ModelParser.parseAttachments(dataView, header.attachmentindex, header.numattachments)
+    expect(attachments).toMatchSnapshot('leet attachments')
   })
 
   test('should parse hitboxes', () => {
-    const hitBoxes = parseHitboxes(dataView, header.hitboxindex, header.numhitboxes)
-    expect(hitBoxes).toEqual(leetData.hitBoxes)
+    const hitBoxes = ModelParser.parseHitboxes(dataView, header.hitboxindex, header.numhitboxes)
+    expect(hitBoxes).toMatchSnapshot('leet hitboxes')
   })
 
   test('should parse sequences', () => {
-    const sequences = parseSequences(dataView, header.seqindex, header.numseq)
-    expect(sequences).toEqual(leetData.sequences)
+    const sequences = ModelParser.parseSequences(dataView, header.seqindex, header.numseq)
+    expect(sequences).toMatchSnapshot('leet sequences')
   })
 
   test('should parse sequence groups', () => {
-    const sequenceGroups = parseSequenceGroups(dataView, header.seqgroupindex, header.numseqgroups)
-    expect(sequenceGroups).toEqual(leetData.sequenceGroups)
+    const sequenceGroups = ModelParser.parseSequenceGroups(dataView, header.seqgroupindex, header.numseqgroups)
+    expect(sequenceGroups).toMatchSnapshot('leet sequence groups')
   })
 
   test('should parse bodyparts', () => {
-    const bodyParts = parseBodyParts(dataView, header.bodypartindex, header.numbodyparts)
-    expect(bodyParts).toEqual(leetData.bodyParts)
+    const bodyParts = ModelParser.parseBodyParts(dataView, header.bodypartindex, header.numbodyparts)
+    expect(bodyParts).toMatchSnapshot('leet body parts')
   })
 
   test('should parse textures', () => {
-    const textures = parseTextures(dataView, header.textureindex, header.numtextures)
-    expect(textures).toEqual(leetData.textures)
+    const textures = ModelParser.parseTextures(dataView, header.textureindex, header.numtextures)
+    expect(textures).toMatchSnapshot('leet textures info')
   })
 
   test('should parse skin references', () => {
-    const skinRef = parseSkinRef(dataView, header.skinindex, header.numskinref)
-    expect(skinRef).toEqual(leetData.skinRef)
+    const skinRef = ModelParser.parseSkinRef(dataView, header.skinindex, header.numskinref)
+    expect(skinRef).toMatchSnapshot('leet skin references')
+  })
+
+  test('should parse animation values', () => {
+    const sequences = ModelParser.parseSequences(dataView, header.seqindex, header.numseq)
+    const animations = ModelParser.parseAnimations(dataView, sequences, header.numbones)
+
+    const animValues = ModelParser.parseAnimValues(dataView, sequences, animations, header.numbones)
+    const slicedAnimValues = (animValues.array as Int16Array).slice(10000, 11000)
+
+    expect(slicedAnimValues).toMatchSnapshot('leet animation values from 10 000 to 11 000')
   })
 })
 
 describe('parsing whole model', () => {
   test('just parsing without errors', () => {
     expect(() => {
-      parseModel(leetBuffer)
+      ModelParser.parseModel(leetBuffer)
     }).not.toThrowError()
   })
 
-  //   test('equaling parsed data with valid data', () => {
-  //     const modelData: ModelData = parseModel(leetBuffer)
-
-  //     expect(modelData).toEqual(leetData)
-  //   })
+  xtest('equaling parsed data with valid data', () => {
+    const modelData: ModelParser.ModelData = ModelParser.parseModel(leetBuffer)
+    // expect(modelData).toEqual(leetData)
+  })
 
   test('should detect invalid version of model', () => {
     expect(() => {
-      parseModel(ratamahattaBuffer)
+      ModelParser.parseModel(ratamahattaBuffer)
     }).toThrowError('Unsupported version of the MDL file')
   })
 })
