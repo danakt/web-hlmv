@@ -73,9 +73,9 @@ describe('parsing model parts', () => {
     const animations = ModelParser.parseAnimations(dataView, sequences, header.numbones)
 
     const animValues = ModelParser.parseAnimValues(dataView, sequences, animations, header.numbones)
-    const slicedAnimValues = (animValues.array as Int16Array).slice(10000, 11000)
+    const slicedAnimValues = (animValues.array as Int16Array).slice(0, 1000)
 
-    expect(slicedAnimValues).toMatchSnapshot('leet animation values from 10 000 to 11 000')
+    expect(slicedAnimValues).toMatchSnapshot('leet animation values from 0 to 1000')
   })
 })
 
@@ -87,7 +87,7 @@ describe('parsing whole model', () => {
   })
 
   xtest('equaling parsed data with valid data', () => {
-    const modelData: ModelParser.ModelData = ModelParser.parseModel(leetBuffer)
+    // const modelData: ModelParser.ModelData = ModelParser.parseModel(leetBuffer)
     // expect(modelData).toEqual(leetData)
   })
 
