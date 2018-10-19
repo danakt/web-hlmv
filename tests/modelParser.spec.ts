@@ -68,18 +68,27 @@ describe('parsing model parts', () => {
     expect(skinRef).toMatchSnapshot('leet skin references')
   })
 
+  test('should parse animations', () => {
+    const sequences = ModelParser.parseSequences(dataView, header.seqindex, header.numseq)
+    const animations = ModelParser.parseAnimations(dataView, sequences, header.numbones)
+
+    expect(animations).toMatchSnapshot('leet animation')
+  })
+
   test('should parse animation values', () => {
     const sequences = ModelParser.parseSequences(dataView, header.seqindex, header.numseq)
     const animations = ModelParser.parseAnimations(dataView, sequences, header.numbones)
 
     const animValues = ModelParser.parseAnimValues(dataView, sequences, animations, header.numbones)
-    const slicedAnimValues = (animValues.array as Int16Array).slice(0, 1000)
+    const slicedAnimValues1 = (animValues.array as Int16Array).slice(0, 1000)
+    const slicedAnimValues2 = (animValues.array as Int16Array).slice(10000, 11000)
 
-    expect(slicedAnimValues).toMatchSnapshot('leet animation values from 0 to 1000')
+    expect(slicedAnimValues1).toMatchSnapshot('leet animation values from 0 to 1000')
+    expect(slicedAnimValues2).toMatchSnapshot('leet animation values from 10 000 to 11 000')
   })
 })
 
-describe('parsing whole model', () => {
+xdescribe('parsing whole model', () => {
   test('just parsing without errors', () => {
     expect(() => {
       ModelParser.parseModel(leetBuffer)
