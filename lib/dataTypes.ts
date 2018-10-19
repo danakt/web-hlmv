@@ -49,6 +49,13 @@ export const int8: DataType<number, Int8Array> = {
 }
 
 /**
+ * Alias for int8. Creates reader of the Int8 value at the specified byte
+ * offset from the start of the DataView object. It has a minimum value of
+ * -128 and a maximum value of 127 (inclusive).
+ */
+export const byte = int8
+
+/**
  * Creates reader of the Uint8 value at the specified byte offset from the
  * start of the DataView object. It has a minimum value of 0 and a
  * maximum value of 255 (inclusive).
@@ -58,6 +65,13 @@ export const uint8: DataType<number, Uint8Array> = {
   getValue:         (dataView, offset) => dataView.getUint8(offset),
   arrayConstructor: Uint8Array
 }
+
+/**
+ * Alias for uint8. Creates reader of the Uint8 value at the specified byte
+ * offset from the start of the DataView object. It has a minimum value of 0
+ * and a maximum value of 255 (inclusive).
+ */
+export const ubyte = uint8
 
 /**
  * Creates reader of the Int16 value at the specified byte offset from the
@@ -71,6 +85,13 @@ export const int16: DataType<number, Int16Array> = {
 }
 
 /**
+ * Alias for uint16. Creates reader of the Int16 value at the specified byte
+ * offset from the start of the DataView object. It has a minimum value of
+ * -32 768 and a maximum value of 32 767 (inclusive).
+ */
+export const short = int16
+
+/**
  * Creates reader of the Uint16 value at the specified byte offset from the
  * start of the DataView object.
  */
@@ -79,6 +100,12 @@ export const uint16: DataType<number, Int16Array> = {
   getValue:         (dataView, offset) => dataView.getUint16(offset, true),
   arrayConstructor: Int16Array
 }
+
+/**
+ * Alias for uint16. Creates reader of the Uint16 value at the specified byte
+ * offset from the start of the DataView object.
+ */
+export const ushort = uint16
 
 /**
  * Creates reader of the Int32 value at the specified byte offset from the
