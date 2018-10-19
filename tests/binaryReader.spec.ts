@@ -1,6 +1,5 @@
 import * as fs                            from 'fs'
 import * as path                          from 'path'
-import { leetData }                       from './__mock__'
 import * as structs                       from '../const/structs'
 import { readStruct, readStructMultiple } from '../lib/BinaryReader'
 import { getPerformance }                 from './tools'
@@ -13,7 +12,7 @@ const leetBuffer: ArrayBuffer = fs.readFileSync(leetPath).buffer
 test('parsing some struct in binary file', () => {
   const dataView = new FastDataView(leetBuffer)
   const header = readStruct(dataView, structs.header)
-  expect(header).toEqual(leetData.header)
+  expect(header).toMatchSnapshot('leet header')
 })
 
 test('parsing multiple structs in binary file', () => {
@@ -21,7 +20,7 @@ test('parsing multiple structs in binary file', () => {
   const header = readStruct(dataView, structs.header)
   const texturesInfo = readStructMultiple(dataView, structs.texture, header.textureindex, header.numtextures)
 
-  expect(texturesInfo).toEqual(leetData.textures)
+  expect(texturesInfo).toMatchSnapshot('leet texture info')
 })
 
 test('speed test', () => {

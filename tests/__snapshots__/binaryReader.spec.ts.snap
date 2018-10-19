@@ -1,0 +1,88 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`parsing multiple structs in binary file: leet texture info 1`] = `
+Array [
+  Object {
+    "flags": 0,
+    "height": 512,
+    "index": 2117064,
+    "name": "Arab_dmbase1.bmp",
+    "width": 512,
+  },
+  Object {
+    "flags": 3,
+    "height": 64,
+    "index": 2379976,
+    "name": "Chrome3.bmp",
+    "width": 64,
+  },
+  Object {
+    "flags": 0,
+    "height": 128,
+    "index": 2384840,
+    "name": "Backpack1.BMP",
+    "width": 128,
+  },
+]
+`;
+
+exports[`parsing some struct in binary file: leet header 1`] = `
+Object {
+  "attachmentindex": 6428,
+  "bbmax": Float32Array [
+    0,
+    0,
+    0,
+  ],
+  "bbmin": Float32Array [
+    0,
+    0,
+    0,
+  ],
+  "bodypartindex": 2094732,
+  "bonecontrollerindex": 6404,
+  "boneindex": 244,
+  "eyeposition": Float32Array [
+    0,
+    0,
+    0,
+  ],
+  "flags": 0,
+  "hitboxindex": 6604,
+  "id": 1414743113,
+  "length": 2401992,
+  "max": Float32Array [
+    0,
+    0,
+    0,
+  ],
+  "min": Float32Array [
+    0,
+    0,
+    0,
+  ],
+  "name": "leet\\\\leet.mdl",
+  "numattachments": 2,
+  "numbodyparts": 2,
+  "numbonecontrollers": 1,
+  "numbones": 55,
+  "numhitboxes": 21,
+  "numseq": 111,
+  "numseqgroups": 1,
+  "numskinfamilies": 1,
+  "numskinref": 3,
+  "numtextures": 3,
+  "numtransitions": 0,
+  "seqgroupindex": 2094628,
+  "seqindex": 2072508,
+  "skinindex": 2117056,
+  "soundgroupindex": 0,
+  "soundgroups": 0,
+  "soundindex": 0,
+  "soundtable": 0,
+  "texturedataindex": 2117064,
+  "textureindex": 2116816,
+  "transitionindex": 2094732,
+  "version": 10,
+}
+`;
