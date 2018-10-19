@@ -82,3 +82,17 @@ export const readStructValues = function * <T, S extends Struct<T>>(
     offset += struct[key].byteLength
   }
 }
+
+/**
+ * Returns length of a structure
+ * @param struct Structure description
+ */
+export const getStructLength = (struct: Struct<any>): number => {
+  let length: number = 0
+
+  for (const key in struct) {
+    length += struct[key].byteLength
+  }
+
+  return length
+}
