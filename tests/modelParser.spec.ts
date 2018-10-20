@@ -1,14 +1,15 @@
 import * as fs           from 'fs'
 import * as path         from 'path'
 import * as FastDataView from 'fast-dataview'
+import { intersection }  from 'ramda'
 import * as ModelParser  from '../lib/modelParser'
 
 // Loading model for testing
 const leetPath = path.resolve(__dirname, '../models/leet.mdl')
 const leetBuffer: ArrayBuffer = fs.readFileSync(leetPath).buffer
 
-// const ratamahattaPath = path.resolve(__dirname, '../models/ratamahatta.md2')
-// const ratamahattaBuffer: ArrayBuffer = fs.readFileSync(ratamahattaPath).buffer
+const ratamahattaPath = path.resolve(__dirname, '../models/ratamahatta.md2')
+const ratamahattaBuffer: ArrayBuffer = fs.readFileSync(ratamahattaPath).buffer
 
 const dataView = new FastDataView(leetBuffer)
 const header = ModelParser.parseHeader(dataView)
@@ -68,25 +69,6 @@ describe('parsing model parts', () => {
     expect(skinRef).toMatchSnapshot('leet skin references')
   })
 
-  test('should parse animations', () => {
-    const sequences = ModelParser.parseSequences(dataView, header.seqindex, header.numseq)
-    const animations = ModelParser.parseAnimations(dataView, sequences, header.numbones)
-
-    expect(animations).toMatchSnapshot('leet animation')
-  })
-
-  test('should parse animation values', () => {
-    const sequences = ModelParser.parseSequences(dataView, header.seqindex, header.numseq)
-    const animations = ModelParser.parseAnimations(dataView, sequences, header.numbones)
-
-    const animValues = ModelParser.parseAnimValues(dataView, sequences, animations, header.numbones)
-    const slicedAnimValues1 = (animValues.array as Int16Array).slice(0, 1000)
-    const slicedAnimValues2 = (animValues.array as Int16Array).slice(10000, 11000)
-
-    expect(slicedAnimValues1).toMatchSnapshot('leet animation values from 0 to 1000')
-    expect(slicedAnimValues2).toMatchSnapshot('leet animation values from 10 000 to 11 000')
-  })
-
   test('should parse submodels', () => {
     const bodyParts = ModelParser.parseBodyParts(dataView, header.bodypartindex, header.numbodyparts)
     const subModels = ModelParser.parseSubModel(dataView, bodyParts)
@@ -126,23 +108,62 @@ describe('parsing model parts', () => {
 
     expect(triangles).toMatchSnapshot('leet triangles')
   })
+
+  test('should parse animations', () => {
+    const sequences = ModelParser.parseSequences(dataView, header.seqindex, header.numseq)
+    const animations = ModelParser.parseAnimations(dataView, sequences, header.numbones)
+
+    expect(animations).toMatchSnapshot('leet animation')
+  })
+
+  test('should parse animation values', () => {
+    const sequences = ModelParser.parseSequences(dataView, header.seqindex, header.numseq)
+    const animations = ModelParser.parseAnimations(dataView, sequences, header.numbones)
+
+    const animValues = ModelParser.parseAnimValues(dataView, sequences, animations, header.numbones)
+    const slicedAnimValues1 = (animValues.array as Int16Array).slice(0, 1000)
+    const slicedAnimValues2 = (animValues.array as Int16Array).slice(10000, 11000)
+
+    expect(slicedAnimValues1).toMatchSnapshot('leet animation values from 0 to 1000')
+    expect(slicedAnimValues2).toMatchSnapshot('leet animation values from 10 000 to 11 000')
+  })
 })
 
-// xdescribe('parsing whole model', () => {
-//   test('just parsing without errors', () => {
-//     expect(() => {
-//       ModelParser.parseModel(leetBuffer)
-//     }).not.toThrowError()
-//   })
+describe('parsing whole model', () => {
+  test('just parsing without errors', () => {
+    expect(() => {
+      ModelParser.parseModel(leetBuffer)
+    }).not.toThrowError()
+  })
 
-//   test('equaling parsed data with valid data', () => {
-//     // const modelData: ModelParser.ModelData = ModelParser.parseModel(leetBuffer)
-//     // expect(modelData).toEqual(leetData)
-//   })
+  test('should have all keys in model data', () => {
+    const expected = [
+      'header',
+      'bones',
+      'boneControllers',
+      'attachments',
+      'hitBoxes',
+      'sequences',
+      'sequenceGroups',
+      'bodyParts',
+      'textures',
+      'skinRef',
+      'subModels',
+      'meshes',
+      'vertices',
+      'vertBoneBuffer',
+      'triangles',
+      'animations',
+      'animValues'
+    ]
 
-//   test('should detect invalid version of model', () => {
-//     expect(() => {
-//       ModelParser.parseModel(ratamahattaBuffer)
-//     }).toThrowError('Unsupported version of the MDL file')
-//   })
-// })
+    const modelData: ModelParser.ModelData = ModelParser.parseModel(leetBuffer)
+    expect(intersection(Object.keys(modelData), expected)).toEqual(expected)
+  })
+
+  test('should detect invalid version of model', () => {
+    expect(() => {
+      ModelParser.parseModel(ratamahattaBuffer)
+    }).toThrowError('Unsupported version of the MDL file')
+  })
+})

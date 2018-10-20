@@ -58,14 +58,6 @@ describe('parsing model parts', () => {
     ModelParser.parseSkinRef(dataView.buffer, header.skinindex, header.numskinref)
   })
 
-  test('should parse animations', () => {
-    animations = ModelParser.parseAnimations(dataView, sequences, header.numbones)
-  })
-
-  test('should parse animation values', () => {
-    ModelParser.parseAnimValues(dataView, sequences, animations, header.numbones)
-  })
-
   test('should parse submodels', () => {
     subModels = ModelParser.parseSubModel(dataView, bodyParts)
   })
@@ -84,5 +76,13 @@ describe('parsing model parts', () => {
 
   test('should parse triangles', () => {
     ModelParser.parseTriangles(dataView.buffer, meshes, header.length)
+  })
+
+  test('should parse animations', () => {
+    animations = ModelParser.parseAnimations(dataView, sequences, header.numbones)
+  })
+
+  test('should parse animation values', () => {
+    ModelParser.parseAnimValues(dataView, sequences, animations, header.numbones)
   })
 })

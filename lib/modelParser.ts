@@ -68,6 +68,38 @@ export const parseMeshes = (dataView: DataView, subModels: structs.SubModel[][])
   )
 
 /**
+ * Parses submodels vertices.
+ * Path: vertices[bodyPartIndex][subModelIndex]
+ */
+export const parseVertices = (buffer: ArrayBuffer, subModels: structs.SubModel[][]): Float32Array[][] => {
+  return subModels.map(bodyPart =>
+    bodyPart.map(subModel => new Float32Array(buffer, subModel.vertindex, subModel.numverts * 3))
+  )
+}
+
+/**
+ * Parses ones vertices buffer.
+ * Path: vertBoneBuffer[bodyPartIndex][subModelIndex]
+ */
+export const parseVertBoneBuffer = (buffer: ArrayBuffer, subModels: structs.SubModel[][]): Uint8Array[][] =>
+  subModels.map(bodyPart => bodyPart.map(subModel => new Uint8Array(buffer, subModel.vertinfoindex, subModel.numverts)))
+
+/**
+ * Parses meshes triangles.
+ * Path: meshes[bodyPartIndex][subModelIndex][meshIndex]
+ */
+export const parseTriangles = (
+  buffer: ArrayBuffer,
+  meshes: structs.Mesh[][][],
+  headerLength: number
+): Int16Array[][][] =>
+  meshes.map(bodyPart =>
+    bodyPart.map(subModel =>
+      subModel.map(mesh => new Int16Array(buffer, mesh.triindex, Math.floor((headerLength - mesh.triindex) / 2)))
+    )
+  )
+
+/**
  * Parses bone animations
  * @todo make shorter
  */
@@ -115,38 +147,6 @@ export const parseAnimValues = (
 
   return animValues
 }
-
-/**
- * Parses submodels vertices.
- * Path: vertices[bodyPartIndex][subModelIndex]
- */
-export const parseVertices = (buffer: ArrayBuffer, subModels: structs.SubModel[][]): Float32Array[][] => {
-  return subModels.map(bodyPart =>
-    bodyPart.map(subModel => new Float32Array(buffer, subModel.vertindex, subModel.numverts * 3))
-  )
-}
-
-/**
- * Parses ones vertices buffer.
- * Path: vertBoneBuffer[bodyPartIndex][subModelIndex]
- */
-export const parseVertBoneBuffer = (buffer: ArrayBuffer, subModels: structs.SubModel[][]): Uint8Array[][] =>
-  subModels.map(bodyPart => bodyPart.map(subModel => new Uint8Array(buffer, subModel.vertinfoindex, subModel.numverts)))
-
-/**
- * Parses meshes triangles.
- * Path: meshes[bodyPartIndex][subModelIndex][meshIndex]
- */
-export const parseTriangles = (
-  buffer: ArrayBuffer,
-  meshes: structs.Mesh[][][],
-  headerLength: number
-): Int16Array[][][] =>
-  meshes.map(bodyPart =>
-    bodyPart.map(subModel =>
-      subModel.map(mesh => new Int16Array(buffer, mesh.triindex, Math.floor((headerLength - mesh.triindex) / 2)))
-    )
-  )
 
 /**
  * Returns parsed data of MDL file. A MDL file is a binary buffer divided in
