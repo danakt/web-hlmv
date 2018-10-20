@@ -1,5 +1,5 @@
-import { StructResult, int, float, string, array, vec3 } from '../lib/dataTypes'
-import { MAX_PER_BONE_CONTROLLERS }                      from './constants'
+import { StructResult, int, float, string, array, vec3, ubyte } from '../lib/dataTypes'
+import { MAX_PER_BONE_CONTROLLERS }                             from './constants'
 
 /**
  * Head of mdl-file
@@ -305,3 +305,12 @@ export const mesh = {
 }
 
 export type Mesh = StructResult<typeof mesh>
+
+/**
+ * Animation description
+ */
+export const animation = {
+  offset: array(6, ubyte)
+}
+
+export type Animation = StructResult<typeof animation>

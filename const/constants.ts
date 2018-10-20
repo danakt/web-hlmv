@@ -37,3 +37,22 @@ export const PALETTE_SIZE = PALETTE_ENTRIES * RGB_SIZE
  * The index in a palette where the alpha color is stored. Used for transparent textures.
  */
 export const PALETTE_ALPHA_INDEX = 255 * RGB_SIZE
+
+/**
+ * Number of bones allowed at source movement
+ */
+export const MAX_SRCBONES = 512
+
+/**
+ * Number of axles in 3d space
+ */
+export const AXLES_NUM = 3
+
+/**
+ * Animation value items index constants
+ */
+export const enum ANIM_VALUE {
+  VALUE = 0,
+  VALID,
+  TOTAL
+}

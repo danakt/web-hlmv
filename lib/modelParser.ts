@@ -1,9 +1,10 @@
-import * as FastDataView                  from 'fast-dataview'
-import * as structs                       from '../const/structs'
-import { VERSION }                        from '../const/constants'
-import { readStruct, readStructMultiple } from './binaryReader'
+import * as FastDataView                                   from 'fast-dataview'
+import * as MultiArrayView                                 from 'multi-array-view'
+import * as structs                                        from '../const/structs'
+import { VERSION, MAX_SRCBONES, AXLES_NUM, ANIM_VALUE }    from '../const/constants'
+import { readStruct, readStructMultiple, getStructLength } from './binaryReader'
 // eslint-disable-next-line no-unused-vars
-import { Struct, StructResult }           from './dataTypes'
+import { Struct, StructResult, short, byte }               from './dataTypes'
 
 /**
  * Creates multiple reader
@@ -38,10 +39,6 @@ export const parseSequenceGroups = createMultipleParser(structs.seqgroup)
 /** Parses body parts */
 export const parseBodyParts = createMultipleParser(structs.bodypart)
 
-// TODO
-// export const parseTransitions = (dataView: DataView, transitionIndex: number, numTransitions: number) =>
-//   new Int32Array(dataView.buffer, transitionIndex, numTransitions * int32.byteLength),
-
 /** Parses textures info */
 export const parseTextures = createMultipleParser(structs.texture)
 
@@ -49,11 +46,67 @@ export const parseTextures = createMultipleParser(structs.texture)
 export const parseSkinRef = (dataView: DataView, skinRefOffset: number, numSkinRef: number) =>
   new Int16Array(dataView.buffer, skinRefOffset, numSkinRef)
 
-/** Parses sub model */
-export const parseSubModel = createMultipleParser(structs.subModel)
+/** Parses sub model @todo make shorter */
+export const parseSubModel = (dataView: DataView, bodyParts: structs.BodyPart[]): structs.SubModel[][] =>
+  bodyParts.map(bodyPart => createMultipleParser(structs.subModel)(dataView, bodyPart.modelindex, bodyPart.nummodels))
 
-/** Parses meshes */
-export const parseMeshes = createMultipleParser(structs.mesh)
+/** Parses meshes @todo make shorter */
+export const parseMeshes = (dataView: DataView, subModels: structs.SubModel[][]): structs.Mesh[][][] =>
+  subModels.map(bodyPart =>
+    bodyPart.map(subModel => createMultipleParser(structs.mesh)(dataView, subModel.meshindex, subModel.nummesh))
+  )
+
+/** Parses bone animations @todo make shorter */
+export const parseAnimations = (
+  dataView: DataView,
+  sequences: structs.SequenceDesc[],
+  numBones: number
+): structs.Animation[][] =>
+  sequences.map(sequence =>
+    createMultipleParser(structs.animation)(
+      dataView,
+      sequence.animindex, // + seqGroup.data,
+      numBones
+    )
+  )
+
+/**
+ * Parses animation values
+ */
+export const parseAnimValues = (
+  dataView: DataView,
+  sequences: structs.SequenceDesc[],
+  animations: structs.Animation[][],
+  numBones: number
+) => {
+  const animStructLength = getStructLength(structs.animation)
+
+  // Create frames values array
+  const animValues = MultiArrayView.create([sequences.length, numBones, AXLES_NUM, MAX_SRCBONES, 3], Int16Array)
+
+  for (let i = 0; i < sequences.length; i++) {
+    for (let j = 0; j < numBones; j++) {
+      const animationIndex = /* seqGroup.data + */ sequences[i].animindex + j * animStructLength
+
+      for (let axis = 0; axis < AXLES_NUM; axis++) {
+        for (let v = 0; v < MAX_SRCBONES; v++) {
+          const offset = animationIndex + animations[i][j].offset[axis + AXLES_NUM] + v * short.byteLength
+
+          // Using the "method" instead of applying a structure is an optimization of reading
+          const value = short.getValue(dataView, offset)
+          const valid = byte.getValue(dataView, offset)
+          const total = byte.getValue(dataView, offset + byte.byteLength)
+
+          animValues.set(value, i, j, axis, v, ANIM_VALUE.VALUE)
+          animValues.set(valid, i, j, axis, v, ANIM_VALUE.VALID)
+          animValues.set(total, i, j, axis, v, ANIM_VALUE.TOTAL)
+        }
+      }
+    }
+  }
+
+  return animValues
+}
 
 /**
  * Returns parsed data of MDL file. A MDL file is a binary buffer divided in
@@ -80,22 +133,27 @@ export const parseModel = (modelBuffer: ArrayBuffer) => {
     throw new Error('No textures in the MDL file')
   }
 
-  /**
-   * The data that will be used to obtain another data
-   */
+  /// The data below will be used to obtain another data
+
+  // Body parts info
   const bodyParts: structs.BodyPart[] = parseBodyParts(dataView, header.bodypartindex, header.numbodyparts)
-  const subModels: structs.SubModel[][] = bodyParts.map(bodyPart =>
-    parseSubModel(dataView, bodyPart.modelindex, bodyPart.nummodels)
-  )
-  const meshes = subModels.map(bodyPart =>
-    bodyPart.map(subModel => parseMeshes(dataView, subModel.meshindex, subModel.nummesh))
-  )
+  // Submodels info
+  const subModels: structs.SubModel[][] = parseSubModel(dataView, bodyParts)
+  // Meshes info
+  const meshes = parseMeshes(dataView, subModels)
+
+  //  Model sequences info
+  const sequences = parseSequences(dataView, header.seqindex, header.numseq)
+  // Bones animations
+  const animations = parseAnimations(dataView, sequences, header.numbones)
+  // Animation frames
+  const animValues = parseAnimValues(dataView, sequences, animations, header.numbones)
 
   return {
-    /** Header */
+    /** The header of the MDL file */
     header,
 
-    // Main data
+    // Main data that was obtained directly from the MDL file header
 
     /** Bones info */
     bones:           parseBones(dataView, header.boneindex, header.numbones),
@@ -106,7 +164,7 @@ export const parseModel = (modelBuffer: ArrayBuffer) => {
     /** Model hitboxes */
     hitBoxes:        parseHitboxes(dataView, header.hitboxindex, header.numhitboxes),
     /** Model sequences info */
-    sequences:       parseSequences(dataView, header.seqindex, header.numseq),
+    sequences,
     /** Sequences groups */
     sequenceGroups:  parseSequenceGroups(dataView, header.seqgroupindex, header.numseqgroups),
     /** Body parts info */
@@ -116,7 +174,7 @@ export const parseModel = (modelBuffer: ArrayBuffer) => {
     /** Skins references */
     skinRef:         parseSkinRef(dataView, header.skinindex, header.numskinref),
 
-    // Sub data
+    // Sub models data. This data was obtained by parsing data from body parts
 
     /** Submodels info */
     subModels,
@@ -137,7 +195,14 @@ export const parseModel = (modelBuffer: ArrayBuffer) => {
           mesh => new Int16Array(modelBuffer, mesh.triindex, Math.floor((header.length - mesh.triindex) / 2))
         )
       )
-    )
+    ),
+
+    // Sequences data
+
+    /** Bones animations */
+    animations,
+    /** Animation frames */
+    animValues
   }
 }
 
