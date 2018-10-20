@@ -6,5 +6,5 @@ coverage/
 
 # files
 package-lock.json
-*.bak
+*.temp
 TODO.md
