@@ -33,6 +33,17 @@ export const readStruct = function<T, S extends Struct<T>> (
   return structResult
 }
 
+/**
+ * @todo Describe me
+ *
+ * @param dataView The DataView object
+ * @param struct Structure description. The structure can't contain keys
+ * starting with a digit due to the peculiarities of the javascript engine.
+ * Otherwise, the reading result may be corrupted.
+ * @param byteOffset Offset in buffer to read, "0" by default
+ * @param times Times of structure repeating
+ * @returns The array of structure applying result
+ */
 export const readStructMultiple = function<T, S extends Struct<T>> (
   dataView: DataView,
   struct: S,
