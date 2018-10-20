@@ -1,7 +1,7 @@
 import * as fs           from 'fs'
 import * as path         from 'path'
-import * as FastDataView from 'fast-dataview'
 import * as structs      from '../const/structs'
+import * as FastDataView from 'fast-dataview'
 import * as ModelParser  from '../lib/modelParser'
 
 // Loading model for testing
@@ -13,53 +13,76 @@ const dataView = new FastDataView(leetBuffer)
 let header: structs.Header
 let sequences: structs.SequenceDesc[]
 let animations: structs.Animation[][]
+let bodyParts: structs.BodyPart[]
+let subModels: structs.SubModel[][]
+let meshes: structs.Mesh[][][]
 
-describe('benchmarks', () => {
-  test('should parse header', () => {
+describe('parsing model parts', () => {
+  test('parse header', () => {
     header = ModelParser.parseHeader(dataView)
   })
 
-  test('parsing bones', () => {
+  test('parse bones', () => {
     ModelParser.parseBones(dataView, header.boneindex, header.numbones)
   })
 
-  test('parsing bone controllers', () => {
+  test('should parse bone controllers', () => {
     ModelParser.parseBoneControllers(dataView, header.bonecontrollerindex, header.numbonecontrollers)
   })
 
-  test('parsing attachments', () => {
+  test('should parse attachments', () => {
     ModelParser.parseAttachments(dataView, header.attachmentindex, header.numattachments)
   })
 
-  test('parsing hitboxes', () => {
+  test('should parse hitboxes', () => {
     ModelParser.parseHitboxes(dataView, header.hitboxindex, header.numhitboxes)
   })
 
-  test('parsing sequences', () => {
+  test('should parse sequences', () => {
     sequences = ModelParser.parseSequences(dataView, header.seqindex, header.numseq)
   })
 
-  test('parsing sequence groups', () => {
+  test('should parse sequence groups', () => {
     ModelParser.parseSequenceGroups(dataView, header.seqgroupindex, header.numseqgroups)
   })
 
-  test('parsing bodyparts', () => {
-    ModelParser.parseBodyParts(dataView, header.bodypartindex, header.numbodyparts)
+  test('should parse bodyparts', () => {
+    bodyParts = ModelParser.parseBodyParts(dataView, header.bodypartindex, header.numbodyparts)
   })
 
-  test('parsing textures', () => {
+  test('should parse textures', () => {
     ModelParser.parseTextures(dataView, header.textureindex, header.numtextures)
   })
 
-  test('parsing skin references', () => {
-    ModelParser.parseSkinRef(dataView, header.skinindex, header.numskinref)
+  test('should parse skin references', () => {
+    ModelParser.parseSkinRef(dataView.buffer, header.skinindex, header.numskinref)
   })
 
-  test('parsing animations', () => {
+  test('should parse animations', () => {
     animations = ModelParser.parseAnimations(dataView, sequences, header.numbones)
   })
 
-  test('parsing animation values', () => {
+  test('should parse animation values', () => {
     ModelParser.parseAnimValues(dataView, sequences, animations, header.numbones)
+  })
+
+  test('should parse submodels', () => {
+    subModels = ModelParser.parseSubModel(dataView, bodyParts)
+  })
+
+  test('should parse meshes', () => {
+    meshes = ModelParser.parseMeshes(dataView, subModels)
+  })
+
+  test('should parse vertices', () => {
+    ModelParser.parseVertices(dataView.buffer, subModels)
+  })
+
+  test('should parse bones vertices', () => {
+    ModelParser.parseVertBoneBuffer(dataView.buffer, subModels)
+  })
+
+  test('should parse triangles', () => {
+    ModelParser.parseTriangles(dataView.buffer, meshes, header.length)
   })
 })

@@ -1,7 +1,7 @@
 import * as fs                            from 'fs'
 import * as path                          from 'path'
 import * as structs                       from '../const/structs'
-import { readStruct, readStructMultiple } from '../lib/BinaryReader'
+import { readStruct, readStructMultiple } from '../lib/binaryReader'
 import { getPerformance }                 from './tools'
 import * as FastDataView                  from 'fast-dataview'
 

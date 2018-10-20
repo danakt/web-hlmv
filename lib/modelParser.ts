@@ -1,22 +1,23 @@
-import * as FastDataView                                   from 'fast-dataview'
-import * as MultiArrayView                                 from 'multi-array-view'
-import * as structs                                        from '../const/structs'
-import { VERSION, MAX_SRCBONES, AXLES_NUM, ANIM_VALUE }    from '../const/constants'
-import { readStruct, readStructMultiple, getStructLength } from './binaryReader'
+import * as FastDataView                                from 'fast-dataview'
+import * as MultiArrayView                              from 'multi-array-view'
+import * as structs                                     from '../const/structs'
+import { MAX_SRCBONES, AXLES_NUM, ANIM_VALUE, VERSION } from '../const/constants'
+import * as BinaryReader                                from './binaryReader'
 // eslint-disable-next-line no-unused-vars
-import { Struct, StructResult, short, byte }               from './dataTypes'
+import { Struct, StructResult, short, byte }            from './dataTypes'
 
 /**
  * Creates multiple reader
+ * @internal
  */
 const createMultipleParser = <T, S extends Struct<T>>(struct: S) => (
   dataView: DataView,
   offsetIndex: number,
   number: number
-): StructResult<S>[] => readStructMultiple(dataView, struct, offsetIndex, number)
+): StructResult<S>[] => BinaryReader.readStructMultiple(dataView, struct, offsetIndex, number)
 
 /** Parses header of the MDL file */
-export const parseHeader = (dataView: DataView): structs.Header => readStruct(dataView, structs.header)
+export const parseHeader = (dataView: DataView): structs.Header => BinaryReader.readStruct(dataView, structs.header)
 
 /** Parses bones */
 export const parseBones = createMultipleParser(structs.bone)
@@ -43,32 +44,39 @@ export const parseBodyParts = createMultipleParser(structs.bodypart)
 export const parseTextures = createMultipleParser(structs.texture)
 
 /** Parses skin references */
-export const parseSkinRef = (dataView: DataView, skinRefOffset: number, numSkinRef: number) =>
-  new Int16Array(dataView.buffer, skinRefOffset, numSkinRef)
+export const parseSkinRef = (buffer: ArrayBuffer, skinRefOffset: number, numSkinRef: number) =>
+  new Int16Array(buffer, skinRefOffset, numSkinRef)
 
-/** Parses sub model @todo make shorter */
+/**
+ * Parses sub model
+ * @todo make shorter
+ */
 export const parseSubModel = (dataView: DataView, bodyParts: structs.BodyPart[]): structs.SubModel[][] =>
-  bodyParts.map(bodyPart => createMultipleParser(structs.subModel)(dataView, bodyPart.modelindex, bodyPart.nummodels))
-
-/** Parses meshes @todo make shorter */
-export const parseMeshes = (dataView: DataView, subModels: structs.SubModel[][]): structs.Mesh[][][] =>
-  subModels.map(bodyPart =>
-    bodyPart.map(subModel => createMultipleParser(structs.mesh)(dataView, subModel.meshindex, subModel.nummesh))
+  bodyParts.map(bodyPart =>
+    BinaryReader.readStructMultiple(dataView, structs.subModel, bodyPart.modelindex, bodyPart.nummodels)
   )
 
-/** Parses bone animations @todo make shorter */
+/**
+ * Parses meshes
+ * @todo make shorter
+ */
+export const parseMeshes = (dataView: DataView, subModels: structs.SubModel[][]): structs.Mesh[][][] =>
+  subModels.map(bodyPart =>
+    bodyPart.map(subModel =>
+      BinaryReader.readStructMultiple(dataView, structs.mesh, subModel.meshindex, subModel.nummesh)
+    )
+  )
+
+/**
+ * Parses bone animations
+ * @todo make shorter
+ */
 export const parseAnimations = (
   dataView: DataView,
   sequences: structs.SequenceDesc[],
   numBones: number
 ): structs.Animation[][] =>
-  sequences.map(sequence =>
-    createMultipleParser(structs.animation)(
-      dataView,
-      sequence.animindex, // + seqGroup.data,
-      numBones
-    )
-  )
+  sequences.map(sequence => BinaryReader.readStructMultiple(dataView, structs.animation, sequence.animindex, numBones))
 
 /**
  * Parses animation values
@@ -78,8 +86,8 @@ export const parseAnimValues = (
   sequences: structs.SequenceDesc[],
   animations: structs.Animation[][],
   numBones: number
-) => {
-  const animStructLength = getStructLength(structs.animation)
+): MultiArrayView<number> => {
+  const animStructLength = BinaryReader.getStructLength(structs.animation)
 
   // Create frames values array
   const animValues = MultiArrayView.create([sequences.length, numBones, AXLES_NUM, MAX_SRCBONES, 3], Int16Array)
@@ -107,6 +115,38 @@ export const parseAnimValues = (
 
   return animValues
 }
+
+/**
+ * Parses submodels vertices.
+ * Path: vertices[bodyPartIndex][subModelIndex]
+ */
+export const parseVertices = (buffer: ArrayBuffer, subModels: structs.SubModel[][]): Float32Array[][] => {
+  return subModels.map(bodyPart =>
+    bodyPart.map(subModel => new Float32Array(buffer, subModel.vertindex, subModel.numverts * 3))
+  )
+}
+
+/**
+ * Parses ones vertices buffer.
+ * Path: vertBoneBuffer[bodyPartIndex][subModelIndex]
+ */
+export const parseVertBoneBuffer = (buffer: ArrayBuffer, subModels: structs.SubModel[][]): Uint8Array[][] =>
+  subModels.map(bodyPart => bodyPart.map(subModel => new Uint8Array(buffer, subModel.vertinfoindex, subModel.numverts)))
+
+/**
+ * Parses meshes triangles.
+ * Path: meshes[bodyPartIndex][subModelIndex][meshIndex]
+ */
+export const parseTriangles = (
+  buffer: ArrayBuffer,
+  meshes: structs.Mesh[][][],
+  headerLength: number
+): Int16Array[][][] =>
+  meshes.map(bodyPart =>
+    bodyPart.map(subModel =>
+      subModel.map(mesh => new Int16Array(buffer, mesh.triindex, Math.floor((headerLength - mesh.triindex) / 2)))
+    )
+  )
 
 /**
  * Returns parsed data of MDL file. A MDL file is a binary buffer divided in
@@ -172,7 +212,7 @@ export const parseModel = (modelBuffer: ArrayBuffer) => {
     /** Textures info */
     textures:        parseTextures(dataView, header.textureindex, header.numtextures),
     /** Skins references */
-    skinRef:         parseSkinRef(dataView, header.skinindex, header.numskinref),
+    skinRef:         parseSkinRef(dataView.buffer, header.skinindex, header.numskinref),
 
     // Sub models data. This data was obtained by parsing data from body parts
 
@@ -181,21 +221,11 @@ export const parseModel = (modelBuffer: ArrayBuffer) => {
     /** Meshes info. Path: meshes[bodyPartIndex][subModelIndex][meshIndex] */
     meshes,
     /** Submodels vertices. Path: vertices[bodyPartIndex][subModelIndex] */
-    vertices: subModels.map(bodyPart =>
-      bodyPart.map(subModel => new Float32Array(modelBuffer, subModel.vertindex, subModel.numverts * 3))
-    ),
+    vertices:       parseVertices(dataView.buffer, subModels),
     /** Bones vertices buffer. Path: vertBoneBuffer[bodyPartIndex][subModelIndex] */
-    vertBoneBuffer: subModels.map(bodyPart =>
-      bodyPart.map(subModel => new Uint8Array(modelBuffer, subModel.vertinfoindex, subModel.numverts))
-    ),
+    vertBoneBuffer: parseVertBoneBuffer(dataView.buffer, subModels),
     /** Mesh triangles. Path: meshes[bodyPartIndex][subModelIndex][meshIndex] */
-    triangles: meshes.map(bodyPart =>
-      bodyPart.map(subModel =>
-        subModel.map(
-          mesh => new Int16Array(modelBuffer, mesh.triindex, Math.floor((header.length - mesh.triindex) / 2))
-        )
-      )
-    ),
+    triangles:      parseTriangles(dataView.buffer, meshes, header.length),
 
     // Sequences data
 
