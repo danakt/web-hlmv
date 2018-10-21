@@ -41,7 +41,7 @@
     "@types/react-dom": "^16.0.8",
     "@types/three": "^0.92.23",
     "awesome-typescript-loader": "^5.2.0",
-    "eslint": "4.18.1",
+    "eslint": "^5.7.0",
     "eslint-config-prettier": "^2.9.0",
     "eslint-config-standard": "^11.0.0",
     "eslint-loader": "^1.9.0",
@@ -63,7 +63,7 @@
     "ts-jest": "^23.10.4",
     "ts-node": "^6.1.0",
     "typescript": "3.0.3",
-    "typescript-eslint-parser": "^14.0.0",
+    "typescript-eslint-parser": "^20.0.0",
     "webpack": "^4.0.0-beta.3",
     "webpack-cli": "^3.0.8",
     "webpack-dev-server": "^3.1.4"

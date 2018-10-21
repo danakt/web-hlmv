@@ -1,0 +1,29 @@
+module.exports = {
+  parser: 'typescript-eslint-parser',
+  extends: ['standard', 'plugin:react/recommended'],
+  plugins: ['typescript', 'prettier', 'arca'],
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: false
+    }
+  },
+  rules: {
+    indent: 'off',
+    'indent-legacy': ['error', 2],
+    'max-len': ['error', 120],
+    'no-undef': 'off',
+    'space-before-function-paren': [
+      'error',
+      { anonymous: 'always', named: 'never', asyncArrow: 'always' }
+    ],
+    'comma-dangle': 'off',
+    'key-spacing': ['error', { align: 'value' }],
+    'operator-linebreak': ['error', 'before'],
+    'no-unused-vars': 'error',
+    'typescript/no-unused-vars': 'error',
+    'arca/import-align': 'error',
+    'no-multi-spaces': ['error', { exceptions: { ImportDeclaration: true } }],
+    'no-dupe-class-members': 'off',
+    'no-useless-constructor': 'off'
+  }
+}
