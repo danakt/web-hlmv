@@ -37,7 +37,7 @@
     "@types/jest-image-snapshot": "^2.4.0",
     "@types/node": "^10.3.1",
     "@types/ramda": "^0.25.34",
-    "@types/react": "^16.4.14",
+    "@types/react": "^16.4.18",
     "@types/react-dom": "^16.0.8",
     "@types/three": "^0.92.23",
     "awesome-typescript-loader": "^5.2.0",
