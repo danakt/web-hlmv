@@ -44,7 +44,7 @@ describe('test building functions', () => {
     const textureImageData = ModelRenderer.buildTexture(leetBuffer, leetModelData.textures[0])
 
     test('speed of geometry building', () => {
-      ModelRenderer.getFaceVertices(triangles, vertices, textureImageData)
+      ModelRenderer.readFacesData(triangles, vertices, textureImageData)
     })
 
     test('should build the proper number of vertices', () => {
@@ -54,12 +54,12 @@ describe('test building functions', () => {
     })
 
     test('should build geometry buffer', () => {
-      const { geometry } = ModelRenderer.getFaceVertices(triangles, vertices, textureImageData)
+      const { geometry } = ModelRenderer.readFacesData(triangles, vertices, textureImageData)
       expect(geometry).toMatchSnapshot('geometry buffer')
     })
 
     test('should building uv map', () => {
-      const { uv } = ModelRenderer.getFaceVertices(triangles, vertices, textureImageData)
+      const { uv } = ModelRenderer.readFacesData(triangles, vertices, textureImageData)
       expect(uv).toMatchSnapshot('uv buffer')
     })
   })

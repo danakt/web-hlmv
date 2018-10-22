@@ -122,9 +122,15 @@ export const countVertices = (trianglesBuffer: Int16Array): number => {
 
 /**
  * Returns face vertices of the mesh
- * @todo Make faster
+ * @param trianglesBuffer Triangles data
+ * @param verticesBuffer Unique vertices
+ * @param texture Image data of texture
+ * @returns
+ *
+ * @todo Make faster and simpler. For example, generate a queue of indexes and
+ * generate uv map and geometry based on the queue.
  */
-export const getFaceVertices = (trianglesBuffer: Int16Array, vertices: Float32Array, texture: ImageData) => {
+export const readFacesData = (trianglesBuffer: Int16Array, verticesBuffer: Float32Array, texture: ImageData) => {
   // Number of vertices for generating buffer
   const vertNumber = countVertices(trianglesBuffer)
 
@@ -140,7 +146,7 @@ export const getFaceVertices = (trianglesBuffer: Int16Array, vertices: Float32Ar
     const trianglesType = trianglesBuffer[trisPos] < 0 ? constants.TRIANGLE_FAN : constants.TRIANGLE_STRIP
 
     // Starting vertex for triangle fan
-    let startVert = null
+    let startVert: number[] | null = null
 
     // Number of following triangles
     const trianglesNum = Math.abs(trianglesBuffer[trisPos])
@@ -150,9 +156,9 @@ export const getFaceVertices = (trianglesBuffer: Int16Array, vertices: Float32Ar
     trisPos++
 
     // For counting we will make steps for 4 array items:
-    // 0 — vertex
+    // 0 — index of the vertex origin in vertices buffer
     // 1 — light (?)
-    // 2 — fist uv coordinate
+    // 2 — first uv coordinate
     // 3 — second uv coordinate
     for (let j = 0; j < trianglesNum; j++, trisPos += 4) {
       // const vertIndex: number = trianglesBuffer[trisPos]
@@ -162,9 +168,9 @@ export const getFaceVertices = (trianglesBuffer: Int16Array, vertices: Float32Ar
       // Vertex data
       const vertexData = [
         // Origin
-        vertices[vert + 0],
-        vertices[vert + 1],
-        vertices[vert + 2],
+        verticesBuffer[vert + 0],
+        verticesBuffer[vert + 1],
+        verticesBuffer[vert + 2],
 
         // UV data
         trianglesBuffer[trisPos + 2] / texture.width,
@@ -216,23 +222,20 @@ export const getFaceVertices = (trianglesBuffer: Int16Array, vertices: Float32Ar
     }
   }
 
-  // Flattening geometry buffer
-  const geometryBuffer = new Float32Array(vertNumber * 3)
-  const uvBuffer = new Float32Array(vertNumber * 2)
+  // Flattening buffers
+  const geometry = new Float32Array(vertNumber * 3)
+  const uv = new Float32Array(vertNumber * 2)
 
   for (let i = 0; i < vertNumber; i++) {
-    geometryBuffer[i * 3 + 0] = geometryVertices[i][0]
-    geometryBuffer[i * 3 + 1] = geometryVertices[i][1]
-    geometryBuffer[i * 3 + 2] = geometryVertices[i][2]
+    geometry[i * 3 + 0] = geometryVertices[i][0]
+    geometry[i * 3 + 1] = geometryVertices[i][1]
+    geometry[i * 3 + 2] = geometryVertices[i][2]
 
-    uvBuffer[i * 2 + 0] = geometryVertices[i][3]
-    uvBuffer[i * 2 + 1] = geometryVertices[i][4]
+    uv[i * 2 + 0] = geometryVertices[i][3]
+    uv[i * 2 + 1] = geometryVertices[i][4]
   }
 
-  return {
-    geometry: geometryBuffer,
-    uv:       uvBuffer
-  }
+  return { geometry, uv }
 }
 
 /**
