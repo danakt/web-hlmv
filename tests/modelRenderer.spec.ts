@@ -12,7 +12,7 @@ expect.extend({ toMatchImageSnapshot })
 // Mock of ImageData
 Object.defineProperty(global, 'ImageData', { value: MockImageData })
 
-const leetPath = path.resolve(__dirname, '../models/leet.mdl')
+const leetPath = path.resolve(__dirname, '../mdl/leet.mdl')
 const leetBuffer: ArrayBuffer = fs.readFileSync(leetPath).buffer
 const leetModelData = parseModel(leetBuffer)
 

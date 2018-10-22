@@ -6,7 +6,7 @@ import { getPerformance }                 from './tools'
 import * as FastDataView                  from 'fast-dataview'
 
 // Loading model for testing
-const leetPath = path.resolve(__dirname, '../models/leet.mdl')
+const leetPath = path.resolve(__dirname, '../mdl/leet.mdl')
 const leetBuffer: ArrayBuffer = fs.readFileSync(leetPath).buffer
 
 test('parsing some struct in binary file', () => {

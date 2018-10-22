@@ -5,10 +5,10 @@ import { intersection }  from 'ramda'
 import * as ModelParser  from '../lib/modelParser'
 
 // Loading model for testing
-const leetPath = path.resolve(__dirname, '../models/leet.mdl')
+const leetPath = path.resolve(__dirname, '../mdl/leet.mdl')
 const leetBuffer: ArrayBuffer = fs.readFileSync(leetPath).buffer
 
-const ratamahattaPath = path.resolve(__dirname, '../models/ratamahatta.md2')
+const ratamahattaPath = path.resolve(__dirname, '../mdl/ratamahatta.md2')
 const ratamahattaBuffer: ArrayBuffer = fs.readFileSync(ratamahattaPath).buffer
 
 const dataView = new FastDataView(leetBuffer)

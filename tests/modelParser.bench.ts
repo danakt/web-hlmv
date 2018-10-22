@@ -5,7 +5,7 @@ import * as FastDataView from 'fast-dataview'
 import * as ModelParser  from '../lib/modelParser'
 
 // Loading model for testing
-const leetPath = path.resolve(__dirname, '../models/leet.mdl')
+const leetPath = path.resolve(__dirname, '../mdl/leet.mdl')
 const leetBuffer: ArrayBuffer = fs.readFileSync(leetPath).buffer
 
 const dataView = new FastDataView(leetBuffer)
