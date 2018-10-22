@@ -56,3 +56,13 @@ export const enum ANIM_VALUE {
   VALID,
   TOTAL
 }
+
+/**
+ * Triangle fan type
+ */
+export const TRIANGLE_FAN = 0
+
+/**
+ * Triangle strip type
+ */
+export const TRIANGLE_STRIP = 1
