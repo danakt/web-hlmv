@@ -1,3 +1,15 @@
+/** Type of typed array instance */
+// eslint-disable-next-line no-unused-vars
+declare type TypedArray
+  = | Int8Array
+  | Uint8Array
+  | Int16Array
+  | Uint16Array
+  | Int32Array
+  | Uint32Array
+  | Float32Array
+  | Float64Array
+
 /**
  * Type of struct data type description
  */
