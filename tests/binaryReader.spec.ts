@@ -23,7 +23,8 @@ import {
   double,
   string,
   array,
-  vec3
+  vec3,
+  skip
 } from '../lib/dataTypes'
 
 // Loading model for testing
@@ -118,4 +119,9 @@ test('should get array of bytes from buffer', () => {
 test('should get vector 3 from buffer', () => {
   const dataView = new DataView(new Float32Array([0.5, 0.25, 0.125]).buffer)
   expect(vec3.getValue(dataView, 0)).toEqual(new Float32Array([0.5, 0.25, 0.125]))
+})
+
+test('should create skipping data type', () => {
+  expect(skip(8).byteLength).toEqual(8)
+  expect(skip(int).byteLength).toEqual(4)
 })
