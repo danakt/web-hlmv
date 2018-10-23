@@ -146,6 +146,12 @@ export const uint32: DataType<number, Uint32Array> = {
 }
 
 /**
+ * Alias for uint32. Creates reader of the Uint32 value at the specified byte
+ * offset from the start of the DataView object.
+ */
+export const uint = uint32
+
+/**
  * Creates reader of the Float32 value at the specified byte offset from the
  * start of the DataView object.
  */
@@ -168,6 +174,12 @@ export const float64: DataType<number, Float64Array> = {
   getValue:         (dataView, offset) => dataView.getFloat64(offset, true),
   arrayConstructor: Float64Array
 }
+
+/**
+ * Alias for float64. Creates reader of the Float64 value at the specified
+ * byte offset from the start of the DataView object.
+ */
+export const double = float64
 
 /**
  * Creates reader of the String value at the specified byte offset from the
@@ -218,7 +230,7 @@ export const array = <T, A extends TypedArray | T[]>(arrayLength: number, struct
 /**
  * Alias for float32-vector with 3 elements
  */
-export const vec3 = array(3, float32)
+export const vec3 = array(3, float)
 
 /**
  * Creates an element to skip a specified number of bytes or number of bytes in
