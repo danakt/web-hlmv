@@ -23,7 +23,7 @@ test('parsing multiple structs in binary file', () => {
   expect(texturesInfo).toMatchSnapshot('leet texture info')
 })
 
-test('speed test', () => {
+xtest('speed test', () => {
   const dataView = new FastDataView(leetBuffer)
 
   const perf = getPerformance(() => {
