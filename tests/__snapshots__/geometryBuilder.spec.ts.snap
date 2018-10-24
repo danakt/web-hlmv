@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`test building functions test geometry building should build geometry buffer: geometry buffer 1`] = `
+exports[`test geometry building should build geometry buffer: geometry buffer 1`] = `
 Float32Array [
   12.430000305175781,
   -1.350000023841858,
@@ -6665,7 +6665,7 @@ Float32Array [
 ]
 `;
 
-exports[`test building functions test geometry building should building uv map: uv buffer 1`] = `
+exports[`test geometry building should building uv map: uv buffer 1`] = `
 Float32Array [
   0.5234375,
   0.962890625,

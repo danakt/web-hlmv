@@ -1,0 +1,154 @@
+import * as structs                     from '../const/structs'
+import { TRIANGLE_FAN, TRIANGLE_STRIP } from '../const/constants'
+
+/**
+ * Returns type of a series of connected triangles
+ */
+export const getTrianglesType = (trianglesSeriesHead: number) =>
+  trianglesSeriesHead < 0 ? TRIANGLE_FAN : TRIANGLE_STRIP
+
+/**
+ * Counts vertices for building geometry buffer
+ * @param trianglesBuffer Triangles buffer
+ * @return Number of vertices
+ */
+export const countVertices = (trianglesBuffer: Int16Array): number => {
+  // Count of vertices
+  let vertCount = 0
+
+  // Current position in buffer
+  let p = 0
+
+  // Processing triangle series
+  while (trianglesBuffer[p]) {
+    // Number of following vertices
+    const verticesNum = Math.abs(trianglesBuffer[p])
+
+    // This position is no longer needed,
+    // we proceed to the following
+    p += verticesNum * 4 + 1
+
+    // Increase the number of vertices
+    vertCount += (verticesNum - 3) * 3 + 3
+  }
+
+  return vertCount
+}
+
+/**
+ * Returns face vertices of the mesh
+ * @param trianglesBuffer Triangles data
+ * @param verticesBuffer Unique vertices
+ * @param texture Image data of texture
+ * @returns
+ *
+ * @todo Make faster and simpler. For example, generate a queue of indexes and
+ * generate uv map and geometry based on the queue.
+ */
+export const readFacesData = (trianglesBuffer: Int16Array, verticesBuffer: Float32Array, texture: structs.Texture) => {
+  // Number of vertices for generating buffer
+  const vertNumber = countVertices(trianglesBuffer)
+
+  // List of vertices data: origin and uv position on texture
+  const geometryVertices: number[][] = []
+
+  // Current position in buffer
+  let trisPos = 0
+
+  // Processing triangle series
+  while (trianglesBuffer[trisPos]) {
+    // Detecting triangle series type
+    const trianglesType = trianglesBuffer[trisPos] < 0 ? TRIANGLE_FAN : TRIANGLE_STRIP
+
+    // Starting vertex for triangle fan
+    let startVert: number[] | null = null
+
+    // Number of following triangles
+    const trianglesNum = Math.abs(trianglesBuffer[trisPos])
+
+    // This index is no longer needed,
+    // we proceed to the following
+    trisPos++
+
+    // For counting we will make steps for 4 array items:
+    // 0 — index of the vertex origin in vertices buffer
+    // 1 — light (?)
+    // 2 — first uv coordinate
+    // 3 — second uv coordinate
+    for (let j = 0; j < trianglesNum; j++, trisPos += 4) {
+      // const vertIndex: number = trianglesBuffer[trisPos]
+      const vert: number = trianglesBuffer[trisPos] * 3
+      // const light: number = trianglesBuffer[trisPos + 1] // ?
+
+      // Vertex data
+      const vertexData = [
+        // Origin
+        verticesBuffer[vert + 0],
+        verticesBuffer[vert + 1],
+        verticesBuffer[vert + 2],
+
+        // UV data
+        trianglesBuffer[trisPos + 2] / texture.width,
+        1 - trianglesBuffer[trisPos + 3] / texture.height
+      ]
+
+      // Triangle strip. Draw the associated group of triangles.
+      // Each next vertex, beginning with the third, forms a triangle with the last and the penultimate vertex.
+      //       1 ________3 ________ 5
+      //       ╱╲        ╱╲        ╱╲
+      //     ╱    ╲    ╱    ╲    ╱    ╲
+      //   ╱________╲╱________╲╱________╲
+      // 0          2         4          6
+      if (trianglesType === TRIANGLE_STRIP) {
+        if (j > 2) {
+          if (j % 2 === 0) {
+            // even
+            geometryVertices.push(
+              geometryVertices[geometryVertices.length - 3], // previously first one
+              geometryVertices[geometryVertices.length - 1] // last one
+            )
+          } else {
+            // odd
+            geometryVertices.push(
+              geometryVertices[geometryVertices.length - 1], // last one
+              geometryVertices[geometryVertices.length - 2] // second to last
+            )
+          }
+        }
+      }
+
+      // Triangle fan. Draw a connected fan-shaped group of triangles.
+      // Each next vertex, beginning with the third, forms a triangle with the last and first vertex.
+      //       2 ____3 ____ 4
+      //       ╱╲    |    ╱╲
+      //     ╱    ╲  |  ╱    ╲
+      //   ╱________╲|╱________╲
+      // 1          0            5
+      if (trianglesType === TRIANGLE_FAN) {
+        startVert = startVert || vertexData
+
+        if (j > 2) {
+          geometryVertices.push(startVert, geometryVertices[geometryVertices.length - 1])
+        }
+      }
+
+      // New one
+      geometryVertices.push(vertexData)
+    }
+  }
+
+  // Flattening buffers
+  const geometry = new Float32Array(vertNumber * 3)
+  const uv = new Float32Array(vertNumber * 2)
+
+  for (let i = 0; i < vertNumber; i++) {
+    geometry[i * 3 + 0] = geometryVertices[i][0]
+    geometry[i * 3 + 1] = geometryVertices[i][1]
+    geometry[i * 3 + 2] = geometryVertices[i][2]
+
+    uv[i * 2 + 0] = geometryVertices[i][3]
+    uv[i * 2 + 1] = geometryVertices[i][4]
+  }
+
+  return { geometry, uv }
+}

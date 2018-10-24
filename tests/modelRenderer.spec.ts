@@ -37,30 +37,4 @@ describe('test building functions', () => {
       expect(Buffer.from(buildedSkin)).toMatchImageSnapshot()
     })
   })
-
-  describe('test geometry building', () => {
-    const triangles = leetModelData.triangles[0][0][0]
-    const vertices = leetModelData.vertices[0][0]
-    const textureImageData = ModelRenderer.buildTexture(leetBuffer, leetModelData.textures[0])
-
-    test('speed of geometry building', () => {
-      ModelRenderer.readFacesData(triangles, vertices, textureImageData)
-    })
-
-    test('should build the proper number of vertices', () => {
-      expect(ModelRenderer.countVertices(leetModelData.triangles[0][0][0])).toBe(2220)
-      expect(ModelRenderer.countVertices(leetModelData.triangles[0][0][1])).toBe(36)
-      expect(ModelRenderer.countVertices(leetModelData.triangles[1][1][0])).toBe(132)
-    })
-
-    test('should build geometry buffer', () => {
-      const { geometry } = ModelRenderer.readFacesData(triangles, vertices, textureImageData)
-      expect(geometry).toMatchSnapshot('geometry buffer')
-    })
-
-    test('should building uv map', () => {
-      const { uv } = ModelRenderer.readFacesData(triangles, vertices, textureImageData)
-      expect(uv).toMatchSnapshot('uv buffer')
-    })
-  })
 })
