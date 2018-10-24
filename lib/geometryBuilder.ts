@@ -4,7 +4,7 @@ import { TRIANGLE_FAN, TRIANGLE_STRIP } from '../const/constants'
 /**
  * Returns type of a series of connected triangles
  */
-export const getTrianglesType = (trianglesSeriesHead: number) =>
+export const getTriangleSeriesType = (trianglesSeriesHead: number) =>
   trianglesSeriesHead < 0 ? TRIANGLE_FAN : TRIANGLE_STRIP
 
 /**

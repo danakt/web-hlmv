@@ -1,19 +1,25 @@
-import * as path                        from 'path'
-import * as fs                          from 'fs'
-import { parseModel }                   from '../lib/modelParser'
-import { readFacesData, countVertices } from '../lib/geometryBuilder'
+import * as path                                               from 'path'
+import * as fs                                                 from 'fs'
+import { parseModel }                                          from '../lib/modelParser'
+import { readFacesData, countVertices, getTriangleSeriesType } from '../lib/geometryBuilder'
+import { TRIANGLE_FAN, TRIANGLE_STRIP }                        from '../const/constants'
 
 const leetPath = path.resolve(__dirname, '../mdl/leet.mdl')
 const leetBuffer: ArrayBuffer = fs.readFileSync(leetPath).buffer
 const leetModelData = parseModel(leetBuffer)
 
-const triangles = leetModelData.triangles[0][0][0]
-const vertices = leetModelData.vertices[0][0]
-const texture = leetModelData.textures[0]
+const meshDataPath = [[0, 0, 0], [0, 0, 1], [1, 1, 0]]
 
 describe('test geometry building', () => {
+  test('detect triangles series type', () => {
+    expect(getTriangleSeriesType(-1)).toBe(TRIANGLE_FAN)
+    expect(getTriangleSeriesType(1)).toBe(TRIANGLE_STRIP)
+  })
+
   test('speed of geometry building', () => {
-    readFacesData(triangles, vertices, texture)
+    for (const [a, b, c] of meshDataPath) {
+      readFacesData(leetModelData.triangles[a][b][c], leetModelData.vertices[a][b], leetModelData.textures[a])
+    }
   })
 
   test('should build the proper number of vertices', () => {
@@ -23,12 +29,19 @@ describe('test geometry building', () => {
   })
 
   test('should build geometry buffer', () => {
-    const { geometry } = readFacesData(triangles, vertices, texture)
-    expect(geometry).toMatchSnapshot('geometry buffer')
+    for (const [a, b, c] of meshDataPath) {
+      expect(
+        readFacesData(leetModelData.triangles[a][b][c], leetModelData.vertices[a][b], leetModelData.textures[a])
+          .geometry
+      ).toMatchSnapshot(`geometry buffer`)
+    }
   })
 
   test('should building uv map', () => {
-    const { uv } = readFacesData(triangles, vertices, texture)
-    expect(uv).toMatchSnapshot('uv buffer')
+    for (const [a, b, c] of meshDataPath) {
+      expect(
+        readFacesData(leetModelData.triangles[a][b][c], leetModelData.vertices[a][b], leetModelData.textures[a]).uv
+      ).toMatchSnapshot('uv buffer')
+    }
   })
 })
