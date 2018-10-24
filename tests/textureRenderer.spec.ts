@@ -1,7 +1,7 @@
 import * as fs                  from 'fs'
 import * as path                from 'path'
 import * as png                 from 'fast-png'
-import { parseModel }           from '../lib/modelParser'
+import { parseModel }           from '../lib/modelDataParser'
 import { MockImageData }        from './tools'
 import { toMatchImageSnapshot } from 'jest-image-snapshot'
 import { buildTexture }         from '../lib/textureBuilder'

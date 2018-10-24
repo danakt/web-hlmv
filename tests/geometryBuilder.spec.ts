@@ -1,6 +1,6 @@
 import * as path                                               from 'path'
 import * as fs                                                 from 'fs'
-import { parseModel }                                          from '../lib/modelParser'
+import { parseModel }                                          from '../lib/modelDataParser'
 import { readFacesData, countVertices, getTriangleSeriesType } from '../lib/geometryBuilder'
 import { TRIANGLE_FAN, TRIANGLE_STRIP }                        from '../const/constants'
 

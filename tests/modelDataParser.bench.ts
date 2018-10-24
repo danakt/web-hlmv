@@ -2,7 +2,7 @@ import * as fs           from 'fs'
 import * as path         from 'path'
 import * as structs      from '../const/structs'
 import * as FastDataView from 'fast-dataview'
-import * as ModelParser  from '../lib/modelParser'
+import * as ModelParser  from '../lib/modelDataParser'
 
 // Loading model for testing
 const leetPath = path.resolve(__dirname, '../mdl/leet.mdl')

@@ -1,5 +1,5 @@
 import * as THREE                from 'three'
-import { ModelData, parseModel } from './modelParser'
+import { ModelData, parseModel } from './modelDataParser'
 import * as structs              from '../const/structs'
 import { readFacesData }         from './geometryBuilder'
 import { buildTexture }          from './textureBuilder'
