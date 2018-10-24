@@ -36,21 +36,20 @@ export const countVertices = (trianglesBuffer: Int16Array): number => {
 }
 
 /**
- * Returns face vertices of the mesh
+ * Unpack faces of the mesh
  * @param trianglesBuffer Triangles data
- * @param verticesBuffer Unique vertices
+ * @param verticesBuffer Vertices
  * @param texture Image data of texture
  * @returns
  *
- * @todo Make faster and simpler. For example, generate a queue of indexes and
- * generate uv map and geometry based on the queue.
+ * @todo Make faster and simpler.
  */
 export const readFacesData = (trianglesBuffer: Int16Array, verticesBuffer: Float32Array, texture: structs.Texture) => {
   // Number of vertices for generating buffer
   const vertNumber = countVertices(trianglesBuffer)
 
   // List of vertices data: origin and uv position on texture
-  const geometryVertices: number[][] = []
+  const verticesData: number[][] = []
 
   // Current position in buffer
   let trisPos = 0
@@ -103,15 +102,15 @@ export const readFacesData = (trianglesBuffer: Int16Array, verticesBuffer: Float
         if (j > 2) {
           if (j % 2 === 0) {
             // even
-            geometryVertices.push(
-              geometryVertices[geometryVertices.length - 3], // previously first one
-              geometryVertices[geometryVertices.length - 1] // last one
+            verticesData.push(
+              verticesData[verticesData.length - 3], // previously first one
+              verticesData[verticesData.length - 1] // last one
             )
           } else {
             // odd
-            geometryVertices.push(
-              geometryVertices[geometryVertices.length - 1], // last one
-              geometryVertices[geometryVertices.length - 2] // second to last
+            verticesData.push(
+              verticesData[verticesData.length - 1], // last one
+              verticesData[verticesData.length - 2] // second to last
             )
           }
         }
@@ -128,27 +127,30 @@ export const readFacesData = (trianglesBuffer: Int16Array, verticesBuffer: Float
         startVert = startVert || vertexData
 
         if (j > 2) {
-          geometryVertices.push(startVert, geometryVertices[geometryVertices.length - 1])
+          verticesData.push(startVert, verticesData[verticesData.length - 1])
         }
       }
 
       // New one
-      geometryVertices.push(vertexData)
+      verticesData.push(vertexData)
     }
   }
 
-  // Flattening buffers
+  // Converting array of vertices data to geometry buffer and UV buffer
   const geometry = new Float32Array(vertNumber * 3)
   const uv = new Float32Array(vertNumber * 2)
 
   for (let i = 0; i < vertNumber; i++) {
-    geometry[i * 3 + 0] = geometryVertices[i][0]
-    geometry[i * 3 + 1] = geometryVertices[i][1]
-    geometry[i * 3 + 2] = geometryVertices[i][2]
+    geometry[i * 3 + 0] = verticesData[i][0]
+    geometry[i * 3 + 1] = verticesData[i][1]
+    geometry[i * 3 + 2] = verticesData[i][2]
 
-    uv[i * 2 + 0] = geometryVertices[i][3]
-    uv[i * 2 + 1] = geometryVertices[i][4]
+    uv[i * 2 + 0] = verticesData[i][3]
+    uv[i * 2 + 1] = verticesData[i][4]
   }
 
-  return { geometry, uv }
+  return {
+    geometry,
+    uv
+  }
 }
