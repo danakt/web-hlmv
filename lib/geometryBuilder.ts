@@ -91,8 +91,8 @@ export const readFacesData = (trianglesBuffer: Int16Array, verticesBuffer: Float
         1 - trianglesBuffer[trisPos + 3] / texture.height
       ]
 
-      // Triangle strip. Draw the associated group of triangles.
-      // Each next vertex, beginning with the third, forms a triangle with the last and the penultimate vertex.
+      // Unpacking triangle strip. Each next vertex, beginning with the third,
+      // forms a triangle with the last and the penultimate vertex.
       //       1 ________3 ________ 5
       //       ╱╲        ╱╲        ╱╲
       //     ╱    ╲    ╱    ╲    ╱    ╲
@@ -116,8 +116,8 @@ export const readFacesData = (trianglesBuffer: Int16Array, verticesBuffer: Float
         }
       }
 
-      // Triangle fan. Draw a connected fan-shaped group of triangles.
-      // Each next vertex, beginning with the third, forms a triangle with the last and first vertex.
+      // Unpacking triangle fan. Each next vertex, beginning with the third,
+      // forms a triangle with the last and first vertex.
       //       2 ____3 ____ 4
       //       ╱╲    |    ╱╲
       //     ╱    ╲  |  ╱    ╲
