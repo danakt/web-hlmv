@@ -24,14 +24,22 @@ describe('test textures building', () => {
 
   test('should build valid skin texture', () => {
     const texture = leetModelData.textures[0]
-    const buildedSkin: Uint8Array = png.encode(buildTexture(leetBuffer, texture))
+    const buildedSkin: Uint8Array = png.encode({
+      width:  texture.width,
+      height: texture.height,
+      data:   buildTexture(leetBuffer, texture)
+    })
 
     expect(Buffer.from(buildedSkin)).toMatchImageSnapshot()
   })
 
   test('should build valid backpack texture', () => {
     const texture = leetModelData.textures[2]
-    const buildedSkin: Uint8Array = png.encode(buildTexture(leetBuffer, texture))
+    const buildedSkin: Uint8Array = png.encode({
+      width:  texture.width,
+      height: texture.height,
+      data:   buildTexture(leetBuffer, texture)
+    })
 
     expect(Buffer.from(buildedSkin)).toMatchImageSnapshot()
   })

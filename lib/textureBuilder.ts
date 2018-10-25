@@ -2,11 +2,11 @@ import * as structs                                                          fro
 import { NF_MASKED, PALETTE_SIZE, PALETTE_ALPHA_INDEX, RGB_SIZE, RGBA_SIZE } from '../const/constants'
 
 /**
- * Build image data from buffer
+ * Build texture data from buffer
  * @param buffer The model buffer
  * @param texture Texture description
  */
-export const buildTexture = (buffer: ArrayBuffer, texture: structs.Texture): ImageData => {
+export const buildTexture = (buffer: ArrayBuffer, texture: structs.Texture): Uint8ClampedArray => {
   const textureArea: number = texture.width * texture.height
   const isTextureMasked: number = texture.flags & NF_MASKED
 
@@ -51,5 +51,5 @@ export const buildTexture = (buffer: ArrayBuffer, texture: structs.Texture): Ima
     }
   }
 
-  return new ImageData(imageBuffer, texture.width, texture.height)
+  return imageBuffer
 }
