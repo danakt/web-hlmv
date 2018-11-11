@@ -7,9 +7,7 @@ declare module 'three-orbit-controls'
 declare module 'fast-dataview' {
   class FastDataView extends DataView {}
 
-  namespace FastDataView {
-
-  }
-
+  // prettier-ignore
+  namespace FastDataView {}
   export = FastDataView
 }
