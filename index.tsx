@@ -2,8 +2,8 @@ import * as React      from 'react'
 import * as ReactDOM   from 'react-dom'
 import { App }         from './ui/App'
 
-import * as model      from './models/leet.mdl'
-// import * as model      from './models/jpngirl01.mdl'
+import * as model      from './mdl/leet.mdl'
+// import * as model      from './mdl/jpngirl01.mdl'
 import { renderModel } from './lib/modelRenderer'
 
 // Render the app
