@@ -8,8 +8,18 @@ const config: Configuration = {
   module:  {
     rules: [
       {
-        test:    /\.tsx?$/,
-        use:     'awesome-typescript-loader',
+        test: /\.tsx?$/,
+        use:  {
+          loader:  'awesome-typescript-loader',
+          options: {
+            useBabel:     true,
+            babelOptions: {
+              babelrc: false,
+              plugins: ['react-hot-loader/babel', 'babel-plugin-styled-components']
+            },
+            babelCore: '@babel/core'
+          }
+        },
         exclude: /node_modules/
       },
       {
