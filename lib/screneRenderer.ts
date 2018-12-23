@@ -62,7 +62,7 @@ const runRenderer = (
   drawKeyframe()
 }
 
-export const renderScene = (canvas: HTMLCanvasElement, object: THREE.Object3D, initDistance = 80) => {
+export const renderScene = (canvas: HTMLCanvasElement, initDistance = 80): THREE.Scene => {
   const scene = new THREE.Scene()
   const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000)
   camera.position.z = initDistance
@@ -82,5 +82,5 @@ export const renderScene = (canvas: HTMLCanvasElement, object: THREE.Object3D, i
   const clock = new THREE.Clock()
   runRenderer(renderer, scene, camera, orbitControls, clock)
 
-  scene.add(object)
+  return scene
 }

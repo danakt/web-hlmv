@@ -1,4 +1,5 @@
 import * as THREE        from 'three'
+import { vec3 }          from 'gl-matrix'
 import { ModelData }     from './modelDataParser'
 import { readFacesData } from './geometryBuilder'
 
@@ -20,6 +21,19 @@ export const createTexture = (skinBuffer: Uint8ClampedArray, width: number, heig
   texture.needsUpdate = true
 
   return texture
+}
+
+export const renderBones = (bonesPositions: vec3[], color = 0x0000ff): THREE.Line => {
+  const geometry = new THREE.Geometry()
+
+  for (let i = 0; i < bonesPositions.length; i++) {
+    geometry.vertices.push(new THREE.Vector3(bonesPositions[i][0], bonesPositions[i][1], bonesPositions[i][2]))
+  }
+
+  const material = new THREE.LineBasicMaterial({ color })
+  const line = new THREE.Line(geometry, material)
+
+  return line
 }
 
 /**
