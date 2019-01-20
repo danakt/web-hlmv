@@ -62,6 +62,18 @@ const runRenderer = (
   drawKeyframe()
 }
 
+/**
+ * Binds renderer resize
+ */
+const bindRendererResize = (camera: THREE.PerspectiveCamera, renderer: THREE.Renderer) => {
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight
+    camera.updateProjectionMatrix()
+
+    renderer.setSize(window.innerWidth, window.innerHeight)
+  })
+}
+
 export const renderScene = (canvas: HTMLCanvasElement, initDistance = 80): THREE.Scene => {
   const scene = new THREE.Scene()
   const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000)
@@ -81,6 +93,8 @@ export const renderScene = (canvas: HTMLCanvasElement, initDistance = 80): THREE
 
   const clock = new THREE.Clock()
   runRenderer(renderer, scene, camera, orbitControls, clock)
+
+  bindRendererResize(camera, renderer)
 
   return scene
 }
