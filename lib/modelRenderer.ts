@@ -131,5 +131,13 @@ export const renderModel = (modelBuffer: ArrayBuffer) => {
 
   container.add(mesh)
 
+  // Sets to display the front of the model
+  container.rotation.x = THREE.Math.degToRad(-90)
+  container.rotation.z = THREE.Math.degToRad(-90)
+
+  // Sets to display model on the center of camera
+  const boundingBox = new THREE.Box3().setFromObject(container)
+  container.position.y = (boundingBox.min.y - boundingBox.max.y) / 2
+
   return container
 }
