@@ -1,4 +1,5 @@
 import { vec3, quat, mat4 } from 'gl-matrix'
+import * as R               from 'ramda'
 import * as structs         from '../const/structs'
 import * as MultiArrayView  from 'multi-array-view'
 import { ANIM_VALUE }       from '../const/constants'
@@ -28,15 +29,46 @@ export function anglesToQuaternion(angles: vec3): quat {
 }
 
 /**
+ * Returns bone quaternions
+ * @param sequence
+ * @param frame Frame
+ * @param s Interpolation amount
+ * @param bones Bones list
+ */
+export const getBoneQuaternions = (
+  bones: structs.Bone[],
+  animations: structs.Animation[],
+  animationValues: MultiArrayView<number>,
+  sequenceIndex: number,
+  frame: number,
+  s: number = 0
+): quat[] =>
+  R.times(
+    boneIndex =>
+      calcBoneQuaternion(
+        frame,
+        bones[boneIndex],
+        animations[boneIndex].offset,
+        animationValues,
+        boneIndex,
+        sequenceIndex,
+        s
+      ),
+    bones.length
+  )
+
+/**
  * Calculates bone angle
  */
-const calcBoneAngles = (
+export const calcBoneQuaternion = (
   frame: number,
   bone: structs.Bone,
-  animOffset: Uint8Array,
+  animOffset: Uint16Array,
   animValues: MultiArrayView<number>,
-  boneIndex: number
-): [vec3, vec3] => {
+  boneIndex: number,
+  sequenceIndex: number,
+  s: number
+): quat => {
   let angle1 = vec3.create()
   let angle2 = vec3.create()
 
@@ -50,41 +82,54 @@ const calcBoneAngles = (
     } else {
       // Animation
       let i = 0
-      let f = frame
+      let k = frame
 
-      while (animValues.get(boneIndex, axis, i, ANIM_VALUE.TOTAL) <= f) {
-        f -= animValues.get(boneIndex, axis, i, ANIM_VALUE.TOTAL)
-        i += animValues.get(boneIndex, axis, i, ANIM_VALUE.TOTAL) + 1
+      let loopBreaker = 1e7
+      while (animValues.get(sequenceIndex, boneIndex, axis, i, ANIM_VALUE.TOTAL) <= k) {
+        k -= animValues.get(sequenceIndex, boneIndex, axis, i, ANIM_VALUE.TOTAL)
+        i += animValues.get(sequenceIndex, boneIndex, axis, i, ANIM_VALUE.VALID) + 1
+
+        if (loopBreaker-- <= 0) {
+          throw new Error(`Infinity loop. Bone index: ${boneIndex}`)
+        }
       }
 
       // Bah, missing blend!
-      if (animValues.get(boneIndex, axis, i, ANIM_VALUE.VALID) > f) {
-        angle1[axis] = animValues.get(boneIndex, axis, f + 1, ANIM_VALUE.VALUE)
+      if (animValues.get(sequenceIndex, boneIndex, axis, i, ANIM_VALUE.VALID) > k) {
+        angle1[axis] = animValues.get(sequenceIndex, boneIndex, axis, k + 1, ANIM_VALUE.VALUE)
 
-        if (animValues.get(boneIndex, axis, i, ANIM_VALUE.VALID) > f + 1) {
-          angle2[axis] = animValues.get(boneIndex, axis, f + 2, ANIM_VALUE.VALUE)
+        if (animValues.get(sequenceIndex, boneIndex, axis, i, ANIM_VALUE.VALID) > k + 1) {
+          angle2[axis] = animValues.get(sequenceIndex, boneIndex, axis, k + 2, ANIM_VALUE.VALUE)
         } else {
-          if (animValues.get(boneIndex, axis, i, ANIM_VALUE.TOTAL) > f + 1) {
+          if (animValues.get(sequenceIndex, boneIndex, axis, i, ANIM_VALUE.TOTAL) > k + 1) {
             angle2[axis] = angle1[axis]
           } else {
-            angle2[axis] = animValues.get(boneIndex, axis, animValues.get(boneIndex, axis, i, ANIM_VALUE.VALID) + 2, 0)
+            angle2[axis] = animValues.get(
+              sequenceIndex,
+              boneIndex,
+              axis,
+              animValues.get(sequenceIndex, boneIndex, axis, i, ANIM_VALUE.VALID) + 2,
+              0
+            )
           }
         }
       } else {
         angle1[axis] = animValues.get(
+          sequenceIndex,
           boneIndex,
           axis,
-          animValues.get(boneIndex, axis, i, ANIM_VALUE.VALID),
+          animValues.get(sequenceIndex, boneIndex, axis, i, ANIM_VALUE.VALID),
           ANIM_VALUE.VALUE
         )
 
-        if (animValues.get(boneIndex, axis, i, ANIM_VALUE.TOTAL) > f + 1) {
+        if (animValues.get(sequenceIndex, boneIndex, axis, i, ANIM_VALUE.TOTAL) > k + 1) {
           angle2[axis] = angle1[axis]
         } else {
           angle2[axis] = animValues.get(
+            sequenceIndex,
             boneIndex,
             axis,
-            animValues.get(boneIndex, axis, i, ANIM_VALUE.VALID) + 2,
+            animValues.get(sequenceIndex, boneIndex, axis, i, ANIM_VALUE.VALID) + 2,
             ANIM_VALUE.VALUE
           )
         }
@@ -95,42 +140,14 @@ const calcBoneAngles = (
     }
   }
 
-  return [angle1, angle2]
-}
-
-/**
- * Returns bone quaternions
- * @param sequence
- * @param frame Frame
- * @param s Interpolation amount
- * @param bones Bones list
- */
-export const getBoneQuaternions = (
-  bones: structs.Bone[],
-  animations: structs.Animation[],
-  animationValues: MultiArrayView<number>,
-  frame: number,
-  s: number
-): quat[] => {
-  // List of bone quaternions
-  const quaternions = []
-
-  for (let i = 0; i < bones.length; i++) {
-    let angle2: vec3
-    let angle1: vec3
-    ;[angle1, angle2] = calcBoneAngles(frame, bones[i], animations[i].offset, animationValues, i)
-
-    if (!vec3.equals(angle1, angle2)) {
-      const q1 = anglesToQuaternion(angle1)
-      const q2 = anglesToQuaternion(angle2)
-
-      quaternions.push(quat.slerp(quat.create(), q1, q2, s))
-    } else {
-      quaternions.push(anglesToQuaternion(angle1))
-    }
+  if (vec3.equals(angle1, angle2)) {
+    return anglesToQuaternion(angle1)
   }
 
-  return quaternions
+  const q1 = anglesToQuaternion(angle1)
+  const q2 = anglesToQuaternion(angle2)
+
+  return quat.slerp(quat.create(), q1, q2, s)
 }
 
 /**

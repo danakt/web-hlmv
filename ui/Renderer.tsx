@@ -1,23 +1,17 @@
-import * as React                   from 'react'
+import * as React                from 'react'
 // import * as THREE                from 'three'
-import { WindowSizeSensor }         from 'libreact'
-import { ModelData, parseModel }    from '../lib/modelDataParser'
-import { buildTexture }             from '../lib/textureBuilder'
-import { renderModel, renderBones } from '../lib/modelRenderer'
-import { renderScene }              from '../lib/screneRenderer'
-import { getBonePositions }         from '../lib/geometryTransformer'
+import { WindowSizeSensor }      from 'libreact'
+import { ModelData, parseModel } from '../lib/modelDataParser'
+import { buildTexture }          from '../lib/textureBuilder'
+import { renderModel }           from '../lib/modelRenderer'
+import { renderScene }           from '../lib/screneRenderer'
+import { getBonePositions }      from '../lib/geometryTransformer'
 
 type Props = {
   modelBuffer: ArrayBuffer
 }
 
 export const Renderer = (props: Props) => {
-  // Model data
-  const modelData: ModelData = React.useMemo(() => parseModel(props.modelBuffer), [props.modelBuffer])
-  const textures: Uint8ClampedArray[] = React.useMemo(
-    () => modelData.textures.map(texture => buildTexture(props.modelBuffer, texture)),
-    [modelData]
-  )
   // Canvas reference
   const canvasRef = React.useRef<HTMLCanvasElement>(null)
 
@@ -25,9 +19,9 @@ export const Renderer = (props: Props) => {
     if (canvasRef.current) {
       const scene = renderScene(canvasRef.current)
 
-      scene.add(renderModel(modelData, textures))
+      scene.add(renderModel(props.modelBuffer))
 
-      scene.add(renderBones(getBonePositions(modelData.bones)))
+      // scene.add(render§s(getBonePositions(modelData.bones)))
     }
   }, [])
 

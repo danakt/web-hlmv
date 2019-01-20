@@ -75,7 +75,7 @@ export const readFacesData = (trianglesBuffer: Int16Array, verticesBuffer: Float
     // 2 — first uv coordinate
     // 3 — second uv coordinate
     for (let j = 0; j < trianglesNum; j++, trisPos += 4) {
-      // const vertIndex: number = trianglesBuffer[trisPos]
+      const vertIndex: number = trianglesBuffer[trisPos]
       const vert: number = trianglesBuffer[trisPos] * 3
       // const light: number = trianglesBuffer[trisPos + 1] // ?
 
@@ -88,7 +88,10 @@ export const readFacesData = (trianglesBuffer: Int16Array, verticesBuffer: Float
 
         // UV data
         trianglesBuffer[trisPos + 2] / texture.width,
-        1 - trianglesBuffer[trisPos + 3] / texture.height
+        1 - trianglesBuffer[trisPos + 3] / texture.height,
+
+        // Vertice index for getting bone tranforms in subsequent calculations
+        vertIndex
       ]
 
       // Unpacking triangle strip. Each next vertex, beginning with the third,
@@ -137,20 +140,24 @@ export const readFacesData = (trianglesBuffer: Int16Array, verticesBuffer: Float
   }
 
   // Converting array of vertices data to geometry buffer and UV buffer
-  const geometry = new Float32Array(vertNumber * 3)
+  const vertices = new Float32Array(vertNumber * 3)
   const uv = new Float32Array(vertNumber * 2)
+  const indices = new Int16Array(vertNumber)
 
   for (let i = 0; i < vertNumber; i++) {
-    geometry[i * 3 + 0] = verticesData[i][0]
-    geometry[i * 3 + 1] = verticesData[i][1]
-    geometry[i * 3 + 2] = verticesData[i][2]
+    vertices[i * 3 + 0] = verticesData[i][0]
+    vertices[i * 3 + 1] = verticesData[i][1]
+    vertices[i * 3 + 2] = verticesData[i][2]
 
     uv[i * 2 + 0] = verticesData[i][3]
     uv[i * 2 + 1] = verticesData[i][4]
+
+    indices[i] = verticesData[i][5]
   }
 
   return {
-    geometry,
-    uv
+    vertices,
+    uv,
+    indices
   }
 }

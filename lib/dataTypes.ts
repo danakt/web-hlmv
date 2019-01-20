@@ -107,10 +107,10 @@ export const short = int16
  * Creates reader of the Uint16 value at the specified byte offset from the
  * start of the DataView object.
  */
-export const uint16: DataType<number, Int16Array> = {
+export const uint16: DataType<number, Uint16Array> = {
   byteLength:       2,
   getValue:         (dataView, offset) => dataView.getUint16(offset, true),
-  arrayConstructor: Int16Array
+  arrayConstructor: Uint16Array
 }
 
 /**

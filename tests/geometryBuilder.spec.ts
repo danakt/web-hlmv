@@ -32,7 +32,7 @@ describe('test geometry building', () => {
     for (const [a, b, c] of meshDataPath) {
       expect(
         readFacesData(leetModelData.triangles[a][b][c], leetModelData.vertices[a][b], leetModelData.textures[a])
-          .geometry
+          .vertices
       ).toMatchSnapshot(`geometry buffer`)
     }
   })
