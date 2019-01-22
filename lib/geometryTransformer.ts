@@ -84,7 +84,7 @@ export const calcBoneQuaternion = (
       let i = 0
       let k = frame
 
-      let loopBreaker = 1e7
+      let loopBreaker = 1e6
       while (animValues.get(sequenceIndex, boneIndex, axis, i, ANIM_VALUE.TOTAL) <= k) {
         k -= animValues.get(sequenceIndex, boneIndex, axis, i, ANIM_VALUE.TOTAL)
         i += animValues.get(sequenceIndex, boneIndex, axis, i, ANIM_VALUE.VALID) + 1
