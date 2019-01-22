@@ -4,7 +4,7 @@ import * as structs                                     from '../const/structs'
 import { MAX_SRCBONES, AXLES_NUM, ANIM_VALUE, VERSION } from '../const/constants'
 import * as BinaryReader                                from './binaryReader'
 // eslint-disable-next-line no-unused-vars
-import { Struct, StructResult, short, byte }            from './dataTypes'
+import { Struct, StructResult, short, byte, ubyte }     from './dataTypes'
 
 /**
  * Creates multiple reader
@@ -134,8 +134,8 @@ export const parseAnimValues = (
 
           // Using the "method" instead of applying a structure is an optimization of reading
           const value = short.getValue(dataView, offset)
-          const valid = byte.getValue(dataView, offset)
-          const total = byte.getValue(dataView, offset + byte.byteLength)
+          const valid = ubyte.getValue(dataView, offset)
+          const total = ubyte.getValue(dataView, offset + byte.byteLength)
 
           animValues.set(value, i, j, axis, v, ANIM_VALUE.VALUE)
           animValues.set(valid, i, j, axis, v, ANIM_VALUE.VALID)
