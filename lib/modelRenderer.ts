@@ -74,45 +74,82 @@ export const applyBoneTranforms = (
 export const renderModel = (modelBuffer: ArrayBuffer) => {
   const container = new THREE.Group()
 
+  console.time('Parse model')
   const modelData: ModelData = parseModel(modelBuffer)
+  console.timeEnd('Parse model')
 
+  console.time('Prepare frames')
   const textures: Uint8ClampedArray[] = modelData.textures.map(texture => buildTexture(modelBuffer, texture))
 
-  const bodyPartIndex = 0
-  const subModelIndex = 0
-  const meshIndex = 0
-  const sequenceIndex = 0
-  const frame = 0
+  // path: [bodyPartIndex][subModelIndex][meshIndex][sequenceId][frame]
+  const geomtryBuffers: THREE.BufferAttribute[][][][][] = []
 
-  const { vertices, uv, indices } = readFacesData(
-    modelData.triangles[bodyPartIndex][subModelIndex][meshIndex],
-    modelData.vertices[bodyPartIndex][subModelIndex],
-    modelData.textures[bodyPartIndex]
-  )
+  // path: [bodyPartIndex][subModelIndex]
+  const uvMaps: THREE.BufferAttribute[][][] = []
+
+  for (let bodyPartIndex = 0; bodyPartIndex < modelData.triangles.length; bodyPartIndex++) {
+    geomtryBuffers[bodyPartIndex] = []
+    uvMaps[bodyPartIndex] = []
+
+    for (let subModelIndex = 0; subModelIndex < modelData.triangles[bodyPartIndex].length; subModelIndex++) {
+      geomtryBuffers[bodyPartIndex][subModelIndex] = []
+      uvMaps[bodyPartIndex][subModelIndex] = []
+
+      for (let meshIndex = 0; meshIndex < modelData.triangles[bodyPartIndex][subModelIndex].length; meshIndex++) {
+        geomtryBuffers[bodyPartIndex][subModelIndex][meshIndex] = []
+
+        const { vertices, uv, indices } = readFacesData(
+          modelData.triangles[bodyPartIndex][subModelIndex][meshIndex],
+          modelData.vertices[bodyPartIndex][subModelIndex],
+          modelData.textures[bodyPartIndex]
+        )
+
+        uvMaps[bodyPartIndex][subModelIndex][meshIndex] = new THREE.BufferAttribute(uv, 2)
+
+        for (let sequenceIndex = 0; sequenceIndex < modelData.sequences.length; sequenceIndex++) {
+          geomtryBuffers[bodyPartIndex][subModelIndex][meshIndex][sequenceIndex] = []
+
+          for (let frame = 0; frame < modelData.sequences[sequenceIndex].numframes; frame++) {
+            try {
+              const boneQuaternions = getBoneQuaternions(
+                modelData.bones,
+                modelData.animations[sequenceIndex],
+                modelData.animValues,
+                sequenceIndex,
+                frame
+              )
+
+              const bonesPositions = getBonePositions(modelData.bones)
+
+              const boneTransforms = calcBoneTransforms(boneQuaternions, bonesPositions, modelData.bones)
+
+              const transformedVertices = applyBoneTranforms(
+                vertices,
+                indices,
+                modelData.vertBoneBuffer[bodyPartIndex][subModelIndex],
+                boneTransforms
+              )
+
+              geomtryBuffers[bodyPartIndex][subModelIndex][meshIndex][sequenceIndex][frame] = new THREE.BufferAttribute(
+                transformedVertices,
+                3
+              )
+            } catch (err) {
+              console.log(bodyPartIndex, subModelIndex, meshIndex, sequenceIndex, frame)
+
+              throw new Error(err)
+            }
+          }
+        }
+      }
+    }
+  }
+  console.timeEnd('Prepare frames')
 
   const geometry = new THREE.BufferGeometry()
 
-  const boneQuaternions = getBoneQuaternions(
-    modelData.bones,
-    modelData.animations[bodyPartIndex],
-    modelData.animValues,
-    sequenceIndex,
-    frame
-  )
-
-  const bonesPositions = getBonePositions(modelData.bones)
-
-  const boneTransforms = calcBoneTransforms(boneQuaternions, bonesPositions, modelData.bones)
-
-  const transformedVertices = applyBoneTranforms(
-    vertices,
-    indices,
-    modelData.vertBoneBuffer[bodyPartIndex][subModelIndex],
-    boneTransforms
-  )
-
-  geometry.addAttribute('position', new THREE.BufferAttribute(transformedVertices, 3))
-  geometry.addAttribute('uv', new THREE.BufferAttribute(uv, 2))
+  geometry.addAttribute('position', geomtryBuffers[0][0][0][0][0])
+  geometry.addAttribute('uv', uvMaps[0][0][0])
 
   // Preparing texture
   const texture: THREE.Texture = createTexture(textures[0], modelData.textures[0].width, modelData.textures[0].height)
