@@ -3,7 +3,6 @@ import * as path                          from 'path'
 import * as FastDataView                  from 'fast-dataview'
 import * as structs                       from '../const/structs'
 import { readStruct, readStructMultiple } from '../lib/binaryReader'
-import { getPerformance }                 from './tools'
 import {
   int8,
   byte,
@@ -43,18 +42,6 @@ test('should parse multiple structs in binary file', () => {
   const texturesInfo = readStructMultiple(dataView, structs.texture, header.textureindex, header.numtextures)
 
   expect(texturesInfo).toMatchSnapshot('leet texture info')
-})
-
-xtest('speed test', () => {
-  const dataView = new FastDataView(leetBuffer)
-
-  const perf = getPerformance(() => {
-    for (let i = 0; i < 1e4; i++) {
-      readStruct(dataView, structs.header)
-    }
-  })
-
-  expect(perf).toBeLessThan(200)
 })
 
 test('should get byte from buffer', () => {
