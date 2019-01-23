@@ -1,9 +1,9 @@
 import * as fs                  from 'fs'
 import * as path                from 'path'
 import * as png                 from 'fast-png'
-import { parseModel }           from '../lib/modelDataParser'
 import { toMatchImageSnapshot } from 'jest-image-snapshot'
-import { buildTexture }         from '../lib/textureBuilder'
+import { parseModel }           from '../modelDataParser'
+import { buildTexture }         from '../textureBuilder'
 
 // Extending jest's expect
 expect.extend({ toMatchImageSnapshot })
@@ -15,7 +15,7 @@ Object.defineProperty(global, 'ImageData', {
   }
 })
 
-const leetPath = path.resolve(__dirname, '../mdl/leet.mdl')
+const leetPath = path.resolve(__dirname, '../../__mock__/leet.mdl')
 const leetBuffer: ArrayBuffer = fs.readFileSync(leetPath).buffer
 const leetModelData = parseModel(leetBuffer)
 

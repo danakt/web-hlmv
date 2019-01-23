@@ -1,8 +1,8 @@
 import * as fs                            from 'fs'
 import * as path                          from 'path'
 import * as FastDataView                  from 'fast-dataview'
-import * as structs                       from '../const/structs'
-import { readStruct, readStructMultiple } from '../lib/binaryReader'
+import * as structs                       from '../../const/structs'
+import { readStruct, readStructMultiple } from '../binaryReader'
 import {
   int8,
   byte,
@@ -24,10 +24,10 @@ import {
   array,
   vec3,
   skip
-} from '../lib/dataTypes'
+} from '../dataTypes'
 
 // Loading model for testing
-const leetPath = path.resolve(__dirname, '../mdl/leet.mdl')
+const leetPath = path.resolve(__dirname, '../../__mock__/leet.mdl')
 const leetBuffer: ArrayBuffer = fs.readFileSync(leetPath).buffer
 
 test('should parse some struct in binary file', () => {

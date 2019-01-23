@@ -21,7 +21,8 @@
       }
     },
     "testMatch": [
-      "**/tests/*.(spec|test|bench).+(ts|tsx|js)"
+      "**/__tests__/**/*.ts?(x)",
+      "**/?(*.)+(spec|test).ts?(x)"
     ],
     "collectCoverage": true,
     "collectCoverageFrom": [

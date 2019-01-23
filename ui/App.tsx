@@ -2,8 +2,8 @@ import * as React   from 'react'
 import { Fetch }    from './Fetch'
 import { Renderer } from './Renderer'
 
-import * as model   from '../mdl/leet.mdl'
-// import * as model   from '../mdl/jpngirl01.mdl'
+import * as model   from '../__mock__/leet.mdl'
+// import * as model   from '../__mock__/jpngirl01.mdl'
 
 type Props = {
   //

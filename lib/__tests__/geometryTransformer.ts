@@ -1,9 +1,9 @@
 import * as path                                  from 'path'
 import * as fs                                    from 'fs'
-import { parseModel }                             from '../lib/modelDataParser'
-import { getBoneQuaternions, calcBoneQuaternion } from '../lib/geometryTransformer'
+import { parseModel }                             from '../modelDataParser'
+import { getBoneQuaternions, calcBoneQuaternion } from '../geometryTransformer'
 
-const leetPath = path.resolve(__dirname, '../mdl/leet.mdl')
+const leetPath = path.resolve(__dirname, '../../__mock__/leet.mdl')
 const leetBuffer: ArrayBuffer = fs.readFileSync(leetPath).buffer
 const leetModelData = parseModel(leetBuffer)
 

@@ -2,13 +2,13 @@ import * as fs           from 'fs'
 import * as path         from 'path'
 import * as FastDataView from 'fast-dataview'
 import { intersection }  from 'ramda'
-import * as ModelParser  from '../lib/modelDataParser'
+import * as ModelParser  from '../modelDataParser'
 
 // Loading model for testing
-const leetPath = path.resolve(__dirname, '../mdl/leet.mdl')
+const leetPath = path.resolve(__dirname, '../../__mock__/leet.mdl')
 const leetBuffer: ArrayBuffer = fs.readFileSync(leetPath).buffer
 
-const ratamahattaPath = path.resolve(__dirname, '../mdl/ratamahatta.md2')
+const ratamahattaPath = path.resolve(__dirname, '../../__mock__/ratamahatta.md2')
 const ratamahattaBuffer: ArrayBuffer = fs.readFileSync(ratamahattaPath).buffer
 
 const dataView = new FastDataView(leetBuffer)
