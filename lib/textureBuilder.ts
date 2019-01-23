@@ -5,6 +5,7 @@ import { NF_MASKED, PALETTE_SIZE, PALETTE_ALPHA_INDEX, RGB_SIZE, RGBA_SIZE } fro
  * Build texture data from buffer
  * @param buffer The model buffer
  * @param texture Texture description
+ * @returns Uint8ClampedArray with unpacked RGBA data of a texture
  */
 export const buildTexture = (buffer: ArrayBuffer, texture: structs.Texture): Uint8ClampedArray => {
   const textureArea: number = texture.width * texture.height
