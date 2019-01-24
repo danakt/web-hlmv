@@ -7,6 +7,14 @@ import { calcBoneTransforms, getBoneQuaternions, getBonePositions } from './geom
 import { buildTexture }                                             from './textureBuilder'
 
 /**
+ * Mesh buffers of each frame of each sequence of the model and mesh UV-maps
+ */
+export type MeshRenderData = {
+  geometryBuffers: THREE.BufferAttribute[][]
+  uvMap: THREE.BufferAttribute
+}
+
+/**
  * Creates texture instance
  */
 export const createTexture = (skinBuffer: Uint8ClampedArray, width: number, height: number): THREE.Texture => {
@@ -27,25 +35,9 @@ export const createTexture = (skinBuffer: Uint8ClampedArray, width: number, heig
 }
 
 /**
- * Until better times
- */
-// export const renderBones = (bonesPositions: vec3[], color = 0x0000ff): THREE.Line => {
-//   const geometry = new THREE.Geometry()
-
-//   for (let i = 0; i < bonesPositions.length; i++) {
-//     geometry.vertices.push(new THREE.Vector3(bonesPositions[i][0], bonesPositions[i][1], bonesPositions[i][2]))
-//   }
-
-//   const material = new THREE.LineBasicMaterial({ color })
-//   const line = new THREE.Line(geometry, material)
-
-//   return line
-// }
-
-/**
  * Applies bone transforms to a position array and returns it
  */
-export const applyBoneTranforms = (
+export const applyBoneTransforms = (
   vertices: Float32Array,
   vertIndices: Int16Array,
   vertBoneBuffer: Uint8Array,
@@ -77,9 +69,7 @@ export const applyBoneTranforms = (
  * the model
  * @param modelData Model data
  */
-export const prepareFrames = (
-  modelData: ModelData
-): { geometryBuffers: THREE.BufferAttribute[][]; uvMap: THREE.BufferAttribute }[][][] =>
+export const prepareRenderData = (modelData: ModelData): MeshRenderData[][][] =>
   modelData.bodyParts.map((_, bodyPartIndex) =>
     modelData.subModels[bodyPartIndex].map((_, subModelIndex) =>
       modelData.meshes[bodyPartIndex][subModelIndex].map((_, meshIndex) => {
@@ -109,14 +99,16 @@ export const prepareFrames = (
 
                 const bonesPositions = getBonePositions(modelData.bones)
                 const boneTransforms = calcBoneTransforms(boneQuaternions, bonesPositions, modelData.bones)
-                const transformedVertices = applyBoneTranforms(
+                const transformedVertices = applyBoneTransforms(
                   vertices,
                   indices,
                   modelData.vertBoneBuffer[bodyPartIndex][subModelIndex],
                   boneTransforms
                 )
 
-                return new THREE.BufferAttribute(transformedVertices, 3)
+                const bufferAttribute = new THREE.BufferAttribute(transformedVertices, 3)
+
+                return bufferAttribute
               })
           )
         }
@@ -124,43 +116,79 @@ export const prepareFrames = (
     )
   )
 
+export const createModelMeshes = (
+  meshesRenderData: MeshRenderData[][][],
+  modelData: ModelData,
+  textureBuffers: Uint8ClampedArray[]
+) => {
+  const textures: THREE.Texture[] = textureBuffers.map((textureBuffer, textureIndex) => {
+    const texture = new THREE.Texture(
+      new ImageData(
+        textureBuffer,
+        modelData.textures[textureIndex].width,
+        modelData.textures[textureIndex].height
+      ) as any,
+      THREE.UVMapping,
+      THREE.ClampToEdgeWrapping,
+      THREE.ClampToEdgeWrapping,
+      THREE.LinearFilter,
+      THREE.LinearFilter,
+      THREE.RGBAFormat,
+      THREE.UnsignedByteType
+    )
+
+    texture.needsUpdate = true
+
+    return texture
+  })
+
+  return meshesRenderData.map((bodyPart, bodyPartIndex) =>
+    // Body part level
+    bodyPart.map((subModel, subModelIndex) =>
+      // Sub model level
+      subModel.map(({ geometryBuffers, uvMap }, meshIndex) => {
+        // Pizdec kakoi-to
+        const textureIndex = modelData.skinRef[modelData.meshes[bodyPartIndex][subModelIndex][meshIndex].skinref]
+
+        // Mesh level
+        const material = new THREE.MeshBasicMaterial({
+          map:          textures[textureIndex],
+          side:         THREE.DoubleSide,
+          transparent:  true,
+          alphaTest:    0.5,
+          morphTargets: true
+          // color:        0xffffff
+        })
+
+        // Prepare geometry
+        const geometry = new THREE.BufferGeometry()
+        geometry.addAttribute('position', geometryBuffers[0][0])
+        geometry.addAttribute('uv', uvMap)
+
+        // Prepare mesh
+        return new THREE.Mesh(geometry, material)
+      })
+    )
+  )
+}
+
 /**
  * Creates THREE.js object to render
  */
-export const renderModel = (modelBuffer: ArrayBuffer) => {
+export const createContainer = (meshes: THREE.Mesh[][][]) => {
   const container = new THREE.Group()
 
-  console.time('Parse model')
-  const modelData: ModelData = parseModel(modelBuffer)
-  console.timeEnd('Parse model')
-
-  console.time('Prepare frames')
-  const textures: Uint8ClampedArray[] = modelData.textures.map(texture => buildTexture(modelBuffer, texture))
-
-  const renderData = prepareFrames(modelData)
-  console.timeEnd('Prepare frames')
-
-  const geometry = new THREE.BufferGeometry()
-
-  geometry.addAttribute('position', renderData[0][0][0].geometryBuffers[0][0])
-  geometry.addAttribute('uv', renderData[0][0][0].uvMap)
-
-  // Preparing texture
-  const texture: THREE.Texture = createTexture(textures[0], modelData.textures[0].width, modelData.textures[0].height)
-
-  // // Mesh material
-  const material = new THREE.MeshBasicMaterial({
-    map:          texture,
-    side:         THREE.DoubleSide,
-    transparent:  true,
-    alphaTest:    0.5,
-    morphTargets: true
-    // color:        0xffffff
-  })
-
-  const mesh = new THREE.Mesh(geometry, material)
-
-  container.add(mesh)
+  // Adding meshes to the container
+  meshes.forEach(bodyPart =>
+    // Body part level
+    bodyPart.forEach(subModel =>
+      // Sub model level
+      subModel.forEach(mesh => {
+        // Mesh level
+        container.add(mesh)
+      })
+    )
+  )
 
   // Sets to display the front of the model
   container.rotation.x = THREE.Math.degToRad(-90)

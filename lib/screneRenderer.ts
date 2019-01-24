@@ -1,5 +1,6 @@
 import * as THREE                from 'three'
 import * as orbitControlsCreator from 'three-orbit-controls'
+import { ModelController }       from './modelController'
 
 /*
  * Allow the camera to orbit around a target
@@ -46,15 +47,16 @@ const runRenderer = (
   scene: THREE.Scene,
   camera: THREE.Camera,
   controls: THREE.OrbitControls,
-  clock: THREE.Clock
+  clock: THREE.Clock,
+  modelController: ModelController
 ) => {
   const drawKeyframe = () => {
     requestAnimationFrame(drawKeyframe)
     // required if controls.enableDamping or controls.autoRotate are set to true
     controls.update()
 
-    // const delta = clock.getDelta()
-    // character.update(delta)
+    const delta = clock.getDelta()
+    modelController.update(delta)
 
     renderer.render(scene, camera)
   }
@@ -74,7 +76,11 @@ const bindRendererResize = (camera: THREE.PerspectiveCamera, renderer: THREE.Ren
   })
 }
 
-export const renderScene = (canvas: HTMLCanvasElement, initDistance = 80): THREE.Scene => {
+export const renderScene = (
+  canvas: HTMLCanvasElement,
+  modelController: ModelController,
+  initDistance = 80
+): THREE.Scene => {
   const scene = new THREE.Scene()
   const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000)
   camera.position.z = initDistance
@@ -92,7 +98,7 @@ export const renderScene = (canvas: HTMLCanvasElement, initDistance = 80): THREE
   scene.add(...lights)
 
   const clock = new THREE.Clock()
-  runRenderer(renderer, scene, camera, orbitControls, clock)
+  runRenderer(renderer, scene, camera, orbitControls, clock, modelController)
 
   bindRendererResize(camera, renderer)
 

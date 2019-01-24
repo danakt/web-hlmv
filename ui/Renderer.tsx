@@ -1,11 +1,10 @@
-import * as React                from 'react'
-// import * as THREE                from 'three'
-import { WindowSizeSensor }      from 'libreact'
-import { ModelData, parseModel } from '../lib/modelDataParser'
-import { buildTexture }          from '../lib/textureBuilder'
-import { renderModel }           from '../lib/modelRenderer'
-import { renderScene }           from '../lib/screneRenderer'
-import { getBonePositions }      from '../lib/geometryTransformer'
+import * as React                                                from 'react'
+import { WindowSizeSensor }                                      from 'libreact'
+import { ModelData, parseModel }                                 from '../lib/modelDataParser'
+import { buildTexture }                                          from '../lib/textureBuilder'
+import { prepareRenderData, createModelMeshes, createContainer } from '../lib/modelRenderer'
+import { renderScene }                                           from '../lib/screneRenderer'
+import { createModelController }                                 from '../lib/modelController'
 
 type Props = {
   modelBuffer: ArrayBuffer
@@ -17,9 +16,21 @@ export const Renderer = (props: Props) => {
 
   React.useEffect(() => {
     if (canvasRef.current) {
-      const scene = renderScene(canvasRef.current)
+      console.time('Parse model')
+      const modelData: ModelData = parseModel(props.modelBuffer)
+      console.timeEnd('Parse model')
 
-      scene.add(renderModel(props.modelBuffer))
+      console.time('Prepare frames')
+      const meshesRenderData = prepareRenderData(modelData)
+      const textures = modelData.textures.map(texture => buildTexture(props.modelBuffer, texture))
+      const meshes = createModelMeshes(meshesRenderData, modelData, textures)
+      const controller = createModelController(meshes, meshesRenderData, modelData)
+      console.timeEnd('Prepare frames')
+
+      const container = createContainer(meshes)
+
+      const scene = renderScene(canvasRef.current, controller)
+      scene.add(container)
 
       // scene.add(render§s(getBonePositions(modelData.bones)))
     }
