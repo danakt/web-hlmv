@@ -73,11 +73,13 @@ export const prepareRenderData = (modelData: ModelData): MeshRenderData[][][] =>
   modelData.bodyParts.map((_, bodyPartIndex) =>
     modelData.subModels[bodyPartIndex].map((_, subModelIndex) =>
       modelData.meshes[bodyPartIndex][subModelIndex].map((_, meshIndex) => {
+        const textureIndex = modelData.skinRef[modelData.meshes[bodyPartIndex][subModelIndex][meshIndex].skinref]
+
         // Unpack faces of the mesh
         const { vertices, uv, indices } = readFacesData(
           modelData.triangles[bodyPartIndex][subModelIndex][meshIndex],
           modelData.vertices[bodyPartIndex][subModelIndex],
-          modelData.textures[bodyPartIndex]
+          modelData.textures[textureIndex]
         )
 
         return {
