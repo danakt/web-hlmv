@@ -45,7 +45,10 @@ export const createModelController = (
   modelData: ModelData
 ) => {
   let activeSequenceIndex = 0
-  let activeAction: THREE.AnimationAction | null = null
+
+  const activeActions: (THREE.AnimationAction | null)[][][] = meshes.map(bodyPart =>
+    bodyPart.map(subModel => subModel.map(() => null))
+  )
 
   // Path: [bodyPartIndex][subModelIndex][meshIndex][sequenceIndex]
   const animationClips: THREE.AnimationClip[][][][] = prepareAnimationClips(meshesRenderData, modelData)
@@ -109,45 +112,54 @@ export const createModelController = (
      * Sets animation to play
      */
     playAnimation: (sequenceIndex: number) => {
+      activeSequenceIndex = sequenceIndex
+
       animationClips.forEach((bodyPart, bodyPartIndex) =>
         // Body part level
-        bodyPart.forEach((subModel, subModelIndex) =>
+        bodyPart.slice(0, 1).forEach((subModel, subModelIndex) =>
           // Sub model level
-          subModel.forEach((mesh, meshIndex) =>
+          subModel.forEach((_, meshIndex) => {
             // Mesh level
-            mesh.forEach((animationClip, sequenceIndex) => {
-              // Animation clip level
+            const animationClip: THREE.AnimationClip | null
+              = animationClips[bodyPartIndex][subModelIndex][meshIndex][sequenceIndex]
 
-              // TODO: Error message
-              if (animationClip == null) {
-                return
-              }
+            // TODO: Error message
+            if (animationClip == null) {
+              return
+            }
 
-              // Update geometry
-              const geometry = meshes[bodyPartIndex][subModelIndex][meshIndex].geometry as THREE.BufferGeometry
-              geometry.morphAttributes.position
-                = meshesRenderData[bodyPartIndex][subModelIndex][meshIndex].geometryBuffers
+            // Active action
+            const activeAction = activeActions[bodyPartIndex][subModelIndex][meshIndex]
+            const setActiveAction = (action: THREE.AnimationAction | null) =>
+              (activeActions[bodyPartIndex][subModelIndex][meshIndex] = action)
 
-              // Update mesh morph targets
-              meshes[bodyPartIndex][subModelIndex][meshIndex].updateMorphTargets()
+            // Animation mixer
+            const mixer: THREE.AnimationMixer = animationMixers[bodyPartIndex][subModelIndex][meshIndex]
+            // Current mesh
+            const mesh: THREE.Mesh = meshes[bodyPartIndex][subModelIndex][meshIndex]
 
-              if (activeAction) {
-                activeAction.stop()
-                activeAction = null
-              }
+            // Mesh geometry
+            const geometry = mesh.geometry as THREE.BufferGeometry
+            // Mesh render data
+            const meshRenderData: MeshRenderData = meshesRenderData[bodyPartIndex][subModelIndex][meshIndex]
 
-              const action: THREE.AnimationAction = animationMixers[bodyPartIndex][subModelIndex][meshIndex].clipAction(
-                animationClips[bodyPartIndex][subModelIndex][meshIndex][sequenceIndex],
-                meshes[bodyPartIndex][subModelIndex][meshIndex]
-              )
+            // Update mesh morph targets
+            geometry.morphAttributes.position = meshRenderData.geometryBuffers[sequenceIndex]
+            mesh.updateMorphTargets()
 
-              // if (action) {
-              activeAction = action.play()
-              // }
+            if (activeAction) {
+              activeAction.stop()
+              setActiveAction(null)
+            }
 
-              activeSequenceIndex = sequenceIndex
-            })
-          )
+            const action: THREE.AnimationAction = mixer.clipAction(animationClip, mesh)
+
+            if (action) {
+              action.play()
+
+              setActiveAction(action)
+            }
+          })
         )
       )
     }

@@ -32,6 +32,8 @@ export const Renderer = (props: Props) => {
       const scene = renderScene(canvasRef.current, controller)
       scene.add(container)
 
+      controller.playAnimation(0)
+
       // scene.add(render§s(getBonePositions(modelData.bones)))
     }
   }, [])

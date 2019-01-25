@@ -90,7 +90,7 @@ export const readFacesData = (trianglesBuffer: Int16Array, verticesBuffer: Float
         trianglesBuffer[trisPos + 2] / texture.width,
         1 - trianglesBuffer[trisPos + 3] / texture.height,
 
-        // Vertice index for getting bone tranforms in subsequent calculations
+        // Vertex index for getting bone transforms in subsequent calculations
         vertIndex
       ]
 
@@ -154,6 +154,8 @@ export const readFacesData = (trianglesBuffer: Int16Array, verticesBuffer: Float
 
     indices[i] = verticesData[i][5]
   }
+
+  console.log(uv)
 
   return {
     vertices,
