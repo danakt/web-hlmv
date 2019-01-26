@@ -69,25 +69,25 @@ export const calcBoneQuaternion = (
   sequenceIndex: number,
   s: number
 ): quat => {
-  let angle1 = vec3.create()
-  let angle2 = vec3.create()
+  let angle1: vec3 = vec3.create()
+  let angle2: vec3 = vec3.create()
 
   for (let axis = 0; axis < 3; axis++) {
-    if (animOffset[axis + 3] === 0) {
-      // Default angles
-      const angle = bone.value[axis + 3]
+    const getTotal = (index: number) => animValues.get(sequenceIndex, boneIndex, axis, index, ANIM_VALUE.TOTAL)
+    const getValue = (index: number) => animValues.get(sequenceIndex, boneIndex, axis, index, ANIM_VALUE.VALUE)
+    const getValid = (index: number) => animValues.get(sequenceIndex, boneIndex, axis, index, ANIM_VALUE.VALID)
 
-      angle1[axis] = angle
-      angle2[axis] = angle
+    if (animOffset[axis + 3] === 0) {
+      angle2[axis] = angle1[axis] = bone.value[axis + 3] // default;
     } else {
       // Animation
       let i = 0
       let k = frame
 
       let loopBreaker = 1e6
-      while (animValues.get(sequenceIndex, boneIndex, axis, i, ANIM_VALUE.TOTAL) <= k) {
-        k -= animValues.get(sequenceIndex, boneIndex, axis, i, ANIM_VALUE.TOTAL)
-        i += animValues.get(sequenceIndex, boneIndex, axis, i, ANIM_VALUE.VALID) + 1
+      while (getTotal(i) <= k) {
+        k -= getTotal(i)
+        i += getValid(i) + 1
 
         if (loopBreaker-- <= 0) {
           throw new Error(`Infinity loop. Bone index: ${boneIndex}`)
@@ -95,43 +95,25 @@ export const calcBoneQuaternion = (
       }
 
       // Bah, missing blend!
-      if (animValues.get(sequenceIndex, boneIndex, axis, i, ANIM_VALUE.VALID) > k) {
-        angle1[axis] = animValues.get(sequenceIndex, boneIndex, axis, k + 1, ANIM_VALUE.VALUE)
+      if (getValid(i) > k) {
+        angle1[axis] = getValue(k + 1)
 
-        if (animValues.get(sequenceIndex, boneIndex, axis, i, ANIM_VALUE.VALID) > k + 1) {
-          angle2[axis] = animValues.get(sequenceIndex, boneIndex, axis, k + 2, ANIM_VALUE.VALUE)
+        if (getValid(i) > k + 1) {
+          angle2[axis] = getValue(k + 2)
         } else {
-          if (animValues.get(sequenceIndex, boneIndex, axis, i, ANIM_VALUE.TOTAL) > k + 1) {
+          if (getTotal(i) > k + 1) {
             angle2[axis] = angle1[axis]
           } else {
-            angle2[axis] = animValues.get(
-              sequenceIndex,
-              boneIndex,
-              axis,
-              animValues.get(sequenceIndex, boneIndex, axis, i, ANIM_VALUE.VALID) + 2,
-              0
-            )
+            angle2[axis] = getValue(getValid(i) + 2)
           }
         }
       } else {
-        angle1[axis] = animValues.get(
-          sequenceIndex,
-          boneIndex,
-          axis,
-          animValues.get(sequenceIndex, boneIndex, axis, i, ANIM_VALUE.VALID),
-          ANIM_VALUE.VALUE
-        )
+        angle1[axis] = getValue(getValid(i))
 
-        if (animValues.get(sequenceIndex, boneIndex, axis, i, ANIM_VALUE.TOTAL) > k + 1) {
+        if (getTotal(i) > k + 1) {
           angle2[axis] = angle1[axis]
         } else {
-          angle2[axis] = animValues.get(
-            sequenceIndex,
-            boneIndex,
-            axis,
-            animValues.get(sequenceIndex, boneIndex, axis, i, ANIM_VALUE.VALID) + 2,
-            ANIM_VALUE.VALUE
-          )
+          angle2[axis] = getValue(getValid(i) + 2)
         }
       }
 
