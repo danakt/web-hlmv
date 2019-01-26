@@ -1,8 +1,9 @@
-import { vec3, quat, mat4 } from 'gl-matrix'
-import * as R               from 'ramda'
-import * as structs         from '../const/structs'
-import * as MultiArrayView  from 'multi-array-view'
-import { ANIM_VALUE }       from '../const/constants'
+import { vec3, quat, mat4 }               from 'gl-matrix'
+import * as R                             from 'ramda'
+import * as structs                       from '../const/structs'
+import * as MultiArrayView                from 'multi-array-view'
+import { ANIM_VALUE, MOTION_X, MOTION_Z } from '../const/constants'
+import { ModelData }                      from './modelDataParser'
 
 /**
  * Converts Euler angles into a quaternion
@@ -65,6 +66,7 @@ export const calcBoneQuaternion = (
   bone: structs.Bone,
   animOffset: Uint16Array,
   animValues: MultiArrayView<number>,
+  // TODO: Swap boneIndex and sequenceIndex
   boneIndex: number,
   sequenceIndex: number,
   s: number
@@ -135,17 +137,64 @@ export const calcBoneQuaternion = (
 /**
  * Returns bone positions
  */
-export const getBonePositions = (bones: structs.Bone[]): vec3[] => {
+export const getBonePositions = (
+  bone: structs.Bone,
+  boneIndex: number,
+  animOffset: Uint16Array,
+  animValues: MultiArrayView<number>,
+  sequenceIndex: number,
+  frame: number,
+  s = 0 // TODO: Do something about it
+): vec3 => {
   // List of bone positions
-  const positions: vec3[] = bones.map(bone => vec3.fromValues(bone.value[0], bone.value[1], bone.value[2]))
+  const position: vec3 = vec3.fromValues(bone.value[0], bone.value[1], bone.value[2])
 
-  // for (const axis of [MOTION_X, MOTION_Y, MOTION_Z]) {
-  //   if (sequence.motiontype & axis) {
-  //     positions[sequence.motionbone][1] = 0
-  //   }
-  // }
+  for (let axis = 0; axis < 3; ++axis) {
+    const getTotal = (index: number) => animValues.get(sequenceIndex, boneIndex, axis, index, ANIM_VALUE.TOTAL)
+    const getValue = (index: number) => animValues.get(sequenceIndex, boneIndex, axis, index, ANIM_VALUE.VALUE)
+    const getValid = (index: number) => animValues.get(sequenceIndex, boneIndex, axis, index, ANIM_VALUE.VALID)
 
-  return positions
+    position[axis] = bone.value[axis] // default;
+
+    if (animOffset[axis] != 0) {
+      let i = 0
+      let k = frame
+
+      // find span of values that includes the frame we want
+      let loopBreaker = 1e6
+      while (getTotal(i) <= k) {
+        k -= getTotal(i)
+        i += getValid(i) + 1
+
+        if (loopBreaker-- <= 0) {
+          throw new Error(`Infinity loop. Bone index: ${boneIndex}`)
+        }
+      }
+
+      // if we're inside the span
+      if (getValid(i) > k) {
+        // and there's more data in the span
+        // if (getValid(i) > k + 1) {
+        //   position[axis] += (getValue(k + 1) * (1.0 - s) + s * getValue(k + 2)) * bone.scale[axis]
+        // } else {
+        //   position[axis] += getValue(k + 1) * bone.scale[axis]
+        // }
+      } else {
+        // 			// are we at the end of the repeating values section and there's another section with data?
+        // if (getTotal(i) <= k + 1) {
+        //   position[axis] += (getValue(getValid(i)) * (1.0 - s) + s * getValue(getValid(i) + 2)) * bone.scale[axis]
+        // } else {
+        //   position[axis] += getValue(getValid(i)) * bone.scale[axis]
+        // }
+      }
+    }
+    // 	if (bone.bonecontroller[j] != -1)
+    // 	{
+    // 		positions[j] += BoneAdj[bone.bonecontroller[j]];
+    // 	}
+  }
+
+  return position
 }
 
 /**
@@ -171,4 +220,46 @@ export const calcBoneTransforms = (quaternions: quat[], positions: vec3[], bones
   }
 
   return boneTransforms
+}
+
+export const calcRotations = (
+  modelData: ModelData,
+  sequenceIndex: number,
+  frame: number,
+  s = 0 // TODO: Do something about it
+): mat4[] => {
+  const boneQuaternions = R.times(
+    boneIndex =>
+      calcBoneQuaternion(
+        frame,
+        modelData.bones[boneIndex],
+        modelData.animations[sequenceIndex][boneIndex].offset,
+        modelData.animValues,
+        boneIndex,
+        sequenceIndex,
+        s
+      ),
+    modelData.bones.length
+  )
+
+  const bonesPositions = modelData.bones.map(
+    (bone, boneIndex): vec3 =>
+      getBonePositions(
+        bone,
+        boneIndex,
+        modelData.animations[sequenceIndex][boneIndex].offset,
+        modelData.animValues,
+        sequenceIndex,
+        frame,
+        s
+      )
+  )
+
+  for (const axis of [MOTION_X, MOTION_X, MOTION_Z]) {
+    if (modelData.sequences[sequenceIndex].motiontype & axis) {
+      bonesPositions[modelData.sequences[sequenceIndex].motionbone][1] = 0
+    }
+  }
+
+  return calcBoneTransforms(boneQuaternions, bonesPositions, modelData.bones)
 }

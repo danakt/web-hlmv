@@ -1,10 +1,10 @@
-import * as THREE                                                   from 'three'
-import * as R                                                       from 'ramda'
-import { mat4 }                                                     from 'gl-matrix'
-import { ModelData, parseModel }                                    from './modelDataParser'
-import { readFacesData }                                            from './geometryBuilder'
-import { calcBoneTransforms, getBoneQuaternions, getBonePositions } from './geometryTransformer'
-import { buildTexture }                                             from './textureBuilder'
+import * as THREE                                                                  from 'three'
+import * as R                                                                      from 'ramda'
+import { mat4 }                                                                    from 'gl-matrix'
+import { ModelData, parseModel }                                                   from './modelDataParser'
+import { readFacesData }                                                           from './geometryBuilder'
+import { calcBoneTransforms, getBoneQuaternions, getBonePositions, calcRotations } from './geometryTransformer'
+import { buildTexture }                                                            from './textureBuilder'
 
 /**
  * Mesh buffers of each frame of each sequence of the model and mesh UV-maps
@@ -91,16 +91,7 @@ export const prepareRenderData = (modelData: ModelData): MeshRenderData[][][] =>
             Array(sequence.numframes)
               .fill(null)
               .map((_, frame) => {
-                const boneQuaternions = getBoneQuaternions(
-                  modelData.bones,
-                  modelData.animations[sequenceIndex],
-                  modelData.animValues,
-                  sequenceIndex,
-                  frame
-                )
-
-                const bonesPositions = getBonePositions(modelData.bones)
-                const boneTransforms = calcBoneTransforms(boneQuaternions, bonesPositions, modelData.bones)
+                const boneTransforms = calcRotations(modelData, sequenceIndex, frame)
                 const transformedVertices = applyBoneTransforms(
                   vertices,
                   indices,

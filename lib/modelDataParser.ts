@@ -135,7 +135,7 @@ export const parseAnimValues = (
           // Using the "method" instead of applying a structure is an optimization of reading
           const value = short.getValue(dataView, offset)
           const valid = ubyte.getValue(dataView, offset)
-          const total = ubyte.getValue(dataView, offset + byte.byteLength)
+          const total = ubyte.getValue(dataView, offset + ubyte.byteLength)
 
           animValues.set(value, i, j, axis, v, ANIM_VALUE.VALUE)
           animValues.set(valid, i, j, axis, v, ANIM_VALUE.VALID)
