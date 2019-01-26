@@ -155,8 +155,6 @@ export const readFacesData = (trianglesBuffer: Int16Array, verticesBuffer: Float
     indices[i] = verticesData[i][5]
   }
 
-  console.log(uv)
-
   return {
     vertices,
     uv,
