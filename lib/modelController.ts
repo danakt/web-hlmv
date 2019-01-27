@@ -45,6 +45,7 @@ export const createModelController = (
   modelData: ModelData
 ) => {
   let activeSequenceIndex = 0
+  let isPaused = false
 
   const activeActions: (THREE.AnimationAction | null)[][][] = meshes.map(bodyPart =>
     bodyPart.map(subModel => subModel.map(() => null))
@@ -66,6 +67,10 @@ export const createModelController = (
   )
 
   return {
+    get isPaused() {
+      return isPaused
+    },
+
     /** Returns active sequence index */
     get activeSequenceIndex() {
       return activeSequenceIndex
@@ -112,7 +117,23 @@ export const createModelController = (
      * Sets animation to play
      */
     playAnimation: (sequenceIndex: number) => {
+      if (isPaused && activeSequenceIndex === sequenceIndex) {
+        return animationClips.forEach((bodyPart, bodyPartIndex) =>
+          bodyPart.slice(0, 1).forEach((subModel, subModelIndex) =>
+            subModel.forEach((_, meshIndex) => {
+              const activeAction = activeActions[bodyPartIndex][subModelIndex][meshIndex]
+
+              if (activeAction) {
+                isPaused = false
+                activeAction.paused = false
+              }
+            })
+          )
+        )
+      }
+
       activeSequenceIndex = sequenceIndex
+      isPaused = false
 
       animationClips.forEach((bodyPart, bodyPartIndex) =>
         // Body part level
@@ -158,6 +179,22 @@ export const createModelController = (
               action.play()
 
               setActiveAction(action)
+            }
+          })
+        )
+      )
+    },
+
+    /** Sets pause to animation */
+    pauseAnimation() {
+      animationClips.forEach((bodyPart, bodyPartIndex) =>
+        bodyPart.slice(0, 1).forEach((subModel, subModelIndex) =>
+          subModel.forEach((_, meshIndex) => {
+            const activeAction = activeActions[bodyPartIndex][subModelIndex][meshIndex]
+
+            if (activeAction) {
+              isPaused = true
+              activeAction.paused = true
             }
           })
         )

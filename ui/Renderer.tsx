@@ -4,10 +4,11 @@ import { ModelData, parseModel }                                 from '../lib/mo
 import { buildTexture }                                          from '../lib/textureBuilder'
 import { prepareRenderData, createModelMeshes, createContainer } from '../lib/modelRenderer'
 import { renderScene }                                           from '../lib/screneRenderer'
-import { createModelController }                                 from '../lib/modelController'
+import { createModelController, ModelController }                from '../lib/modelController'
 
 type Props = {
   modelBuffer: ArrayBuffer
+  setModelController: (controller: ModelController) => void
 }
 
 export const Renderer = (props: Props) => {
@@ -24,7 +25,7 @@ export const Renderer = (props: Props) => {
       const meshesRenderData = prepareRenderData(modelData)
       const textures = modelData.textures.map(texture => buildTexture(props.modelBuffer, texture))
       const meshes = createModelMeshes(meshesRenderData, modelData, textures)
-      const controller = createModelController(meshes, meshesRenderData, modelData)
+      const controller: ModelController = createModelController(meshes, meshesRenderData, modelData)
       console.timeEnd('Prepare frames')
 
       const container = createContainer(meshes)
@@ -33,6 +34,8 @@ export const Renderer = (props: Props) => {
       scene.add(container)
 
       controller.playAnimation(0)
+
+      props.setModelController(controller)
 
       // scene.add(render§s(getBonePositions(modelData.bones)))
     }

@@ -49,3 +49,6 @@ export const MOTION_Y = 0x0002
 
 /** Motion flag Z */
 export const MOTION_Z = 0x0004
+
+/** Controller that wraps shortest distance */
+export const RLOOP = 0x8000

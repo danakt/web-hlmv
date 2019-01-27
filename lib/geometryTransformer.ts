@@ -1,9 +1,9 @@
-import { vec3, quat, mat4 }               from 'gl-matrix'
-import * as R                             from 'ramda'
-import * as structs                       from '../const/structs'
-import * as MultiArrayView                from 'multi-array-view'
-import { ANIM_VALUE, MOTION_X, MOTION_Z } from '../const/constants'
-import { ModelData }                      from './modelDataParser'
+import { vec3, quat, mat4 }                      from 'gl-matrix'
+import * as R                                    from 'ramda'
+import * as structs                              from '../const/structs'
+import * as MultiArrayView                       from 'multi-array-view'
+import { ANIM_VALUE, MOTION_X, MOTION_Z, RLOOP } from '../const/constants'
+import { ModelData }                             from './modelDataParser'
 
 /**
  * Converts Euler angles into a quaternion
@@ -175,7 +175,7 @@ export const getBonePositions = (
       if (getValid(i) > k) {
         // and there's more data in the span
         // if (getValid(i) > k + 1) {
-        //   position[axis] += (getValue(k + 1) * (1.0 - s) + s * getValue(k + 2)) * bone.scale[axis]
+        //   position[axis] += getValue(k + 1) * bone.scale[axis]
         // } else {
         //   position[axis] += getValue(k + 1) * bone.scale[axis]
         // }
