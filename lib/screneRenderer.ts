@@ -88,6 +88,7 @@ export const renderScene = (
   const orbitControls = createOrbitControls(camera, canvas)
 
   const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true })
+  renderer.setPixelRatio(window.devicePixelRatio)
   renderer.setSize(window.innerWidth, window.innerHeight)
 
   // Set background
