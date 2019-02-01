@@ -1,9 +1,9 @@
-import { vec3, quat, mat4 }                      from 'gl-matrix'
-import * as R                                    from 'ramda'
-import * as structs                              from '../const/structs'
-import * as MultiArrayView                       from 'multi-array-view'
-import { ANIM_VALUE, MOTION_X, MOTION_Z, RLOOP } from '../const/constants'
-import { ModelData }                             from './modelDataParser'
+import { vec3, quat, mat4 }               from 'gl-matrix'
+import * as R                             from 'ramda'
+import * as structs                       from '../const/structs'
+import * as MultiArrayView                from 'multi-array-view'
+import { ANIM_VALUE, MOTION_X, MOTION_Z } from '../const/constants'
+import { ModelData }                      from './modelDataParser'
 
 /**
  * Converts Euler angles into a quaternion
@@ -86,37 +86,37 @@ export const calcBoneQuaternion = (
       let i = 0
       let k = frame
 
-      let loopBreaker = 1e6
-      while (getTotal(i) <= k) {
-        k -= getTotal(i)
-        i += getValid(i) + 1
+      // let loopBreaker = 1e6
+      // while (getTotal(i) <= k) {
+      //   k -= getTotal(i)
+      //   i += getValid(i) + 1
 
-        if (loopBreaker-- <= 0) {
-          throw new Error(`Infinity loop. Bone index: ${boneIndex}`)
-        }
-      }
+      //   if (loopBreaker-- <= 0) {
+      //     throw new Error(`Infinity loop. Bone index: ${boneIndex}`)
+      //   }
+      // }
 
       // Bah, missing blend!
       if (getValid(i) > k) {
         angle1[axis] = getValue(k + 1)
 
-        if (getValid(i) > k + 1) {
-          angle2[axis] = getValue(k + 2)
-        } else {
-          if (getTotal(i) > k + 1) {
-            angle2[axis] = angle1[axis]
-          } else {
-            angle2[axis] = getValue(getValid(i) + 2)
-          }
-        }
+        // if (getValid(i) > k + 1) {
+        //   angle2[axis] = getValue(k + 2)
+        // } else {
+        //   if (getTotal(i) > k + 1) {
+        //     angle2[axis] = angle1[axis]
+        //   } else {
+        //     angle2[axis] = getValue(getValid(i) + 2)
+        //   }
+        // }
       } else {
         angle1[axis] = getValue(getValid(i))
 
-        if (getTotal(i) > k + 1) {
-          angle2[axis] = angle1[axis]
-        } else {
-          angle2[axis] = getValue(getValid(i) + 2)
-        }
+        // if (getTotal(i) > k + 1) {
+        //   angle2[axis] = angle1[axis]
+        // } else {
+        //   angle2[axis] = getValue(getValid(i) + 2)
+        // }
       }
 
       angle1[axis] = bone.value[axis + 3] + angle1[axis] * bone.scale[axis + 3]
@@ -228,21 +228,19 @@ export const calcRotations = (
   frame: number,
   s = 0 // TODO: Do something about it
 ): mat4[] => {
-  const boneQuaternions = R.times(
-    boneIndex =>
-      calcBoneQuaternion(
-        frame,
-        modelData.bones[boneIndex],
-        modelData.animations[sequenceIndex][boneIndex].offset,
-        modelData.animValues,
-        boneIndex,
-        sequenceIndex,
-        s
-      ),
-    modelData.bones.length
+  const boneQuaternions: quat[] = modelData.bones.map((_, boneIndex) =>
+    calcBoneQuaternion(
+      frame,
+      modelData.bones[boneIndex],
+      modelData.animations[sequenceIndex][boneIndex].offset,
+      modelData.animValues,
+      boneIndex,
+      sequenceIndex,
+      s
+    )
   )
 
-  const bonesPositions = modelData.bones.map(
+  const bonesPositions: vec3[] = modelData.bones.map(
     (bone, boneIndex): vec3 =>
       getBonePositions(
         bone,

@@ -1,6 +1,7 @@
 import * as React          from 'react'
 import styled              from 'styled-components'
 import { ModelController } from '../lib/modelController'
+import { ModelData }       from '../lib/modelDataParser'
 
 const Wrapper = styled.div`
   z-index: 999;
@@ -14,24 +15,31 @@ const Wrapper = styled.div`
 
 type Props = {
   modelController: ModelController
+  modelData: ModelData
+  currentSequence: number
+  setCurrentSequence: (sequenceIndex: number) => void
 }
 
 export const Controller = (props: Props) => {
-  const [isPaused, setPause] = React.useState(props.modelController.isPaused)
-
   return (
     <Wrapper>
-      <button
-        onClick={() => {
-          isPaused
-            ? props.modelController.playAnimation(props.modelController.activeSequenceIndex)
-            : props.modelController.pauseAnimation()
+      <div>
+        <select
+          value={props.currentSequence}
+          onChange={event => {
+            const sequenceIndex = parseInt(event.target.value) || 0
 
-          setPause(props.modelController.isPaused)
-        }}
-      >
-        {isPaused ? 'Play' : 'Stop'}
-      </button>
+            props.setCurrentSequence(sequenceIndex)
+            props.modelController.setAnimation(sequenceIndex)
+          }}
+        >
+          {props.modelData.sequences.map((sequence, i) => (
+            <option key={i} value={i}>
+              {sequence.label} ({sequence.numframes})
+            </option>
+          ))}
+        </select>
+      </div>
     </Wrapper>
   )
 }

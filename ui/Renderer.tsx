@@ -8,7 +8,9 @@ import { createModelController, ModelController }                from '../lib/mo
 
 type Props = {
   modelBuffer: ArrayBuffer
+  currentSequence: number
   setModelController: (controller: ModelController) => void
+  setModelData: (modelData: ModelData) => void
 }
 
 export const Renderer = (props: Props) => {
@@ -33,8 +35,9 @@ export const Renderer = (props: Props) => {
       const scene = renderScene(canvasRef.current, controller)
       scene.add(container)
 
-      controller.playAnimation(0)
+      controller.setAnimation(props.currentSequence)
 
+      props.setModelData(modelData)
       props.setModelController(controller)
 
       // scene.add(render§s(getBonePositions(modelData.bones)))

@@ -2,39 +2,84 @@ import * as THREE         from 'three'
 import { ModelData }      from './modelDataParser'
 import { MeshRenderData } from './modelRenderer'
 
-/**
- * Returns the model's animation clips
- * Path to a animation clips [bodyPartIndex][subModelIndex][meshIndex][sequenceIndex]
- */
-export const prepareAnimationClips = (
-  meshDataList: MeshRenderData[][][],
-  modelData: ModelData
-): THREE.AnimationClip[][][][] =>
-  meshDataList.map(bodyPart =>
-    // Body part level
-    bodyPart.map(subModel =>
-      // Sub model level
-      subModel.map(meshData =>
-        // Mesh data level
-        meshData.geometryBuffers.map((sequenceBuffers, i) => {
-          // Sequence level
-          const sequence = modelData.sequences[i]
-          const isNoLoop = false
-          const frameBuffers = sequenceBuffers.map((bufferAttribute, i) => ({
-            name:     i.toString(),
-            vertices: bufferAttribute.array
-          }))
+console.log(THREE.AnimationClip.CreateFromMorphTargetSequence)
 
-          return THREE.AnimationClip.CreateFromMorphTargetSequence(
-            sequence.label,
-            frameBuffers as any, // FIXME
-            sequence.fps,
-            isNoLoop
-          )
-        })
-      )
+/**
+ * Returns the mesh's animation clips
+ */
+export const prepareAnimationClips = (meshData: MeshRenderData, modelData: ModelData): THREE.AnimationClip[] =>
+  meshData.geometryBuffers.map((sequenceBuffers, i) => {
+    // Sequence level
+    const sequence = modelData.sequences[i]
+    const isNoLoop = false
+    const frameBuffers = sequenceBuffers.map((bufferAttribute, i) => ({
+      name:     i.toString(),
+      vertices: bufferAttribute.array
+    }))
+
+    return THREE.AnimationClip.CreateFromMorphTargetSequence(
+      sequence.label,
+      frameBuffers as any, // FIXME
+      sequence.fps,
+      isNoLoop
     )
-  )
+  })
+
+export const createMeshController = (mesh: THREE.Mesh, meshRenderData: MeshRenderData, modelData: ModelData) => {
+  let activeAction: THREE.AnimationAction | undefined
+  let previousAction: THREE.AnimationAction | undefined
+
+  const maxFrames = Math.max(...modelData.sequences.map(item => item.numframes))
+  const morphTargetInfluences = Array(maxFrames).fill(0)
+  mesh.morphTargetInfluences = morphTargetInfluences
+  mesh.morphTargetDictionary = morphTargetInfluences.reduce((acc, _, i) => Object.assign({}, acc, { [i]: i }), {})
+
+  const animationClips: THREE.AnimationClip[] = prepareAnimationClips(meshRenderData, modelData)
+  const mixer = new THREE.AnimationMixer(mesh)
+  const actions = animationClips.map(actionClip => mixer.clipAction(actionClip, mesh))
+
+  return {
+    /**
+     * Sets playback rate (animation speed)
+     * @param rate
+     */
+    setPlaybackRate: (rate: number) => {
+      mixer.timeScale = rate !== 0 ? 1 / rate : 0
+    },
+
+    /**
+     * Updates delta tile
+     */
+    update: (deltaTime: number) => mixer.update(deltaTime),
+
+    /**
+     * Sets animation to play
+     */
+    setAnimation: (sequenceIndex: number, duration = 0.2) => {
+      previousAction = activeAction
+      activeAction = actions[sequenceIndex]
+
+      if (previousAction && previousAction !== activeAction) {
+        previousAction.fadeOut(duration)
+      }
+
+      // Update mesh morph targets
+      const geometry = mesh.geometry
+      if (geometry instanceof THREE.BufferGeometry) {
+        // mesh.updateMorphTargets()
+
+        geometry.morphAttributes.position = meshRenderData.geometryBuffers[sequenceIndex]
+      }
+
+      activeAction
+        .reset()
+        .setEffectiveTimeScale(1)
+        .setEffectiveWeight(1)
+        .fadeIn(duration)
+        .play()
+    }
+  }
+}
 
 /**
  * Creates model controller
@@ -45,32 +90,17 @@ export const createModelController = (
   modelData: ModelData
 ) => {
   let activeSequenceIndex = 0
-  let isPaused = false
-
-  const activeActions: (THREE.AnimationAction | null)[][][] = meshes.map(bodyPart =>
-    bodyPart.map(subModel => subModel.map(() => null))
-  )
 
   // Path: [bodyPartIndex][subModelIndex][meshIndex][sequenceIndex]
-  const animationClips: THREE.AnimationClip[][][][] = prepareAnimationClips(meshesRenderData, modelData)
-
-  const animationMixers: THREE.AnimationMixer[][][] = meshes.map(bodyPart =>
-    // Body part level
-    bodyPart.map(subModel =>
-      // Sub model level
-      subModel.map(
-        mesh =>
-          // Mesh level
-          new THREE.AnimationMixer(mesh)
+  const meshControllers = meshes.map((bodyPart, bodyPartIndex) =>
+    bodyPart.map((subModel, subModelIndex) =>
+      subModel.map((mesh, meshIndex) =>
+        createMeshController(mesh, meshesRenderData[bodyPartIndex][subModelIndex][meshIndex], modelData)
       )
     )
   )
 
   return {
-    get isPaused() {
-      return isPaused
-    },
-
     /** Returns active sequence index */
     get activeSequenceIndex() {
       return activeSequenceIndex
@@ -80,124 +110,27 @@ export const createModelController = (
      * Sets playback rate (animation speed)
      * @param rate
      */
-    setPlaybackRate: (rate: number) => {
-      animationMixers.forEach(bodyPart =>
-        // Body part level
-        bodyPart.forEach(subModel =>
-          // Sub model level
-          subModel.forEach(mixer => {
-            if (rate !== 0) {
-              mixer.timeScale = 1 / rate
-            } else {
-              mixer.timeScale = 0
-            }
-          })
-        )
-      )
-    },
+    setPlaybackRate: (rate: number) =>
+      meshControllers.forEach(bodyPart =>
+        bodyPart.forEach(subModel => subModel.forEach(controller => controller.setPlaybackRate(rate)))
+      ),
 
     /**
      * Updates delta tile
      */
-    update: (deltaTime: number) => {
-      animationMixers.forEach(bodyPart =>
-        // Body part level
-        bodyPart.forEach(subModel =>
-          // Sub model level
-          subModel.forEach(mixer => {
-            if (mixer) {
-              mixer.update(deltaTime)
-            }
-          })
-        )
-      )
-    },
+    update: (deltaTime: number) =>
+      meshControllers.forEach(bodyPart =>
+        bodyPart.forEach(subModel => subModel.forEach(controller => controller.update(deltaTime)))
+      ),
 
     /**
      * Sets animation to play
      */
-    playAnimation: (sequenceIndex: number) => {
-      if (isPaused && activeSequenceIndex === sequenceIndex) {
-        return animationClips.forEach((bodyPart, bodyPartIndex) =>
-          bodyPart.slice(0, 1).forEach((subModel, subModelIndex) =>
-            subModel.forEach((_, meshIndex) => {
-              const activeAction = activeActions[bodyPartIndex][subModelIndex][meshIndex]
-
-              if (activeAction) {
-                isPaused = false
-                activeAction.paused = false
-              }
-            })
-          )
-        )
-      }
-
+    setAnimation: (sequenceIndex: number) => {
       activeSequenceIndex = sequenceIndex
-      isPaused = false
 
-      animationClips.forEach((bodyPart, bodyPartIndex) =>
-        // Body part level
-        bodyPart.slice(0, 1).forEach((subModel, subModelIndex) =>
-          // Sub model level
-          subModel.forEach((_, meshIndex) => {
-            // Mesh level
-            const animationClip: THREE.AnimationClip | null
-              = animationClips[bodyPartIndex][subModelIndex][meshIndex][sequenceIndex]
-
-            // TODO: Error message
-            if (animationClip == null) {
-              return
-            }
-
-            // Active action
-            const activeAction = activeActions[bodyPartIndex][subModelIndex][meshIndex]
-            const setActiveAction = (action: THREE.AnimationAction | null) =>
-              (activeActions[bodyPartIndex][subModelIndex][meshIndex] = action)
-
-            // Animation mixer
-            const mixer: THREE.AnimationMixer = animationMixers[bodyPartIndex][subModelIndex][meshIndex]
-            // Current mesh
-            const mesh: THREE.Mesh = meshes[bodyPartIndex][subModelIndex][meshIndex]
-
-            // Mesh geometry
-            const geometry = mesh.geometry as THREE.BufferGeometry
-            // Mesh render data
-            const meshRenderData: MeshRenderData = meshesRenderData[bodyPartIndex][subModelIndex][meshIndex]
-
-            // Update mesh morph targets
-            geometry.morphAttributes.position = meshRenderData.geometryBuffers[sequenceIndex]
-            mesh.updateMorphTargets()
-
-            if (activeAction) {
-              activeAction.stop()
-              setActiveAction(null)
-            }
-
-            const action: THREE.AnimationAction = mixer.clipAction(animationClip, mesh)
-
-            if (action) {
-              action.play()
-
-              setActiveAction(action)
-            }
-          })
-        )
-      )
-    },
-
-    /** Sets pause to animation */
-    pauseAnimation() {
-      animationClips.forEach((bodyPart, bodyPartIndex) =>
-        bodyPart.slice(0, 1).forEach((subModel, subModelIndex) =>
-          subModel.forEach((_, meshIndex) => {
-            const activeAction = activeActions[bodyPartIndex][subModelIndex][meshIndex]
-
-            if (activeAction) {
-              isPaused = true
-              activeAction.paused = true
-            }
-          })
-        )
+      meshControllers.forEach(bodyPart =>
+        bodyPart.forEach(subModel => subModel.forEach(controller => controller.setAnimation(sequenceIndex)))
       )
     }
   }

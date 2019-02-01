@@ -1,10 +1,8 @@
-import * as THREE                                                                  from 'three'
-import * as R                                                                      from 'ramda'
-import { mat4 }                                                                    from 'gl-matrix'
-import { ModelData, parseModel }                                                   from './modelDataParser'
-import { readFacesData }                                                           from './geometryBuilder'
-import { calcBoneTransforms, getBoneQuaternions, getBonePositions, calcRotations } from './geometryTransformer'
-import { buildTexture }                                                            from './textureBuilder'
+import * as THREE        from 'three'
+import { mat4 }          from 'gl-matrix'
+import { ModelData }     from './modelDataParser'
+import { readFacesData } from './geometryBuilder'
+import { calcRotations } from './geometryTransformer'
 
 /**
  * Mesh buffers of each frame of each sequence of the model and mesh UV-maps
@@ -15,11 +13,13 @@ export type MeshRenderData = {
 }
 
 /**
- * Creates texture instance
+ * Creates THREE.Texture instance with presets
  */
 export const createTexture = (skinBuffer: Uint8ClampedArray, width: number, height: number): THREE.Texture => {
+  const imageData = new ImageData(skinBuffer, width, height)
+
   const texture = new THREE.Texture(
-    new ImageData(skinBuffer, width, height) as any,
+    imageData as any,
     THREE.UVMapping,
     THREE.ClampToEdgeWrapping,
     THREE.ClampToEdgeWrapping,
@@ -109,6 +109,31 @@ export const prepareRenderData = (modelData: ModelData): MeshRenderData[][][] =>
     )
   )
 
+export const createMesh = (
+  geometryBuffer: THREE.BufferAttribute,
+  uvMap: THREE.BufferAttribute,
+  texture: THREE.Texture
+) => {
+  // Mesh level
+  const material = new THREE.MeshBasicMaterial({
+    map:          texture,
+    side:         THREE.DoubleSide,
+    transparent:  true,
+    alphaTest:    0.5,
+    morphTargets: true,
+    skinning:     true
+    // color:        0xffffff
+  })
+
+  // Prepare geometry
+  const geometry = new THREE.BufferGeometry()
+  geometry.addAttribute('position', geometryBuffer)
+  geometry.addAttribute('uv', uvMap)
+
+  // Prepare mesh
+  return new THREE.Mesh(geometry, material)
+}
+
 export const createModelMeshes = (
   meshesRenderData: MeshRenderData[][][],
   modelData: ModelData,
@@ -140,26 +165,9 @@ export const createModelMeshes = (
     bodyPart.map((subModel, subModelIndex) =>
       // Sub model level
       subModel.map(({ geometryBuffers, uvMap }, meshIndex) => {
-        // Pizdec kakoi-to
         const textureIndex = modelData.skinRef[modelData.meshes[bodyPartIndex][subModelIndex][meshIndex].skinref]
 
-        // Mesh level
-        const material = new THREE.MeshBasicMaterial({
-          map:          textures[textureIndex],
-          side:         THREE.DoubleSide,
-          transparent:  true,
-          alphaTest:    0.5,
-          morphTargets: true
-          // color:        0xffffff
-        })
-
-        // Prepare geometry
-        const geometry = new THREE.BufferGeometry()
-        geometry.addAttribute('position', geometryBuffers[0][0])
-        geometry.addAttribute('uv', uvMap)
-
-        // Prepare mesh
-        return new THREE.Mesh(geometry, material)
+        return createMesh(geometryBuffers[0][0], uvMap, textures[textureIndex])
       })
     )
   )

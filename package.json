@@ -82,7 +82,7 @@
     "react-dom": "^16.7.0-alpha.2",
     "react-hot-loader": "^4.3.12",
     "styled-components": "^4.0.2",
-    "three": "^0.96.0",
+    "three": "^0.101.1",
     "three-orbit-controls": "^82.1.0"
   }
 }
