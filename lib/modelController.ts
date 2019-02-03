@@ -24,20 +24,19 @@ export const prepareAnimationClips = (meshData: MeshRenderData, modelData: Model
   })
 
 export const createMeshController = (mesh: THREE.Mesh, meshRenderData: MeshRenderData, modelData: ModelData) => {
+  console.time(`   Creating mesh controller ${mesh.uuid}`)
+
   let activeAction: THREE.AnimationAction | undefined
   let previousAction: THREE.AnimationAction | undefined
 
   const framesSum = modelData.sequences.reduce((acc, item) => acc + item.numFrames, 0)
-  const morphTargetInfluences = Array(framesSum).fill(0)
-
-  mesh.morphTargetInfluences = morphTargetInfluences
-  mesh.morphTargetDictionary = morphTargetInfluences.reduce((acc, _, i) => Object.assign({}, acc, { [i]: i }), {})
+  mesh.morphTargetInfluences = Array(framesSum).fill(0)
 
   const animationClips: THREE.AnimationClip[] = prepareAnimationClips(meshRenderData, modelData)
   const mixer = new THREE.AnimationMixer(mesh)
   const actions = animationClips.map(actionClip => mixer.clipAction(actionClip, mesh))
 
-  return {
+  const meshModelController = {
     /**
      * Sets playback rate (animation speed)
      * @param rate
@@ -73,6 +72,10 @@ export const createMeshController = (mesh: THREE.Mesh, meshRenderData: MeshRende
       activeAction.reset().play()
     }
   }
+
+  console.timeEnd(`   Creating mesh controller ${mesh.uuid}`)
+
+  return meshModelController
 }
 
 /**
@@ -83,6 +86,8 @@ export const createModelController = (
   meshesRenderData: MeshRenderData[][][],
   modelData: ModelData
 ) => {
+  console.time('Creating model controller')
+
   let activeSequenceIndex = 0
 
   // Path: [bodyPartIndex][subModelIndex][meshIndex][sequenceIndex]
@@ -94,7 +99,7 @@ export const createModelController = (
     )
   )
 
-  return {
+  const modelController = {
     /** Returns active sequence index */
     get activeSequenceIndex() {
       return activeSequenceIndex
@@ -128,6 +133,10 @@ export const createModelController = (
       )
     }
   }
+
+  console.timeEnd('Creating model controller')
+
+  return modelController
 }
 
 export type ModelController = ReturnType<typeof createModelController>
