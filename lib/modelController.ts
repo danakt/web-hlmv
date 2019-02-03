@@ -2,8 +2,6 @@ import * as THREE         from 'three'
 import { ModelData }      from './modelDataParser'
 import { MeshRenderData } from './modelRenderer'
 
-console.log(THREE.AnimationClip.CreateFromMorphTargetSequence)
-
 /**
  * Returns the mesh's animation clips
  */
@@ -29,8 +27,9 @@ export const createMeshController = (mesh: THREE.Mesh, meshRenderData: MeshRende
   let activeAction: THREE.AnimationAction | undefined
   let previousAction: THREE.AnimationAction | undefined
 
-  const maxFrames = Math.max(...modelData.sequences.map(item => item.numframes))
-  const morphTargetInfluences = Array(maxFrames).fill(0)
+  const framesSum = modelData.sequences.reduce((acc, item) => acc + item.numframes, 0)
+  const morphTargetInfluences = Array(framesSum).fill(0)
+
   mesh.morphTargetInfluences = morphTargetInfluences
   mesh.morphTargetDictionary = morphTargetInfluences.reduce((acc, _, i) => Object.assign({}, acc, { [i]: i }), {})
 
@@ -59,8 +58,8 @@ export const createMeshController = (mesh: THREE.Mesh, meshRenderData: MeshRende
       previousAction = activeAction
       activeAction = actions[sequenceIndex]
 
-      if (previousAction && previousAction !== activeAction) {
-        previousAction.fadeOut(duration)
+      if (previousAction) {
+        previousAction.stop()
       }
 
       // Update mesh morph targets
@@ -71,12 +70,7 @@ export const createMeshController = (mesh: THREE.Mesh, meshRenderData: MeshRende
         geometry.morphAttributes.position = meshRenderData.geometryBuffers[sequenceIndex]
       }
 
-      activeAction
-        .reset()
-        .setEffectiveTimeScale(1)
-        .setEffectiveWeight(1)
-        .fadeIn(duration)
-        .play()
+      activeAction.reset().play()
     }
   }
 }

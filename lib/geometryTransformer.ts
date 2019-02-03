@@ -1,7 +1,6 @@
 import { vec3, quat, mat4 }               from 'gl-matrix'
-import * as R                             from 'ramda'
-import * as structs                       from '../const/structs'
 import * as MultiArrayView                from 'multi-array-view'
+import * as structs                       from '../const/structs'
 import { ANIM_VALUE, MOTION_X, MOTION_Z } from '../const/constants'
 import { ModelData }                      from './modelDataParser'
 
@@ -43,9 +42,11 @@ export const getBoneQuaternions = (
   sequenceIndex: number,
   frame: number,
   s: number = 0
-): quat[] =>
-  R.times(
-    boneIndex =>
+): quat[] => {
+  const quaternions: quat[] = []
+
+  for (let boneIndex = 0; boneIndex < bones.length; boneIndex++) {
+    quaternions.push(
       calcBoneQuaternion(
         frame,
         bones[boneIndex],
@@ -54,9 +55,12 @@ export const getBoneQuaternions = (
         boneIndex,
         sequenceIndex,
         s
-      ),
-    bones.length
-  )
+      )
+    )
+  }
+
+  return quaternions
+}
 
 /**
  * Calculates bone angle
