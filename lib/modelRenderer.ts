@@ -69,10 +69,19 @@ export const applyBoneTransforms = (
  * the model
  * @param modelData Model data
  */
-export const prepareRenderData = (modelData: ModelData): MeshRenderData[][][] =>
-  modelData.bodyParts.map((_, bodyPartIndex) =>
-    modelData.subModels[bodyPartIndex].map((_, subModelIndex) =>
-      modelData.meshes[bodyPartIndex][subModelIndex].map((_, meshIndex) => {
+export const prepareRenderData = (modelData: ModelData): MeshRenderData[][][] => {
+  // Recording time of render data preparing
+  console.time('Prepare model data')
+
+  const renderData: MeshRenderData[][][] = []
+
+  for (let bodyPartIndex = 0; bodyPartIndex < modelData.bodyParts.length; bodyPartIndex++) {
+    renderData[bodyPartIndex] = []
+
+    for (let subModelIndex = 0; subModelIndex < modelData.subModels[bodyPartIndex].length; subModelIndex++) {
+      renderData[bodyPartIndex][subModelIndex] = []
+
+      for (let meshIndex = 0; meshIndex < modelData.meshes[bodyPartIndex][subModelIndex].length; meshIndex++) {
         const textureIndex = modelData.skinRef[modelData.meshes[bodyPartIndex][subModelIndex][meshIndex].skinRef]
 
         // Unpack faces of the mesh
@@ -82,32 +91,38 @@ export const prepareRenderData = (modelData: ModelData): MeshRenderData[][][] =>
           modelData.textures[textureIndex]
         )
 
-        return {
+        renderData[bodyPartIndex][subModelIndex].push({
           // UV-map of the mesh
           uvMap: new THREE.BufferAttribute(uv, 2),
 
           // List of mesh buffer for each frame of each sequence
-          geometryBuffers: modelData.sequences.map((sequence, sequenceIndex) =>
-            Array(sequence.numFrames)
-              .fill(null)
-              .map((_, frame) => {
-                const boneTransforms = calcRotations(modelData, sequenceIndex, frame)
-                const transformedVertices = applyBoneTransforms(
-                  vertices,
-                  indices,
-                  modelData.vertBoneBuffer[bodyPartIndex][subModelIndex],
-                  boneTransforms
-                )
+          geometryBuffers: modelData.sequences.map((sequence, sequenceIndex) => {
+            const bufferAttributes = []
 
-                const bufferAttribute = new THREE.BufferAttribute(transformedVertices, 3)
+            for (let frame = 0; frame < sequence.numFrames; frame++) {
+              const boneTransforms = calcRotations(modelData, sequenceIndex, frame)
+              const transformedVertices = applyBoneTransforms(
+                vertices,
+                indices,
+                modelData.vertBoneBuffer[bodyPartIndex][subModelIndex],
+                boneTransforms
+              )
 
-                return bufferAttribute
-              })
-          )
-        }
-      })
-    )
-  )
+              bufferAttributes.push(new THREE.BufferAttribute(transformedVertices, 3))
+            }
+
+            return bufferAttributes
+          })
+        })
+      }
+    }
+  }
+
+  // Printing time
+  console.timeEnd('Prepare model data')
+
+  return renderData
+}
 
 export const createMesh = (
   geometryBuffer: THREE.BufferAttribute,
@@ -138,7 +153,9 @@ export const createModelMeshes = (
   meshesRenderData: MeshRenderData[][][],
   modelData: ModelData,
   textureBuffers: Uint8ClampedArray[]
-) => {
+): THREE.Mesh[][][] => {
+  console.time('Creating model meshes')
+
   const textures: THREE.Texture[] = textureBuffers.map((textureBuffer, textureIndex) => {
     const texture = new THREE.Texture(
       new ImageData(
@@ -160,17 +177,23 @@ export const createModelMeshes = (
     return texture
   })
 
-  return meshesRenderData.map((bodyPart, bodyPartIndex) =>
+  const modelMeshes: THREE.Mesh[][][] = meshesRenderData.map((bodyPart, bodyPartIndex) =>
     // Body part level
     bodyPart.map((subModel, subModelIndex) =>
       // Sub model level
       subModel.map(({ geometryBuffers, uvMap }, meshIndex) => {
+        const initialGeometryBuffer = geometryBuffers[0][0]
         const textureIndex = modelData.skinRef[modelData.meshes[bodyPartIndex][subModelIndex][meshIndex].skinRef]
+        const texture = textures[textureIndex]
 
-        return createMesh(geometryBuffers[0][0], uvMap, textures[textureIndex])
+        return createMesh(initialGeometryBuffer, uvMap, texture)
       })
     )
   )
+
+  console.timeEnd('Creating model meshes')
+
+  return modelMeshes
 }
 
 /**
