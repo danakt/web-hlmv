@@ -8,7 +8,6 @@ import { createModelController, ModelController }                from '../lib/mo
 
 type Props = {
   modelBuffer: ArrayBuffer
-  currentSequence: number
   setModelController: (controller: ModelController) => void
   setModelData: (modelData: ModelData) => void
 }
@@ -19,23 +18,17 @@ export const Renderer = (props: Props) => {
 
   React.useEffect(() => {
     if (canvasRef.current) {
-      console.time('Parse model')
       const modelData: ModelData = parseModel(props.modelBuffer)
-      console.timeEnd('Parse model')
 
-      console.time('Prepare frames')
       const meshesRenderData = prepareRenderData(modelData)
       const textures = modelData.textures.map(texture => buildTexture(props.modelBuffer, texture))
       const meshes = createModelMeshes(meshesRenderData, modelData, textures)
       const controller: ModelController = createModelController(meshes, meshesRenderData, modelData)
-      console.timeEnd('Prepare frames')
 
       const container = createContainer(meshes)
 
       const scene = renderScene(canvasRef.current, controller)
       scene.add(container)
-
-      controller.setAnimation(props.currentSequence)
 
       props.setModelData(modelData)
       props.setModelController(controller)

@@ -23,8 +23,16 @@ export const prepareAnimationClips = (meshData: MeshRenderData, modelData: Model
     )
   })
 
-export const createMeshController = (mesh: THREE.Mesh, meshRenderData: MeshRenderData, modelData: ModelData) => {
+export const createMeshController = (
+  mesh: THREE.Mesh,
+  meshRenderData: MeshRenderData,
+  modelData: ModelData,
+  isDefaultVisible: boolean = false
+) => {
   console.time(`   Creating mesh controller ${mesh.uuid}`)
+
+  // Set default visibility of the mesh
+  mesh.visible = isDefaultVisible
 
   let activeAction: THREE.AnimationAction | undefined
   let previousAction: THREE.AnimationAction | undefined
@@ -43,6 +51,13 @@ export const createMeshController = (mesh: THREE.Mesh, meshRenderData: MeshRende
      */
     setPlaybackRate: (rate: number) => {
       mixer.timeScale = rate !== 0 ? 1 / rate : 0
+    },
+
+    /**
+     * Sets visibility of the mesh
+     */
+    setVisibility: (isVisible: boolean) => {
+      mesh.visible = isVisible
     },
 
     /**
@@ -84,25 +99,45 @@ export const createMeshController = (mesh: THREE.Mesh, meshRenderData: MeshRende
 export const createModelController = (
   meshes: THREE.Mesh[][][],
   meshesRenderData: MeshRenderData[][][],
-  modelData: ModelData
+  modelData: ModelData,
+  initialSequence: number = 0
 ) => {
   console.time('Creating model controller')
 
-  let activeSequenceIndex = 0
+  // Active sequence
+  let activeSequenceIndex: number = initialSequence
+
+  // List of showed sub models indices
+  let showedSubModels: number[] = modelData.bodyParts.map(() => 0)
 
   // Path: [bodyPartIndex][subModelIndex][meshIndex][sequenceIndex]
   const meshControllers = meshes.map((bodyPart, bodyPartIndex) =>
     bodyPart.map((subModel, subModelIndex) =>
       subModel.map((mesh, meshIndex) =>
-        createMeshController(mesh, meshesRenderData[bodyPartIndex][subModelIndex][meshIndex], modelData)
+        createMeshController(
+          mesh,
+          meshesRenderData[bodyPartIndex][subModelIndex][meshIndex],
+          modelData,
+          subModelIndex === 0
+        )
       )
     )
   )
 
+  // Setting default animation
+  meshControllers.forEach(bodyPart =>
+    bodyPart.forEach(subModel => subModel.forEach(controller => controller.setAnimation(activeSequenceIndex)))
+  )
+
   const modelController = {
     /** Returns active sequence index */
-    get activeSequenceIndex() {
+    get activeSequenceIndex(): number {
       return activeSequenceIndex
+    },
+
+    /* Returns list of showed sub models **/
+    get showedSubModels(): number[] {
+      return showedSubModels
     },
 
     /**
@@ -131,6 +166,18 @@ export const createModelController = (
       meshControllers.forEach(bodyPart =>
         bodyPart.forEach(subModel => subModel.forEach(controller => controller.setAnimation(sequenceIndex)))
       )
+    },
+
+    showSubModel: (bodyPartIndex: number, subModelIndex: number) => {
+      showedSubModels[bodyPartIndex] = subModelIndex
+
+      meshControllers[bodyPartIndex].forEach((subModel, i) => {
+        const isVisible = i === subModelIndex
+
+        subModel.forEach(controller => {
+          controller.setVisibility(isVisible)
+        })
+      })
     }
   }
 

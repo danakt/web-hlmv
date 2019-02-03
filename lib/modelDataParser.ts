@@ -156,6 +156,9 @@ export const parseAnimValues = (
  * @returns {ModelDataParser}
  */
 export const parseModel = (modelBuffer: ArrayBuffer) => {
+  // Recording time of model parsing
+  console.time('Model parsing')
+
   // Create the DataView object from buffer of a MDL file for parsing
   const dataView = new FastDataView(modelBuffer)
 
@@ -189,7 +192,7 @@ export const parseModel = (modelBuffer: ArrayBuffer) => {
   // Animation frames
   const animValues = parseAnimValues(dataView, sequences, animations, header.numBones)
 
-  return {
+  const modelData = {
     /** The header of the MDL file */
     header,
 
@@ -234,6 +237,11 @@ export const parseModel = (modelBuffer: ArrayBuffer) => {
     /** Animation frames */
     animValues
   }
+
+  // Printing time of model parsing
+  console.timeEnd('Model parsing')
+
+  return modelData
 }
 
 /**
