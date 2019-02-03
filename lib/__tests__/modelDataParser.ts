@@ -21,63 +21,63 @@ describe('parsing model parts', () => {
   })
 
   test('should parse bones', () => {
-    const bones = ModelParser.parseBones(dataView, header.boneindex, header.numbones)
+    const bones = ModelParser.parseBones(dataView, header.boneIndex, header.numBones)
     expect(bones).toMatchSnapshot('leet bones')
   })
 
   test('should parse bone controllers', () => {
     const boneControllers = ModelParser.parseBoneControllers(
       dataView,
-      header.bonecontrollerindex,
-      header.numbonecontrollers
+      header.boneControllerIndex,
+      header.numBoneControllers
     )
     expect(boneControllers).toMatchSnapshot('leet bone controllers')
   })
 
   test('should parse attachments', () => {
-    const attachments = ModelParser.parseAttachments(dataView, header.attachmentindex, header.numattachments)
+    const attachments = ModelParser.parseAttachments(dataView, header.attachmentIndex, header.numAttachments)
     expect(attachments).toMatchSnapshot('leet attachments')
   })
 
   test('should parse hitboxes', () => {
-    const hitBoxes = ModelParser.parseHitboxes(dataView, header.hitboxindex, header.numhitboxes)
+    const hitBoxes = ModelParser.parseHitboxes(dataView, header.hitBoxindex, header.numHitboxes)
     expect(hitBoxes).toMatchSnapshot('leet hitboxes')
   })
 
   test('should parse sequences', () => {
-    const sequences = ModelParser.parseSequences(dataView, header.seqindex, header.numseq)
+    const sequences = ModelParser.parseSequences(dataView, header.seqIndex, header.numSeq)
     expect(sequences).toMatchSnapshot('leet sequences')
   })
 
   test('should parse sequence groups', () => {
-    const sequenceGroups = ModelParser.parseSequenceGroups(dataView, header.seqgroupindex, header.numseqgroups)
+    const sequenceGroups = ModelParser.parseSequenceGroups(dataView, header.seqGroupIndex, header.numSeqGroups)
     expect(sequenceGroups).toMatchSnapshot('leet sequence groups')
   })
 
   test('should parse bodyparts', () => {
-    const bodyParts = ModelParser.parseBodyParts(dataView, header.bodypartindex, header.numbodyparts)
+    const bodyParts = ModelParser.parseBodyParts(dataView, header.bodyPartIndex, header.numBodyParts)
     expect(bodyParts).toMatchSnapshot('leet body parts')
   })
 
   test('should parse textures', () => {
-    const textures = ModelParser.parseTextures(dataView, header.textureindex, header.numtextures)
+    const textures = ModelParser.parseTextures(dataView, header.textureIndex, header.numTextures)
     expect(textures).toMatchSnapshot('leet textures info')
   })
 
   test('should parse skin references', () => {
-    const skinRef = ModelParser.parseSkinRef(dataView.buffer, header.skinindex, header.numskinref)
+    const skinRef = ModelParser.parseSkinRef(dataView.buffer, header.skinIndex, header.numSkinRef)
     expect(skinRef).toMatchSnapshot('leet skin references')
   })
 
   test('should parse submodels', () => {
-    const bodyParts = ModelParser.parseBodyParts(dataView, header.bodypartindex, header.numbodyparts)
+    const bodyParts = ModelParser.parseBodyParts(dataView, header.bodyPartIndex, header.numBodyParts)
     const subModels = ModelParser.parseSubModel(dataView, bodyParts)
 
     expect(subModels).toMatchSnapshot('leet submodels')
   })
 
   test('should parse meshes', () => {
-    const bodyParts = ModelParser.parseBodyParts(dataView, header.bodypartindex, header.numbodyparts)
+    const bodyParts = ModelParser.parseBodyParts(dataView, header.bodyPartIndex, header.numBodyParts)
     const subModels = ModelParser.parseSubModel(dataView, bodyParts)
     const meshes = ModelParser.parseMeshes(dataView, subModels)
 
@@ -85,7 +85,7 @@ describe('parsing model parts', () => {
   })
 
   test('should parse vertices', () => {
-    const bodyParts = ModelParser.parseBodyParts(dataView, header.bodypartindex, header.numbodyparts)
+    const bodyParts = ModelParser.parseBodyParts(dataView, header.bodyPartIndex, header.numBodyParts)
     const subModels = ModelParser.parseSubModel(dataView, bodyParts)
     const vertices = ModelParser.parseVertices(dataView.buffer, subModels)
 
@@ -93,7 +93,7 @@ describe('parsing model parts', () => {
   })
 
   test('should parse bones vertices', () => {
-    const bodyParts = ModelParser.parseBodyParts(dataView, header.bodypartindex, header.numbodyparts)
+    const bodyParts = ModelParser.parseBodyParts(dataView, header.bodyPartIndex, header.numBodyParts)
     const subModels = ModelParser.parseSubModel(dataView, bodyParts)
     const vertBoneBuffer = ModelParser.parseVertBoneBuffer(dataView.buffer, subModels)
 
@@ -101,7 +101,7 @@ describe('parsing model parts', () => {
   })
 
   test('should parse triangles', () => {
-    const bodyParts = ModelParser.parseBodyParts(dataView, header.bodypartindex, header.numbodyparts)
+    const bodyParts = ModelParser.parseBodyParts(dataView, header.bodyPartIndex, header.numBodyParts)
     const subModels = ModelParser.parseSubModel(dataView, bodyParts)
     const meshes = ModelParser.parseMeshes(dataView, subModels)
     const triangles = ModelParser.parseTriangles(dataView.buffer, meshes, header.length)
@@ -110,17 +110,17 @@ describe('parsing model parts', () => {
   })
 
   test('should parse animations', () => {
-    const sequences = ModelParser.parseSequences(dataView, header.seqindex, header.numseq)
-    const animations = ModelParser.parseAnimations(dataView, sequences, header.numbones)
+    const sequences = ModelParser.parseSequences(dataView, header.seqIndex, header.numSeq)
+    const animations = ModelParser.parseAnimations(dataView, sequences, header.numBones)
 
     expect(animations).toMatchSnapshot('leet animation')
   })
 
   test('should parse animation values', () => {
-    const sequences = ModelParser.parseSequences(dataView, header.seqindex, header.numseq)
-    const animations = ModelParser.parseAnimations(dataView, sequences, header.numbones)
+    const sequences = ModelParser.parseSequences(dataView, header.seqIndex, header.numSeq)
+    const animations = ModelParser.parseAnimations(dataView, sequences, header.numBones)
 
-    const animValues = ModelParser.parseAnimValues(dataView, sequences, animations, header.numbones)
+    const animValues = ModelParser.parseAnimValues(dataView, sequences, animations, header.numBones)
     const slicedAnimValues1 = (animValues.array as Int16Array).slice(0, 1000)
     const slicedAnimValues2 = (animValues.array as Int16Array).slice(10000, 11000)
 

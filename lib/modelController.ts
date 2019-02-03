@@ -27,7 +27,7 @@ export const createMeshController = (mesh: THREE.Mesh, meshRenderData: MeshRende
   let activeAction: THREE.AnimationAction | undefined
   let previousAction: THREE.AnimationAction | undefined
 
-  const framesSum = modelData.sequences.reduce((acc, item) => acc + item.numframes, 0)
+  const framesSum = modelData.sequences.reduce((acc, item) => acc + item.numFrames, 0)
   const morphTargetInfluences = Array(framesSum).fill(0)
 
   mesh.morphTargetInfluences = morphTargetInfluences

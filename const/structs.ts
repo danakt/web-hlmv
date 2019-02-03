@@ -14,7 +14,7 @@ export const header = {
   /** Data size of MDL file in bytes */
   length:      int,
   /** Position of player viewpoint relative to model origin */
-  eyeposition: vec3,
+  eyePosition: vec3,
   /** Corner of model hull box with the least X/Y/Z values */
   max:         vec3,
   /** Opposite corner of model hull box */
@@ -36,51 +36,51 @@ export const header = {
   // Note that indexes/counts are not always paired and ordered consistently.
 
   /** Number of bones */
-  numbones:            int,
+  numBones:            int,
   /** Offset of first data section */
-  boneindex:           int,
+  boneIndex:           int,
   /** Number of bone controllers */
-  numbonecontrollers:  int,
+  numBoneControllers:  int,
   /** Offset of bone controllers */
-  bonecontrollerindex: int,
+  boneControllerIndex: int,
   /** Number of complex bounding boxes */
-  numhitboxes:         int,
-  /** Offset of hitboxes */
-  hitboxindex:         int,
+  numHitboxes:         int,
+  /** Offset of hit boxes */
+  hitBoxindex:         int,
   /** Number of sequences */
-  numseq:              int,
+  numSeq:              int,
   /** Offset of sequences */
-  seqindex:            int,
+  seqIndex:            int,
   /** Number of demand loaded sequences */
-  numseqgroups:        int,
+  numSeqGroups:        int,
   /** Offset of demand loaded sequences */
-  seqgroupindex:       int,
+  seqGroupIndex:       int,
   /** Number of raw textures */
-  numtextures:         int,
+  numTextures:         int,
   /** Offset of raw textures */
-  textureindex:        int,
+  textureIndex:        int,
   /** Offset of textures data */
-  texturedataindex:    int,
+  textureDataIndex:    int,
   /** Number of replaceable textures */
-  numskinref:          int,
-  numskinfamilies:     int,
-  skinindex:           int,
+  numSkinRef:          int,
+  numSkinFamilies:     int,
+  skinIndex:           int,
   /** Number of body parts */
-  numbodyparts:        int,
+  numBodyParts:        int,
   /** Index of body parts */
-  bodypartindex:       int,
+  bodyPartIndex:       int,
   /** Number queryable attachable points */
-  numattachments:      int,
-  attachmentindex:     int,
+  numAttachments:      int,
+  attachmentIndex:     int,
   // This seems to be obsolete.
   // Probably replaced by events that reference external sounds?
-  soundtable:          int,
-  soundindex:          int,
-  soundgroups:         int,
-  soundgroupindex:     int,
+  soundTable:          int,
+  soundIndex:          int,
+  soundGroups:         int,
+  soundGroupIndex:     int,
   /** Animation node to animation node transition graph */
-  numtransitions:      int,
-  transitionindex:     int
+  numTransitions:      int,
+  transitionIndex:     int
 }
 
 export type Header = StructResult<typeof header>
@@ -96,7 +96,7 @@ export const bone = {
   /** ?? */
   flags:          int,
   /** Bone controller index, -1 == none */
-  bonecontroller: array(MAX_PER_BONE_CONTROLLERS, int),
+  boneController: array(MAX_PER_BONE_CONTROLLERS, int),
   /** Default DoF values */
   value:          array(MAX_PER_BONE_CONTROLLERS, float),
   /** Scale for delta DoF values */
@@ -108,7 +108,7 @@ export type Bone = StructResult<typeof bone>
 /**
  * Bone controllers
  */
-export const bonecontroller = {
+export const boneController = {
   bone:  int,
   type:  int,
   start: float,
@@ -117,7 +117,7 @@ export const bonecontroller = {
   index: int
 }
 
-export type BoneController = StructResult<typeof bonecontroller>
+export type BoneController = StructResult<typeof boneController>
 
 /**
  * Attachment
@@ -136,7 +136,7 @@ export type Attachment = StructResult<typeof attachment>
 /**
  * Bounding boxes
  */
-export const bbox = {
+export const boundingBox = {
   bone:  int,
   /** Intersection group */
   group: int,
@@ -145,12 +145,12 @@ export const bbox = {
   bbmax: vec3
 }
 
-export type BoundingBox = StructResult<typeof bbox>
+export type BoundingBox = StructResult<typeof boundingBox>
 
 /**
  * Sequence description
  */
-export const seqdesc = {
+export const seqDesc = {
   /** Sequence label */
   label: string(32),
 
@@ -160,61 +160,61 @@ export const seqdesc = {
   flags: int,
 
   activity:  int,
-  actweight: int,
+  actWeight: int,
 
-  numevents:  int,
-  eventindex: int,
+  numEvents:  int,
+  eventIndex: int,
 
   /** Number of frames per sequence */
-  numframes: int,
+  numFrames: int,
 
   /** Number of foot pivots */
-  numpivots:  int,
-  pivotindex: int,
+  numPivots:  int,
+  pivotIndex: int,
 
-  motiontype:         int,
-  motionbone:         int,
-  linearmovement:     vec3,
-  automoveposindex:   int,
-  automoveangleindex: int,
+  motionType:         int,
+  motionBone:         int,
+  linearMovement:     vec3,
+  autoMovePosIndex:   int,
+  autoMoveAngleIndex: int,
 
   /** Per sequence bounding box */
   bbmin: vec3,
   bbmax: vec3,
 
-  numblends: int,
+  numBlends: int,
   /** "anim" pointer relative to start of sequence group data */
-  animindex: int,
+  animIndex: int,
 
   // [blend][bone][X, Y, Z, XR, YR, ZR]
   /** X, Y, Z, XR, YR, ZR */
-  blendtype:   array(2, int),
+  blendType:   array(2, int),
   /** Starting value */
-  blendstart:  array(2, float),
+  blendStart:  array(2, float),
   /** Ending value */
-  blendend:    array(2, float),
-  blendparent: int,
+  blendEnd:    array(2, float),
+  blendParent: int,
 
   /** Sequence group for demand loading */
-  seqgroup: int,
+  seqGroup: int,
 
   /** Transition node at entry */
-  entrynode: int,
+  entryNode: int,
   /** Transition node at exit */
-  exitnode:  int,
+  exitNode:  int,
   /** Transition rules */
-  nodeflags: int,
+  nodeFlags: int,
 
   /** Auto advancing sequences */
-  nextseq: int
+  nextSeq: int
 }
 
-export type SequenceDesc = StructResult<typeof seqdesc>
+export type SequenceDesc = StructResult<typeof seqDesc>
 
 /**
  * Demand loaded sequence groups
  */
-export const seqgroup = {
+export const seqGroup = {
   /** Textual name */
   label:   string(32),
   /** File name */
@@ -225,20 +225,20 @@ export const seqgroup = {
   unused2: int
 }
 
-export type SequenceGroup = StructResult<typeof seqgroup>
+export type SequenceGroup = StructResult<typeof seqGroup>
 
 /**
  * Body part index
  */
-export const bodypart = {
+export const bodyPart = {
   name:       string(64),
-  nummodels:  int,
+  numModels:  int,
   base:       int,
   /** Index into models array */
-  modelindex: int
+  modelIndex: int
 }
 
-export type BodyPart = StructResult<typeof bodypart>
+export type BodyPart = StructResult<typeof bodyPart>
 
 /**
  * Texture info
@@ -266,27 +266,27 @@ export const subModel = {
 
   type: int,
 
-  boundingradius: float,
+  boundingRadius: float,
 
-  nummesh:   int,
-  meshindex: int,
+  numMesh:   int,
+  meshIndex: int,
 
   /** Number of unique vertices */
-  numverts:      int,
+  numVerts:      int,
   /** Vertex bone info */
-  vertinfoindex: int,
+  vertInfoIndex: int,
   /** Vertex vec3 */
-  vertindex:     int,
+  vertIndex:     int,
   /** Number of unique surface normals */
-  numnorms:      int,
+  numNorms:      int,
   /** Normal bone info */
-  norminfoindex: int,
+  normInfoIndex: int,
   /** Normal vec3 */
-  normindex:     int,
+  normIndex:     int,
 
   /** Deformation groups */
-  numgroups:  int,
-  groupindex: int
+  numGroups:  int,
+  groupIndex: int
 }
 
 export type SubModel = StructResult<typeof subModel>
@@ -295,13 +295,13 @@ export type SubModel = StructResult<typeof subModel>
  * Mesh info
  */
 export const mesh = {
-  numtris:   int,
-  triindex:  int,
-  skinref:   int,
+  numTris:   int,
+  triIndex:  int,
+  skinRef:   int,
   /** Per mesh normals */
-  numnorms:  int,
+  numNorms:  int,
   /** Normal vec3_t */
-  normindex: int
+  normIndex: int
 }
 
 export type Mesh = StructResult<typeof mesh>

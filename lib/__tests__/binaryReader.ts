@@ -39,7 +39,7 @@ test('should parse some struct in binary file', () => {
 test('should parse multiple structs in binary file', () => {
   const dataView = new FastDataView(leetBuffer)
   const header = readStruct(dataView, structs.header)
-  const texturesInfo = readStructMultiple(dataView, structs.texture, header.textureindex, header.numtextures)
+  const texturesInfo = readStructMultiple(dataView, structs.texture, header.textureIndex, header.numTextures)
 
   expect(texturesInfo).toMatchSnapshot('leet texture info')
 })

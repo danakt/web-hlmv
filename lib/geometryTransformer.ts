@@ -258,8 +258,8 @@ export const calcRotations = (
   )
 
   for (const axis of [MOTION_X, MOTION_X, MOTION_Z]) {
-    if (modelData.sequences[sequenceIndex].motiontype & axis) {
-      bonesPositions[modelData.sequences[sequenceIndex].motionbone][1] = 0
+    if (modelData.sequences[sequenceIndex].motionType & axis) {
+      bonesPositions[modelData.sequences[sequenceIndex].motionBone][1] = 0
     }
   }
 

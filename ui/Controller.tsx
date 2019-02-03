@@ -35,7 +35,7 @@ export const Controller = (props: Props) => {
         >
           {props.modelData.sequences.map((sequence, i) => (
             <option key={i} value={i}>
-              {sequence.label} ({sequence.numframes})
+              {sequence.label} ({sequence.numFrames})
             </option>
           ))}
         </select>

@@ -73,7 +73,7 @@ export const prepareRenderData = (modelData: ModelData): MeshRenderData[][][] =>
   modelData.bodyParts.map((_, bodyPartIndex) =>
     modelData.subModels[bodyPartIndex].map((_, subModelIndex) =>
       modelData.meshes[bodyPartIndex][subModelIndex].map((_, meshIndex) => {
-        const textureIndex = modelData.skinRef[modelData.meshes[bodyPartIndex][subModelIndex][meshIndex].skinref]
+        const textureIndex = modelData.skinRef[modelData.meshes[bodyPartIndex][subModelIndex][meshIndex].skinRef]
 
         // Unpack faces of the mesh
         const { vertices, uv, indices } = readFacesData(
@@ -88,7 +88,7 @@ export const prepareRenderData = (modelData: ModelData): MeshRenderData[][][] =>
 
           // List of mesh buffer for each frame of each sequence
           geometryBuffers: modelData.sequences.map((sequence, sequenceIndex) =>
-            Array(sequence.numframes)
+            Array(sequence.numFrames)
               .fill(null)
               .map((_, frame) => {
                 const boneTransforms = calcRotations(modelData, sequenceIndex, frame)
@@ -165,7 +165,7 @@ export const createModelMeshes = (
     bodyPart.map((subModel, subModelIndex) =>
       // Sub model level
       subModel.map(({ geometryBuffers, uvMap }, meshIndex) => {
-        const textureIndex = modelData.skinRef[modelData.meshes[bodyPartIndex][subModelIndex][meshIndex].skinref]
+        const textureIndex = modelData.skinRef[modelData.meshes[bodyPartIndex][subModelIndex][meshIndex].skinRef]
 
         return createMesh(geometryBuffers[0][0], uvMap, textures[textureIndex])
       })
