@@ -10,6 +10,7 @@ const Wrapper = styled.div`
   position: absolute;
   right: 0;
   top: 0;
+  width: 20vw;
   max-height: 100vh;
   color: rgba(255, 255, 255, 0.75);
 `
