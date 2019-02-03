@@ -1,5 +1,7 @@
 # Web Half-Life Model Viewer
 
+https://danakt.github.io/web-hlmv
+
 There will be a readme, kek
 
 ## License
