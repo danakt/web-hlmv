@@ -1,0 +1,11 @@
+# dirs
+node_modules/
+dist/
+.vscode/
+coverage/
+*.bak/
+
+# files
+package-lock.json
+*.temp
+TODO.md
