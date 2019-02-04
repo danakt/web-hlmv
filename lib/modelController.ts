@@ -29,7 +29,7 @@ export const createMeshController = (
   modelData: ModelData,
   isDefaultVisible: boolean = false
 ) => {
-  console.time(`   Creating mesh controller ${mesh.uuid}`)
+  // console.time(`   Creating mesh controller ${mesh.uuid}`)
 
   // Set default visibility of the mesh
   mesh.visible = isDefaultVisible
@@ -88,7 +88,7 @@ export const createMeshController = (
     }
   }
 
-  console.timeEnd(`   Creating mesh controller ${mesh.uuid}`)
+  // console.timeEnd(`   Creating mesh controller ${mesh.uuid}`)
 
   return meshModelController
 }
@@ -102,7 +102,7 @@ export const createModelController = (
   modelData: ModelData,
   initialSequence: number = 0
 ) => {
-  console.time('Creating model controller')
+  // console.time('Creating model controller')
 
   // Active sequence
   let activeSequenceIndex: number = initialSequence
@@ -181,7 +181,7 @@ export const createModelController = (
     }
   }
 
-  console.timeEnd('Creating model controller')
+  // console.timeEnd('Creating model controller')
 
   return modelController
 }
