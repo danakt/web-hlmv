@@ -1,4 +1,4 @@
-# Web Half-Life Model Viewer
+# Web Half-Life Model Viewer [![Build Status](https://travis-ci.org/danakt/web-hlmv.svg?branch=master)](https://travis-ci.org/danakt/web-hlmv)
 
 To use to view a model, you can use the following link:  
 https://danakt.github.io/web-hlmv
