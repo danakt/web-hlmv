@@ -1,5 +1,6 @@
 import * as leetModel                               from '../__mock__/leet.mdl'
 import * as React                                   from 'react'
+import { hot }                                      from 'react-hot-loader'
 import DropzoneContainer, { DropFilesEventHandler } from 'react-dropzone'
 import { ModelController }                          from '../lib/modelController'
 import { ModelData }                                from '../lib/modelDataParser'
@@ -8,11 +9,12 @@ import { Renderer }                                 from './Renderer'
 import { Controller }                               from './Controller'
 import { GlobalStyles }                             from './GlobalStyles'
 import { Dropzone }                                 from './Dropzone'
+import { BackgroundContainer }                      from './BackgroundContainer'
 
 /** Is need to show demo */
 const IS_DEMO_SHOWED = location.search.indexOf('?demo') === 0
 
-export const App = () => {
+export const App = hot(module)(() => {
   const [modelController, setModelController] = React.useState<ModelController | null>(null)
   const [modelData, setModelData] = React.useState<ModelData | null>(null)
   const [isLoading, setLoadingState] = React.useState(IS_DEMO_SHOWED)
@@ -49,26 +51,35 @@ export const App = () => {
   }
 
   return (
-    <React.Fragment>
-      <GlobalStyles backgroundColor="#4d7f7e" color="#fff" />
-
-      {modelBuffer ? (
+    <BackgroundContainer>
+      {({ backgroundColor }, { setBackgroundColor }) => (
         <React.Fragment>
-          <Renderer modelBuffer={modelBuffer} setModelController={setModelController} setModelData={setModelData} />
+          <GlobalStyles backgroundColor={backgroundColor} color="#fff" />
 
-          {modelController != null && modelData != null && (
-            <Controller modelController={modelController} modelData={modelData} />
+          {modelBuffer ? (
+            <React.Fragment>
+              <Renderer modelBuffer={modelBuffer} setModelController={setModelController} setModelData={setModelData} />
+
+              {modelController != null && modelData != null && (
+                <Controller
+                  backgroundColor={backgroundColor}
+                  onBackgroundColorUpdate={setBackgroundColor}
+                  modelController={modelController}
+                  modelData={modelData}
+                />
+              )}
+            </React.Fragment>
+          ) : isLoading ? (
+            <LoadingScreen />
+          ) : (
+            <DropzoneContainer onDrop={onDrop}>
+              {({ getRootProps, getInputProps, isDragActive }) => (
+                <Dropzone wrapperProps={getRootProps()} inputProps={getInputProps()} isDragActive={isDragActive} />
+              )}
+            </DropzoneContainer>
           )}
         </React.Fragment>
-      ) : isLoading ? (
-        <LoadingScreen />
-      ) : (
-        <DropzoneContainer onDrop={onDrop}>
-          {({ getRootProps, getInputProps, isDragActive }) => (
-            <Dropzone wrapperProps={getRootProps()} inputProps={getInputProps()} isDragActive={isDragActive} />
-          )}
-        </DropzoneContainer>
       )}
-    </React.Fragment>
+    </BackgroundContainer>
   )
-}
+})

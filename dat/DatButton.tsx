@@ -1,7 +1,6 @@
-import * as React   from 'react'
-import styled       from 'styled-components'
-import { DatItem }  from './DatItem'
-import { DatLabel } from './DatLabel'
+import * as React  from 'react'
+import styled      from 'styled-components'
+import { DatItem } from './DatItem'
 
 const DatItemButton = styled(DatItem)`
   border-left-color: #e61d5f;
@@ -17,8 +16,4 @@ type Props = {
   children?: React.ReactNode
 }
 
-export const DatButton = (props: Props) => (
-  <DatItemButton>
-    <DatLabel>{props.children}</DatLabel>
-  </DatItemButton>
-)
+export const DatButton = (props: Props) => <DatItemButton onClick={props.onClick}>{props.children}</DatItemButton>

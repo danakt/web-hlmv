@@ -8,6 +8,7 @@ import { DatFolder }       from '../dat/DatFolder'
 import { DatButton }       from '../dat/DatButton'
 import { DatSelect }       from '../dat/DatSelect'
 import { DatNumber }       from '../dat/DatNumber'
+import { DatColor }        from '../dat/DatColor'
 
 const StyledDatGui = styled(DatWrapper)`
   position: absolute;
@@ -16,6 +17,8 @@ const StyledDatGui = styled(DatWrapper)`
 `
 
 type Props = {
+  backgroundColor: string
+  onBackgroundColorUpdate: (color: string) => void
   modelController: ModelController
   modelData: ModelData
 }
@@ -53,6 +56,8 @@ export const Controller = (props: Props) => {
 
   return (
     <StyledDatGui>
+      <DatColor label="Background" value={props.backgroundColor} onChange={props.onBackgroundColorUpdate} />
+
       <DatFolder title="Animation">
         <DatButton onClick={() => setPause(!isPaused)}>{isPaused ? 'Play' : 'Pause'}</DatButton>
         <DatSelect
