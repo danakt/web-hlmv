@@ -22,6 +22,8 @@ const config: Configuration = {
         },
         exclude: /node_modules/
       },
+
+      // Model loading
       {
         test: /\.mdl$/,
         use:  'file-loader'

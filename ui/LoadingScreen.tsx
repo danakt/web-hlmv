@@ -8,4 +8,15 @@ const Wrapper = styled.div`
   transform: translate(-50%, -50%);
 `
 
-export const LoadingScreen = () => <Wrapper>Loading...</Wrapper>
+const Text = styled.div`
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+`
+
+export const LoadingScreen = () => (
+  <Wrapper>
+    <Text>Loading...</Text>
+  </Wrapper>
+)

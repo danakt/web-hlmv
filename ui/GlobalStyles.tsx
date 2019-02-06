@@ -46,8 +46,13 @@ export const resetCss = `
   }
 `
 
+type Props = {
+  backgroundColor: string
+  color: string
+}
+
 /** Component with global styles of the app */
-export const GlobalStyles = createGlobalStyle`
+export const GlobalStyles = createGlobalStyle<Props>`
   ${resetCss}
 
   @import url('https://fonts.googleapis.com/css?family=Inconsolata');
@@ -65,8 +70,15 @@ export const GlobalStyles = createGlobalStyle`
   body {
     padding: 0;
     margin: 0;
-    background: #4d7f7e;
+    background: ${props => props.backgroundColor};
     font-family: 'Inconsolata', monospace;
-    color: #fff;
+    font-size: 14px;
+    color: ${props => props.color};
+    overflow: hidden;
+  }
+
+  input {
+    font-family: 'Inconsolata', monospace;
+    font-size: 14px;
   }
 `

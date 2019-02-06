@@ -32,19 +32,11 @@ export const Renderer = (props: Props) => {
 
       props.setModelData(modelData)
       props.setModelController(controller)
-
-      // scene.add(render§s(getBonePositions(modelData.bones)))
     }
   }, [])
 
   return (
-    <WindowSizeSensor
-      onChange={size => {
-        // if (typeof props.onResize === 'function') {
-        //   props.onResize(size.width, size.height)
-        // }
-      }}
-    >
+    <WindowSizeSensor>
       {(state: any) => (
         <canvas
           ref={canvasRef}
