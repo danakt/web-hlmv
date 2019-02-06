@@ -25,7 +25,6 @@ const BorderedBox = styled.div`
   top: 25px;
   width: calc(100% - 50px);
   height: calc(100% - 50px);
-  border: 1px dashed rgba(255, 255, 255, 0.5);
   z-index: 1;
 `
 
