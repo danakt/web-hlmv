@@ -3,11 +3,11 @@ import * as R              from 'ramda'
 import styled              from 'styled-components'
 import { ModelController } from '../lib/modelController'
 import { ModelData }       from '../lib/modelDataParser'
-import { DatWrapper }      from './DatWrapper'
-import { DatFolder }       from './DatFolder'
-import { DatButton }       from './DatButton'
-import { DatSelect }       from './DatSelect'
-import { DatNumber }       from './DatNumber'
+import { DatWrapper }      from '../dat/DatWrapper'
+import { DatFolder }       from '../dat/DatFolder'
+import { DatButton }       from '../dat/DatButton'
+import { DatSelect }       from '../dat/DatSelect'
+import { DatNumber }       from '../dat/DatNumber'
 
 const StyledDatGui = styled(DatWrapper)`
   position: absolute;
@@ -66,7 +66,11 @@ export const Controller = (props: Props) => {
         <DatNumber
           label="Duration (sec)"
           disabled
-          value={props.modelData.sequences[animationIndex].numFrames / props.modelData.sequences[animationIndex].fps}
+          value={Number(
+            (
+              props.modelData.sequences[animationIndex].numFrames / props.modelData.sequences[animationIndex].fps
+            ).toFixed(3)
+          )}
         />
       </DatFolder>
 
