@@ -3,11 +3,11 @@ import * as React                                   from 'react'
 import DropzoneContainer, { DropFilesEventHandler } from 'react-dropzone'
 import { ModelController }                          from '../lib/modelController'
 import { ModelData }                                from '../lib/modelDataParser'
+import { LoadingScreen }                            from './LoadingScreen'
 import { Renderer }                                 from './Renderer'
 import { Controller }                               from './Controller'
 import { GlobalStyles }                             from './GlobalStyles'
 import { Dropzone }                                 from './Dropzone'
-import { LoadingScreen }                            from '../components/LoadingScreen'
 
 /** Is need to show demo */
 const IS_DEMO_SHOWED = location.search.indexOf('?demo') === 0
