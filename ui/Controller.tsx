@@ -1,14 +1,16 @@
-import * as React          from 'react'
-import * as R              from 'ramda'
-import styled              from 'styled-components'
-import { ModelController } from '../lib/modelController'
-import { ModelData }       from '../lib/modelDataParser'
-import { DatWrapper }      from '../dat/DatWrapper'
-import { DatFolder }       from '../dat/DatFolder'
-import { DatButton }       from '../dat/DatButton'
-import { DatSelect }       from '../dat/DatSelect'
-import { DatNumber }       from '../dat/DatNumber'
-import { DatColor }        from '../dat/DatColor'
+import * as React                from 'react'
+import * as R                    from 'ramda'
+import styled                    from 'styled-components'
+import { ModelController }       from '../lib/modelController'
+import { ModelData }             from '../lib/modelDataParser'
+import { DatWrapper }            from '../dat/DatWrapper'
+import { DatFolder }             from '../dat/DatFolder'
+import { DatButton }             from '../dat/DatButton'
+import { DatSelect }             from '../dat/DatSelect'
+import { DatNumber }             from '../dat/DatNumber'
+import { DatColor }              from '../dat/DatColor'
+import { BackgroundContainer }   from './BackgroundContainer'
+import { INITIAL_UI_BACKGROUND } from '../const/constants'
 
 const StyledDatGui = styled(DatWrapper)`
   position: absolute;
@@ -56,7 +58,16 @@ export const Controller = (props: Props) => {
 
   return (
     <StyledDatGui>
-      <DatColor label="Background" value={props.backgroundColor} onChange={props.onBackgroundColorUpdate} />
+      <DatColor
+        label="Background"
+        value={props.backgroundColor}
+        onChange={color => props.onBackgroundColorUpdate(color)}
+      />
+      {props.backgroundColor !== INITIAL_UI_BACKGROUND && (
+        <DatButton onClick={() => props.onBackgroundColorUpdate(INITIAL_UI_BACKGROUND)}>
+          Set default background color
+        </DatButton>
+      )}
 
       <DatFolder title="Animation">
         <DatButton onClick={() => setPause(!isPaused)}>{isPaused ? 'Play' : 'Pause'}</DatButton>

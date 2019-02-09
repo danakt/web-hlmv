@@ -52,3 +52,6 @@ export const MOTION_Z = 0x0004
 
 /** Controller that wraps shortest distance */
 export const RLOOP = 0x8000
+
+/** Default interface background color */
+export const INITIAL_UI_BACKGROUND = '#4d7f7e'
