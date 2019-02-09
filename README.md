@@ -13,7 +13,8 @@ https://danakt.github.io/web-hlmv?demo
 - Range input for select animation frame
 - Showing model name
 - Viewing textures
-  Create an [issue](https://github.com/danakt/web-hlmv/issues) to offer new features.
+
+Create an [issue](https://github.com/danakt/web-hlmv/issues) to offer new features.
 
 ## License
 
