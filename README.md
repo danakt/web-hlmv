@@ -6,6 +6,15 @@ https://danakt.github.io/web-hlmv
 Also, you can view demo without dropping custom model here:  
 https://danakt.github.io/web-hlmv?demo
 
+## Todo
+
+- Fix models rendering
+- Re-import a model
+- Range input for select animation frame
+- Showing model name
+- Viewing textures
+  Create an [issue](https://github.com/danakt/web-hlmv/issues) to offer new features.
+
 ## License
 
 This product contains software technology licensed from id Software and Valve
