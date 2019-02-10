@@ -16,12 +16,14 @@ const StyledDatGui = styled(DatWrapper)`
   position: absolute;
   top: 15px;
   right: 15px;
+  z-index: 3;
 `
 
 type Props = {
   backgroundColor: string
   modelController?: ModelController | null
   modelData?: ModelData | null
+  isLoading: boolean
   onBackgroundColorUpdate: (color: string) => void
   onModelLoad: (file: File) => void
 }
@@ -98,7 +100,7 @@ export const Controller = (props: Props) => {
         </DatButton>
       )}
 
-      {props.modelController && props.modelData && (
+      {!props.isLoading && props.modelController && props.modelData && (
         <React.Fragment>
           <DatFolder title="Animation">
             <DatButton onClick={() => setPause(!isPaused)}>{isPaused ? 'Play' : 'Pause'}</DatButton>

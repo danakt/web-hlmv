@@ -15,6 +15,9 @@ type Props = {
   children: (data: Data, actions: Actions) => React.ReactNode
 }
 
+/**
+ * Background color container
+ */
 export const BackgroundContainer = (props: Props) => {
   const [color, setColor] = React.useState(() => localStorage.getItem(LOCAL_STORAGE_KEY) || INITIAL_UI_BACKGROUND)
 

@@ -1,12 +1,14 @@
 import * as React                                from 'react'
 import styled                                    from 'styled-components'
-import { DropzoneInputProps, DropzoneRootProps } from 'react-dropzone'
+import { DropzoneRootProps, DropzoneInputProps } from 'react-dropzone'
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<{ color: string; isDragActive: boolean }>`
   position: relative;
   width: 100vw;
   height: 100vh;
   cursor: pointer;
+  background-color: ${props => props.color};
+  z-index: ${props => (props.isDragActive ? 5 : 'auto')};
 `
 
 const Input = styled.input`
@@ -36,21 +38,39 @@ const Description = styled.div`
 `
 
 type Props = {
-  wrapperProps: DropzoneRootProps
-  inputProps: DropzoneInputProps
   isDragActive: boolean
+  backgroundColor: string
+  inputProps: DropzoneInputProps
+  onFileLoad: (file: File) => void
 }
 
-export const Dropzone = (props: Props) => (
-  <Wrapper {...props.wrapperProps}>
-    <Input {...props.inputProps} />
+/**
+ * Dropzone
+ */
+export const Dropzone = (props: Props) => {
+  const transparentColor = React.useMemo(
+    () => {
+      const r = parseInt(props.backgroundColor.substring(1, 3), 16)
+      const g = parseInt(props.backgroundColor.substring(3, 5), 16)
+      const b = parseInt(props.backgroundColor.substring(5, 7), 16)
 
-    <BorderedBox>
-      <Description>
-        {props.isDragActive
-          ? 'Drop model here...'
-          : 'Try dropping some model here, or click to select model to upload.'}
-      </Description>
-    </BorderedBox>
-  </Wrapper>
-)
+      // Setting half-opacity
+      return `rgba(${r}, ${g}, ${b}, ${0.7})`
+    },
+    [props.backgroundColor]
+  )
+
+  return (
+    <Wrapper color={transparentColor} isDragActive={props.isDragActive}>
+      {!props.isDragActive && <Input {...props.inputProps} />}
+
+      <BorderedBox>
+        <Description>
+          {props.isDragActive
+            ? 'Drop model here...' //
+            : 'Try dropping some model here, or click to select model to upload.'}
+        </Description>
+      </BorderedBox>
+    </Wrapper>
+  )
+}

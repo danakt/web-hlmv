@@ -11,6 +11,7 @@ import { GlobalStyles }        from './GlobalStyles'
 import { Dropzone }            from './Dropzone'
 import { BackgroundContainer } from './BackgroundContainer'
 import { FileContainer }       from './FileContainer'
+import { DropzoneWrapper }     from './DropzoneWrapper'
 
 /** Is need to show demo */
 const IS_DEMO_SHOWED = location.search.indexOf('?demo') === 0
@@ -18,39 +19,52 @@ const IS_DEMO_SHOWED = location.search.indexOf('?demo') === 0
 export const App = hot(module)(() => {
   const [modelController, setModelController] = React.useState<ModelController | null>(null)
   const [modelData, setModelData] = React.useState<ModelData | null>(null)
-
   return (
     <FileContainer defaultFileUrl={IS_DEMO_SHOWED ? leetModel : null}>
       {({ buffer, isLoading }, { setFile }) => (
-        <BackgroundContainer>
-          {({ backgroundColor }, { setBackgroundColor }) => (
-            <React.Fragment>
-              <GlobalStyles backgroundColor={backgroundColor} color="#fff" />
+        <DropzoneContainer onDrop={files => setFile(files[0])}>
+          {({ getRootProps, getInputProps, isDragActive }) => (
+            <DropzoneWrapper {...getRootProps()}>
+              <BackgroundContainer>
+                {({ backgroundColor }, { setBackgroundColor }) => (
+                  <React.Fragment>
+                    <GlobalStyles backgroundColor={backgroundColor} color="#fff" />
 
-              <Controller
-                backgroundColor={backgroundColor}
-                modelController={modelController}
-                modelData={modelData}
-                onBackgroundColorUpdate={setBackgroundColor}
-                onModelLoad={file => setFile(file)}
-              />
+                    <Controller
+                      isLoading={isLoading}
+                      backgroundColor={backgroundColor}
+                      modelController={modelController}
+                      modelData={modelData}
+                      onBackgroundColorUpdate={setBackgroundColor}
+                      onModelLoad={file => setFile(file)}
+                    />
 
-              {buffer ? (
-                <React.Fragment>
-                  <Renderer modelBuffer={buffer} setModelController={setModelController} setModelData={setModelData} />
-                </React.Fragment>
-              ) : isLoading ? (
-                <LoadingScreen />
-              ) : (
-                <DropzoneContainer onDrop={files => setFile(files[0])}>
-                  {({ getRootProps, getInputProps, isDragActive }) => (
-                    <Dropzone wrapperProps={getRootProps()} inputProps={getInputProps()} isDragActive={isDragActive} />
-                  )}
-                </DropzoneContainer>
-              )}
-            </React.Fragment>
+                    {(isDragActive || (!buffer && !isLoading)) && (
+                      <Dropzone
+                        backgroundColor={backgroundColor}
+                        onFileLoad={file => setFile(file)}
+                        isDragActive={isDragActive}
+                        inputProps={getInputProps()}
+                      />
+                    )}
+
+                    {isLoading && <LoadingScreen />}
+
+                    {buffer && !isLoading && (
+                      <React.Fragment>
+                        <Renderer
+                          modelBuffer={buffer}
+                          setModelController={setModelController}
+                          setModelData={setModelData}
+                        />
+                      </React.Fragment>
+                    )}
+                  </React.Fragment>
+                )}
+              </BackgroundContainer>
+            </DropzoneWrapper>
           )}
-        </BackgroundContainer>
+        </DropzoneContainer>
       )}
     </FileContainer>
   )
