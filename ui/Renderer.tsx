@@ -16,24 +16,27 @@ export const Renderer = (props: Props) => {
   // Canvas reference
   const canvasRef = React.useRef<HTMLCanvasElement>(null)
 
-  React.useEffect(() => {
-    if (canvasRef.current) {
-      const modelData: ModelData = parseModel(props.modelBuffer)
+  React.useEffect(
+    () => {
+      if (canvasRef.current) {
+        const modelData: ModelData = parseModel(props.modelBuffer)
 
-      const meshesRenderData = prepareRenderData(modelData)
-      const textures = modelData.textures.map(texture => buildTexture(props.modelBuffer, texture))
-      const meshes = createModelMeshes(meshesRenderData, modelData, textures)
-      const controller: ModelController = createModelController(meshes, meshesRenderData, modelData)
+        const meshesRenderData = prepareRenderData(modelData)
+        const textures = modelData.textures.map(texture => buildTexture(props.modelBuffer, texture))
+        const meshes = createModelMeshes(meshesRenderData, modelData, textures)
+        const controller: ModelController = createModelController(meshes, meshesRenderData, modelData)
 
-      const container = createContainer(meshes)
+        const container = createContainer(meshes)
 
-      const scene = renderScene(canvasRef.current, controller)
-      scene.add(container)
+        const scene = renderScene(canvasRef.current, controller)
+        scene.add(container)
 
-      props.setModelData(modelData)
-      props.setModelController(controller)
-    }
-  }, [])
+        props.setModelData(modelData)
+        props.setModelController(controller)
+      }
+    },
+    [props.modelBuffer]
+  )
 
   return (
     <WindowSizeSensor>

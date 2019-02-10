@@ -74,6 +74,7 @@ export const GlobalStyles = createGlobalStyle<Props>`
     font-family: 'Inconsolata', monospace;
     font-size: 14px;
     color: ${props => props.color};
+    transition: background-color .3s ease-out;
     overflow: hidden;
   }
 
