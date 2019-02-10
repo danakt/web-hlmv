@@ -1,6 +1,5 @@
 import * as THREE                from 'three'
 import * as orbitControlsCreator from 'three-orbit-controls'
-import { ModelController }       from './modelController'
 
 /*
  * Allow the camera to orbit around a target
@@ -11,7 +10,7 @@ const OrbitControls: typeof THREE.OrbitControls = orbitControlsCreator(THREE)
  * Creates orbit controller
  * @param domElement HTML canvas element
  */
-const createOrbitControls = (camera: THREE.Camera, domElement?: HTMLElement) => {
+export const createOrbitControls = (camera: THREE.Camera, domElement?: HTMLElement) => {
   const orbit = new OrbitControls(camera, domElement)
 
   orbit.enableKeys = true
@@ -24,7 +23,7 @@ const createOrbitControls = (camera: THREE.Camera, domElement?: HTMLElement) => 
  * Creates lights for the scene
  * @param color Lights color
  */
-const createLights = (color: number = 0xffffff): THREE.Light[] => {
+export const createLights = (color: number = 0xffffff): THREE.Light[] => {
   const ambientLight = new THREE.AmbientLight(color)
   const lights = []
 
@@ -40,68 +39,44 @@ const createLights = (color: number = 0xffffff): THREE.Light[] => {
 }
 
 /**
- * Starts drawing frames of the renderer
+ * Creates webgl renderer
+ * @param canvas The html canvas node
  */
-const runRenderer = (
-  renderer: THREE.Renderer,
-  scene: THREE.Scene,
-  camera: THREE.Camera,
-  controls: THREE.OrbitControls,
-  clock: THREE.Clock,
-  modelController: ModelController
-) => {
-  const drawKeyframe = () => {
-    requestAnimationFrame(drawKeyframe)
-    // required if controls.enableDamping or controls.autoRotate are set to true
-    controls.update()
+export const createRenderer = (canvas: HTMLCanvasElement): THREE.WebGLRenderer => {
+  const renderer = new THREE.WebGLRenderer({
+    canvas:     canvas,
+    antialias:  true,
+    alpha:      true,
+    clearColor: 0x0,
+    clearAlpha: 0
+  })
 
-    const delta = clock.getDelta()
-    modelController.update(delta)
+  // Pixel ration setting
+  renderer.setPixelRatio(window.devicePixelRatio)
 
-    renderer.render(scene, camera)
-  }
+  // Size setting
+  renderer.setSize(window.innerWidth, window.innerHeight)
 
-  drawKeyframe()
+  return renderer
 }
 
 /**
- * Binds renderer resize
+ * Creates camera object
+ * @param initDistance Initial distance from center
  */
-const bindRendererResize = (camera: THREE.PerspectiveCamera, renderer: THREE.Renderer) => {
-  window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight
-    camera.updateProjectionMatrix()
-
-    renderer.setSize(window.innerWidth, window.innerHeight)
-  })
-}
-
-export const renderScene = (
-  canvas: HTMLCanvasElement,
-  modelController: ModelController,
-  initDistance = 80
-): THREE.Scene => {
-  const scene = new THREE.Scene()
+export const createCamera = (initDistance: number = 80) => {
   const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000)
   camera.position.z = initDistance
 
-  const orbitControls = createOrbitControls(camera, canvas)
-
-  const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true })
-  renderer.setPixelRatio(window.devicePixelRatio)
-  renderer.setSize(window.innerWidth, window.innerHeight)
-
-  // Set background
-  renderer.setClearColor(0x0, 0)
-
-  // Adding lights to the scene
-  const lights = createLights()
-  scene.add(...lights)
-
-  const clock = new THREE.Clock()
-  runRenderer(renderer, scene, camera, orbitControls, clock, modelController)
-
-  bindRendererResize(camera, renderer)
-
-  return scene
+  return camera
 }
+
+/**
+ * Creates a clock object
+ */
+export const createClock = () => new THREE.Clock()
+
+/**
+ * Creates a scene object
+ */
+export const createScene = () => new THREE.Scene()

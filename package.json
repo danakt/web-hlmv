@@ -85,6 +85,8 @@
     "react-dom": "^16.8.1",
     "react-dropzone": "^8.0.4",
     "react-hot-loader": "^4.6.5",
+    "react-three": "^0.9.7",
+    "react-three-renderer": "^3.2.4",
     "style-loader": "^0.23.1",
     "styled-components": "^4.1.3",
     "three": "^0.101.1",
