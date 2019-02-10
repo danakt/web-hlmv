@@ -9,10 +9,9 @@ https://danakt.github.io/web-hlmv?demo
 ## Todo
 
 - Fix models rendering
-- Re-import a model
 - Range input for select animation frame
-- Showing model name
 - Viewing textures
+- Parsing and processing models in worker
 
 Create an [issue](https://github.com/danakt/web-hlmv/issues) to offer new features.
 
