@@ -34,7 +34,7 @@ const config: Configuration = {
     extensions: ['.tsx', '.ts', '.js']
   },
   output: {
-    filename: 'bundle.js',
+    filename: 'bundle.[contenthash].js',
     path:     path.resolve(__dirname, 'dist')
   },
   plugins: [
