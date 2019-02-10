@@ -11,7 +11,7 @@ import { GlobalStyles }        from './GlobalStyles'
 import { Dropzone }            from './Dropzone'
 import { BackgroundContainer } from './BackgroundContainer'
 import { FileContainer }       from './FileContainer'
-import { DropzoneWrapper }     from './DropzoneWrapper'
+import { GithubButton }        from './GithubButton'
 
 /** Is need to show demo */
 const IS_DEMO_SHOWED = location.search.indexOf('?demo') === 0
@@ -19,16 +19,19 @@ const IS_DEMO_SHOWED = location.search.indexOf('?demo') === 0
 export const App = hot(module)(() => {
   const [modelController, setModelController] = React.useState<ModelController | null>(null)
   const [modelData, setModelData] = React.useState<ModelData | null>(null)
+
   return (
     <FileContainer defaultFileUrl={IS_DEMO_SHOWED ? leetModel : null}>
       {({ buffer, isLoading }, { setFile }) => (
         <DropzoneContainer onDrop={files => setFile(files[0])}>
           {({ getRootProps, getInputProps, isDragActive }) => (
-            <DropzoneWrapper {...getRootProps()}>
+            <div {...getRootProps()}>
               <BackgroundContainer>
                 {({ backgroundColor }, { setBackgroundColor }) => (
                   <React.Fragment>
                     <GlobalStyles backgroundColor={backgroundColor} color="#fff" />
+
+                    <GithubButton />
 
                     <Controller
                       isLoading={isLoading}
@@ -62,7 +65,7 @@ export const App = hot(module)(() => {
                   </React.Fragment>
                 )}
               </BackgroundContainer>
-            </DropzoneWrapper>
+            </div>
           )}
         </DropzoneContainer>
       )}
