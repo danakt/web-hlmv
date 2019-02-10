@@ -8,4 +8,8 @@ export const DatInput = styled.input`
   margin: 0;
   outline: none;
   font-size: inherit;
+
+  &:hover {
+    background-color: #3c3c3c;
+  }
 `

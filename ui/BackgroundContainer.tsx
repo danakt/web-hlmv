@@ -1,6 +1,6 @@
-import * as React from 'react'
+import * as React                from 'react'
+import { INITIAL_UI_BACKGROUND } from '../const/constants'
 
-const INITIAL_BACKGROUND_COLOR = '#4d7f7e'
 const LOCAL_STORAGE_KEY = '__hlmv_background_color'
 
 type Data = {
@@ -15,8 +15,11 @@ type Props = {
   children: (data: Data, actions: Actions) => React.ReactNode
 }
 
+/**
+ * Background color container
+ */
 export const BackgroundContainer = (props: Props) => {
-  const [color, setColor] = React.useState(() => localStorage.getItem(LOCAL_STORAGE_KEY) || INITIAL_BACKGROUND_COLOR)
+  const [color, setColor] = React.useState(() => localStorage.getItem(LOCAL_STORAGE_KEY) || INITIAL_UI_BACKGROUND)
 
   React.useEffect(
     () => {

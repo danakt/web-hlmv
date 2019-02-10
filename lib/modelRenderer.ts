@@ -70,9 +70,6 @@ export const applyBoneTransforms = (
  * @param modelData Model data
  */
 export const prepareRenderData = (modelData: ModelData): MeshRenderData[][][] => {
-  // Recording time of render data preparing
-  // console.time('Prepare model data')
-
   const renderData: MeshRenderData[][][] = []
 
   for (let bodyPartIndex = 0; bodyPartIndex < modelData.bodyParts.length; bodyPartIndex++) {
@@ -118,12 +115,12 @@ export const prepareRenderData = (modelData: ModelData): MeshRenderData[][][] =>
     }
   }
 
-  // Printing time
-  // console.timeEnd('Prepare model data')
-
   return renderData
 }
 
+/**
+ * Creates model mesh
+ */
 export const createMesh = (
   geometryBuffer: THREE.BufferAttribute,
   uvMap: THREE.BufferAttribute,
@@ -149,13 +146,14 @@ export const createMesh = (
   return new THREE.Mesh(geometry, material)
 }
 
+/**
+ * Creates list of meshes of every submodel
+ */
 export const createModelMeshes = (
   meshesRenderData: MeshRenderData[][][],
   modelData: ModelData,
   textureBuffers: Uint8ClampedArray[]
 ): THREE.Mesh[][][] => {
-  // console.time('Creating model meshes')
-
   const textures: THREE.Texture[] = textureBuffers.map((textureBuffer, textureIndex) => {
     const texture = new THREE.Texture(
       new ImageData(
@@ -190,8 +188,6 @@ export const createModelMeshes = (
       })
     )
   )
-
-  // console.timeEnd('Creating model meshes')
 
   return modelMeshes
 }
