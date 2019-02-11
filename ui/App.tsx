@@ -25,7 +25,7 @@ export const App = hot(module)(() => {
       {({ buffer, isLoading }, { setFile }) => (
         <DropzoneContainer onDrop={files => setFile(files[0])}>
           {({ getRootProps, getInputProps, isDragActive }) => (
-            <div {...getRootProps()}>
+            <div {...getRootProps()} onClick={undefined}>
               <BackgroundContainer>
                 {({ backgroundColor }, { setBackgroundColor }) => (
                   <React.Fragment>
@@ -44,6 +44,7 @@ export const App = hot(module)(() => {
 
                     {(isDragActive || (!buffer && !isLoading)) && (
                       <Dropzone
+                        onClick={getRootProps().onClick}
                         backgroundColor={backgroundColor}
                         onFileLoad={file => setFile(file)}
                         isDragActive={isDragActive}

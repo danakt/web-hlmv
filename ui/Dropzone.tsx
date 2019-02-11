@@ -41,6 +41,7 @@ type Props = {
   isDragActive: boolean
   backgroundColor: string
   inputProps: DropzoneInputProps
+  onClick?: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void
   onFileLoad: (file: File) => void
 }
 
@@ -61,7 +62,7 @@ export const Dropzone = (props: Props) => {
   )
 
   return (
-    <Wrapper color={transparentColor} isDragActive={props.isDragActive}>
+    <Wrapper color={transparentColor} isDragActive={props.isDragActive} onClick={props.onClick}>
       {!props.isDragActive && <Input {...props.inputProps} />}
 
       <BorderedBox>
