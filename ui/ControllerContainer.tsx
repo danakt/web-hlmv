@@ -32,7 +32,7 @@ export const ControllerContainer = (props: Props) => {
   return (
     <React.Fragment>
       {props.children(modelState, {
-        togglePause:  () => setModelState(props.modelController.setPause(modelState.isPaused)),
+        togglePause:  () => setModelState(props.modelController.setPause(!modelState.isPaused)),
         setAnimation: seqIndex => setModelState(props.modelController.setAnimation(seqIndex)),
         showSubModel: (bodyPartIndex, subModelIndex) =>
           setModelState(props.modelController.showSubModel(bodyPartIndex, subModelIndex))

@@ -164,7 +164,7 @@ export const createModelController = (
 
     /** Set pause state of the model */
     setPause: (isPaused: boolean) => {
-      playbackRate = isPaused ? 0 : 0
+      playbackRate = isPaused ? 0 : 1
 
       meshControllers.forEach(bodyPart =>
         bodyPart.forEach(subModel => subModel.forEach(controller => controller.setPlaybackRate(playbackRate)))
