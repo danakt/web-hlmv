@@ -17,8 +17,8 @@ import { GithubButton }        from './GithubButton'
 const IS_DEMO_SHOWED = location.search.indexOf('?demo') === 0
 
 export const App = hot(module)(() => {
-  const [modelController, setModelController] = React.useState<ModelController | null>(null)
-  const [modelData, setModelData] = React.useState<ModelData | null>(null)
+  const [modelController, setModelController] = React.useState<ModelController | undefined>(undefined)
+  const [modelData, setModelData] = React.useState<ModelData | undefined>(undefined)
 
   return (
     <FileContainer defaultFileUrl={IS_DEMO_SHOWED ? leetModel : null}>

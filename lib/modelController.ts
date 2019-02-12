@@ -23,6 +23,9 @@ export const prepareAnimationClips = (meshData: MeshRenderData, modelData: Model
     )
   })
 
+/**
+ * Creates mesh controller
+ */
 export const createMeshController = (
   mesh: THREE.Mesh,
   meshRenderData: MeshRenderData,
@@ -90,7 +93,19 @@ export const createMeshController = (
 }
 
 /**
- * Creates model controller
+ * The model state
+ */
+export type ModelState = {
+  isPaused: boolean
+  activeSequenceIndex: number
+  showedSubModels: number[]
+  frame: number
+  playbackRate: number
+}
+
+/**
+ * Creates model controller.
+ * @todo refactor this shit
  */
 export const createModelController = (
   meshes: THREE.Mesh[][][],
@@ -98,6 +113,8 @@ export const createModelController = (
   modelData: ModelData,
   initialSequence: number = 0
 ) => {
+  let playbackRate = 1
+
   // Active sequence
   let activeSequenceIndex: number = initialSequence
 
@@ -123,36 +140,55 @@ export const createModelController = (
     bodyPart.forEach(subModel => subModel.forEach(controller => controller.setAnimation(activeSequenceIndex)))
   )
 
+  /** Returns current state of the model */
+  const getCurrentState = (): ModelState => ({
+    isPaused: playbackRate === 0,
+    activeSequenceIndex,
+    showedSubModels,
+    frame:    0,
+    playbackRate
+  })
+
   const modelController = {
-    /** Returns active sequence index */
-    get activeSequenceIndex(): number {
-      return activeSequenceIndex
-    },
-
-    /* Returns list of showed sub models **/
-    get showedSubModels(): number[] {
-      return showedSubModels
-    },
-
     /**
-     * Sets playback rate (animation speed)
-     * @param rate
-     */
-    setPlaybackRate: (rate: number) =>
-      meshControllers.forEach(bodyPart =>
-        bodyPart.forEach(subModel => subModel.forEach(controller => controller.setPlaybackRate(rate)))
-      ),
-
-    /**
-     * Updates delta tile
+     * Updates delta til=me
+     * @param deltaTime
      */
     update: (deltaTime: number) =>
       meshControllers.forEach(bodyPart =>
         bodyPart.forEach(subModel => subModel.forEach(controller => controller.update(deltaTime)))
       ),
 
+    /** Returns current state of the model */
+    getCurrentState,
+
+    /** Set pause state of the model */
+    setPause: (isPaused: boolean) => {
+      playbackRate = isPaused ? 0 : 0
+
+      meshControllers.forEach(bodyPart =>
+        bodyPart.forEach(subModel => subModel.forEach(controller => controller.setPlaybackRate(playbackRate)))
+      )
+
+      return getCurrentState()
+    },
+
+    /**
+     * Sets playback rate (animation speed)
+     * @param rate
+     */
+    setPlaybackRate: (rate: number) => {
+      playbackRate = rate
+
+      meshControllers.forEach(bodyPart =>
+        bodyPart.forEach(subModel => subModel.forEach(controller => controller.setPlaybackRate(playbackRate)))
+      )
+
+      return getCurrentState()
+    },
     /**
      * Sets animation to play
+     * @param sequenceIndex
      */
     setAnimation: (sequenceIndex: number) => {
       activeSequenceIndex = sequenceIndex
@@ -160,6 +196,8 @@ export const createModelController = (
       meshControllers.forEach(bodyPart =>
         bodyPart.forEach(subModel => subModel.forEach(controller => controller.setAnimation(sequenceIndex)))
       )
+
+      return getCurrentState()
     },
 
     /**
@@ -175,6 +213,8 @@ export const createModelController = (
           controller.setVisibility(isVisible)
         })
       })
+
+      return getCurrentState()
     }
   }
 
