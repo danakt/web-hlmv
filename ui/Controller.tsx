@@ -49,9 +49,9 @@ export const Controller = (props: Props) => {
       )}
 
       {!isLoading && modelController && modelData && (
-        <ControllerContainer modelController={modelController}>
+        <ControllerContainer modelData={modelData} modelController={modelController}>
           {(
-            { isPaused, activeSequenceIndex, showedSubModels, frame, playbackRate },
+            { isPaused, activeAnimationIndex: activeSequenceIndex, showedSubModels, frame, playbackRate },
             { togglePause, setAnimation, showSubModel }
           ) => (
             <React.Fragment>
@@ -63,6 +63,7 @@ export const Controller = (props: Props) => {
                   items={modelData.sequences.map(item => item.label)}
                   onChange={seqIndex => setAnimation(seqIndex)}
                 />
+                <DatNumber label="Frame" disabled value={frame} />
                 <DatNumber label="Frames" disabled value={modelData.sequences[activeSequenceIndex].numFrames} />
                 <DatNumber label="FPS" disabled value={modelData.sequences[activeSequenceIndex].fps} />
                 <DatNumber

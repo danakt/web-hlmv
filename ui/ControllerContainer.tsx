@@ -1,5 +1,6 @@
 import * as React                      from 'react'
 import { ModelController, ModelState } from '../lib/modelController'
+import { ModelData }                   from '../lib/modelDataParser'
 
 type Data = ModelState
 
@@ -10,6 +11,7 @@ type Actions = {
 }
 
 type Props = {
+  modelData: ModelData
   modelController: ModelController
   children: (data: Data, actions: Actions) => React.ReactNode
 }
@@ -27,6 +29,17 @@ export const ControllerContainer = (props: Props) => {
       }
     },
     [props.modelController]
+  )
+
+  // Updating animation frame index
+  React.useEffect(
+    () => {
+      const frameDelay = (1 / props.modelData.sequences[modelState.activeAnimationIndex].fps) * 1000
+      const intervalId = setInterval(() => setModelState(props.modelController.getCurrentState()), frameDelay)
+
+      return () => clearInterval(intervalId)
+    },
+    [props.modelData, modelState.activeAnimationIndex]
   )
 
   return (
