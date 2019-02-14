@@ -53,34 +53,34 @@ export const Controller = (props: Props) => {
         <ControllerContainer modelData={modelData} modelController={modelController}>
           {(
             { isPaused, activeAnimationIndex: activeSequenceIndex, showedSubModels, frame, playbackRate },
-            { togglePause, setAnimation, showSubModel, setPlaybackRate, setFrame }
+            { togglePause, setAnimation, showSubModel, setPlaybackRate, setFrame, setTempPaused }
           ) => (
             <React.Fragment>
               <DatFolder title="Animation">
-                <DatButton onClick={() => togglePause()}>{isPaused ? 'Play' : 'Pause'}</DatButton>
                 <DatSelect
                   label="Sequence"
                   activeItemIndex={activeSequenceIndex}
                   items={modelData.sequences.map(item => item.label)}
                   onChange={seqIndex => setAnimation(seqIndex)}
                 />
+                <DatButton onClick={() => togglePause()}>{isPaused ? 'Play' : 'Pause'}</DatButton>
                 <DatRange
                   label="Frame"
                   value={frame}
                   min={0}
                   max={modelData.sequences[activeSequenceIndex].numFrames - 1}
                   onChange={value => setFrame(value)}
+                  onChangeStart={() => setTempPaused(true)}
+                  onChangeComplete={() => setTempPaused(false)}
                 />
-
                 <DatRange
-                  label="Speed"
+                  label="Playback rate"
                   value={Number(playbackRate.toFixed(2))}
                   min={0}
                   max={2}
                   step={0.1}
                   onChange={value => setPlaybackRate(value)}
                 />
-                <DatNumber label="Frame" disabled value={frame} />
                 <DatNumber label="Frames" disabled value={modelData.sequences[activeSequenceIndex].numFrames} />
                 <DatNumber label="FPS" disabled value={modelData.sequences[activeSequenceIndex].fps} />
                 <DatNumber

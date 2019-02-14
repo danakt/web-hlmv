@@ -10,6 +10,7 @@ type Actions = {
   showSubModel: (bodyPartIndex: number, subModelIndex: number) => void
   setPlaybackRate: (rate: number) => void
   setFrame: (frame: number) => void
+  setTempPaused: (isTempPaused: boolean) => void
 }
 
 type Props = {
@@ -23,6 +24,7 @@ type Props = {
  */
 export const ControllerContainer = (props: Props) => {
   const [modelState, setModelState] = React.useState(() => props.modelController.getCurrentState())
+  const [isPrevPaused, setPrevPaused] = React.useState(false)
 
   React.useEffect(() => {
     if (props.modelController) {
@@ -46,7 +48,15 @@ export const ControllerContainer = (props: Props) => {
         showSubModel: (bodyPartIndex, subModelIndex) =>
           setModelState(props.modelController.showSubModel(bodyPartIndex, subModelIndex)),
         setPlaybackRate: rate => setModelState(props.modelController.setPlaybackRate(rate)),
-        setFrame:        frame => setModelState(props.modelController.setFrame(frame))
+        setFrame:        frame => setModelState(props.modelController.setFrame(frame)),
+        setTempPaused:   isTempPaused => {
+          if (isTempPaused) {
+            setPrevPaused(modelState.isPaused)
+            setModelState(props.modelController.setPause(isTempPaused))
+          } else {
+            setModelState(props.modelController.setPause(isPrevPaused))
+          }
+        }
       })}
     </React.Fragment>
   )
