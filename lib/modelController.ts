@@ -48,6 +48,15 @@ export const createMeshController = (
   const actions = animationClips.map(actionClip => mixer.clipAction(actionClip, mesh))
 
   const meshModelController = {
+    /** Return pause state of the mesh */
+    get isPaused() {
+      if (activeAction) {
+        return activeAction.paused
+      }
+
+      return false
+    },
+
     /**
      * Sets playback rate (animation speed)
      * @param rate
@@ -72,6 +81,8 @@ export const createMeshController = (
      * Sets animation to play
      */
     setAnimation: (sequenceIndex: number) => {
+      const wasPaused = activeAction ? activeAction.paused : false
+
       previousAction = activeAction
       activeAction = actions[sequenceIndex]
 
@@ -88,6 +99,7 @@ export const createMeshController = (
       }
 
       activeAction.reset().play()
+      activeAction.paused = wasPaused
     },
 
     /**
@@ -169,7 +181,7 @@ export const createModelController = (
 
   /** Returns current state of the model */
   const getCurrentState = (): ModelState => ({
-    isPaused:             isAnimationPaused,
+    isPaused:             meshControllers[0][0][0].isPaused,
     activeAnimationIndex: activeSequenceIndex,
     showedSubModels,
     frame:                getCurrentFrame(
