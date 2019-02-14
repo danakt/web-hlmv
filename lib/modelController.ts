@@ -1,4 +1,5 @@
 import * as THREE         from 'three'
+import * as R             from 'ramda'
 import { ModelData }      from './modelDataParser'
 import { MeshRenderData } from './modelRenderer'
 
@@ -23,6 +24,9 @@ export const prepareAnimationClips = (meshData: MeshRenderData, modelData: Model
     )
   })
 
+/**
+ * Creates mesh controller
+ */
 export const createMeshController = (
   mesh: THREE.Mesh,
   meshRenderData: MeshRenderData,
@@ -40,9 +44,19 @@ export const createMeshController = (
 
   const animationClips: THREE.AnimationClip[] = prepareAnimationClips(meshRenderData, modelData)
   const mixer = new THREE.AnimationMixer(mesh)
+
   const actions = animationClips.map(actionClip => mixer.clipAction(actionClip, mesh))
 
   const meshModelController = {
+    /** Return pause state of the mesh */
+    get isPaused() {
+      if (activeAction) {
+        return activeAction.paused
+      }
+
+      return false
+    },
+
     /**
      * Sets playback rate (animation speed)
      * @param rate
@@ -66,7 +80,9 @@ export const createMeshController = (
     /**
      * Sets animation to play
      */
-    setAnimation: (sequenceIndex: number, duration = 0.2) => {
+    setAnimation: (sequenceIndex: number) => {
+      const wasPaused = activeAction ? activeAction.paused : false
+
       previousAction = activeAction
       activeAction = actions[sequenceIndex]
 
@@ -83,14 +99,50 @@ export const createMeshController = (
       }
 
       activeAction.reset().play()
-    }
+      activeAction.paused = wasPaused
+    },
+
+    /**
+     * Set pause state of the running animation
+     */
+    setPause: (isPaused: boolean) => {
+      if (activeAction) {
+        activeAction.paused = isPaused
+      }
+    },
+
+    /**
+     * Jump to specific time of the running animation
+     */
+    setTime: (time: number) => {
+      if (activeAction) {
+        activeAction.time = time
+      }
+    },
+
+    /**
+     * Returns current time of the running animation
+     */
+    getCurrentTime: () => (activeAction ? activeAction.time : 0)
   }
 
   return meshModelController
 }
 
 /**
- * Creates model controller
+ * The model state
+ */
+export type ModelState = {
+  isPaused: boolean
+  activeAnimationIndex: number
+  showedSubModels: number[]
+  frame: number
+  playbackRate: number
+}
+
+/**
+ * Creates model controller.
+ * @todo refactor this shit
  */
 export const createModelController = (
   meshes: THREE.Mesh[][][],
@@ -98,6 +150,9 @@ export const createModelController = (
   modelData: ModelData,
   initialSequence: number = 0
 ) => {
+  let playbackRate = 1
+  let isAnimationPaused = false
+
   // Active sequence
   let activeSequenceIndex: number = initialSequence
 
@@ -123,36 +178,66 @@ export const createModelController = (
     bodyPart.forEach(subModel => subModel.forEach(controller => controller.setAnimation(activeSequenceIndex)))
   )
 
-  const modelController = {
-    /** Returns active sequence index */
-    get activeSequenceIndex(): number {
-      return activeSequenceIndex
-    },
+  const getCurrentFrame = (time: number, fps: number, numFrames: number) =>
+    Math.floor((time % (numFrames / fps)) / (1 / fps))
 
-    /* Returns list of showed sub models **/
-    get showedSubModels(): number[] {
-      return showedSubModels
+  /** Returns current state of the model */
+  const getCurrentState = (): ModelState => ({
+    isPaused:             meshControllers[0][0][0].isPaused,
+    activeAnimationIndex: activeSequenceIndex,
+    showedSubModels,
+    frame:                getCurrentFrame(
+      meshControllers[0][0][0].getCurrentTime(),
+      modelData.sequences[activeSequenceIndex].fps,
+      modelData.sequences[activeSequenceIndex].numFrames
+    ),
+    playbackRate
+  })
+
+  const modelController = {
+    /**
+     * Updates delta til=me
+     * @param deltaTime
+     */
+    update: (deltaTime: number) =>
+      meshControllers.forEach(bodyPart =>
+        bodyPart.forEach(subModel =>
+          subModel.forEach(controller => {
+            controller.update(deltaTime)
+          })
+        )
+      ),
+
+    /** Returns current state of the model */
+    getCurrentState,
+
+    /** Set pause state of the model */
+    setPause: (isPaused: boolean) => {
+      isAnimationPaused = isPaused
+
+      meshControllers.forEach(bodyPart =>
+        bodyPart.forEach(subModel => subModel.forEach(controller => controller.setPause(isAnimationPaused)))
+      )
+
+      return getCurrentState()
     },
 
     /**
      * Sets playback rate (animation speed)
      * @param rate
      */
-    setPlaybackRate: (rate: number) =>
-      meshControllers.forEach(bodyPart =>
-        bodyPart.forEach(subModel => subModel.forEach(controller => controller.setPlaybackRate(rate)))
-      ),
+    setPlaybackRate: (rate: number) => {
+      playbackRate = rate
 
-    /**
-     * Updates delta tile
-     */
-    update: (deltaTime: number) =>
       meshControllers.forEach(bodyPart =>
-        bodyPart.forEach(subModel => subModel.forEach(controller => controller.update(deltaTime)))
-      ),
+        bodyPart.forEach(subModel => subModel.forEach(controller => controller.setPlaybackRate(playbackRate)))
+      )
 
+      return getCurrentState()
+    },
     /**
      * Sets animation to play
+     * @param sequenceIndex
      */
     setAnimation: (sequenceIndex: number) => {
       activeSequenceIndex = sequenceIndex
@@ -160,6 +245,8 @@ export const createModelController = (
       meshControllers.forEach(bodyPart =>
         bodyPart.forEach(subModel => subModel.forEach(controller => controller.setAnimation(sequenceIndex)))
       )
+
+      return getCurrentState()
     },
 
     /**
@@ -175,6 +262,24 @@ export const createModelController = (
           controller.setVisibility(isVisible)
         })
       })
+
+      return getCurrentState()
+    },
+
+    /**
+     * Sets specific frame of the running animations
+     */
+    setFrame: (frame: number) => {
+      const { numFrames, fps } = modelData.sequences[activeSequenceIndex]
+      const safeFrame = R.clamp(0, numFrames, frame)
+      const duration = numFrames / fps
+      const specifiedTime = (duration / numFrames) * safeFrame
+
+      meshControllers.forEach(bodyPart =>
+        bodyPart.forEach(subModel => subModel.forEach(controller => controller.setTime(specifiedTime)))
+      )
+
+      return getCurrentState()
     }
   }
 

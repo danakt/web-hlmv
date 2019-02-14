@@ -15,12 +15,15 @@ const DatItemNumber = styled(DatItem)`
   border-left-color: #2fa1d6;
 `
 
+const NumberInput = styled(DatInput)`
+  width: 60%;
+`
+
 export const DatNumber = (props: Props) => (
   <DatItemNumber>
     <DatLabelText>{props.label}</DatLabelText>
 
-    <DatInput
-      style={{ width: '60%' }}
+    <NumberInput
       type="number"
       inputMode="numeric"
       value={props.value}
