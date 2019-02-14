@@ -11,6 +11,7 @@ import { DatSelect }             from '../dat/DatSelect'
 import { DatNumber }             from '../dat/DatNumber'
 import { DatColor }              from '../dat/DatColor'
 import { DatFile }               from '../dat/DatFile'
+import { DatRange }              from '../dat/DatRange'
 
 const StyledDatGui = styled(DatWrapper)`
   position: absolute;
@@ -52,7 +53,7 @@ export const Controller = (props: Props) => {
         <ControllerContainer modelData={modelData} modelController={modelController}>
           {(
             { isPaused, activeAnimationIndex: activeSequenceIndex, showedSubModels, frame, playbackRate },
-            { togglePause, setAnimation, showSubModel }
+            { togglePause, setAnimation, showSubModel, setPlaybackRate, setFrame }
           ) => (
             <React.Fragment>
               <DatFolder title="Animation">
@@ -62,6 +63,22 @@ export const Controller = (props: Props) => {
                   activeItemIndex={activeSequenceIndex}
                   items={modelData.sequences.map(item => item.label)}
                   onChange={seqIndex => setAnimation(seqIndex)}
+                />
+                <DatRange
+                  label="Frame"
+                  value={frame}
+                  min={0}
+                  max={modelData.sequences[activeSequenceIndex].numFrames - 1}
+                  onChange={value => setFrame(value)}
+                />
+
+                <DatRange
+                  label="Speed"
+                  value={Number(playbackRate.toFixed(2))}
+                  min={0}
+                  max={2}
+                  step={0.1}
+                  onChange={value => setPlaybackRate(value)}
                 />
                 <DatNumber label="Frame" disabled value={frame} />
                 <DatNumber label="Frames" disabled value={modelData.sequences[activeSequenceIndex].numFrames} />

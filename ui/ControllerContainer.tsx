@@ -8,6 +8,8 @@ type Actions = {
   togglePause: () => void
   setAnimation: (seqIndex: number) => void
   showSubModel: (bodyPartIndex: number, subModelIndex: number) => void
+  setPlaybackRate: (rate: number) => void
+  setFrame: (frame: number) => void
 }
 
 type Props = {
@@ -22,25 +24,19 @@ type Props = {
 export const ControllerContainer = (props: Props) => {
   const [modelState, setModelState] = React.useState(() => props.modelController.getCurrentState())
 
-  React.useEffect(
-    () => {
-      if (props.modelController) {
-        setModelState(props.modelController.getCurrentState())
-      }
-    },
-    [props.modelController]
-  )
+  React.useEffect(() => {
+    if (props.modelController) {
+      setModelState(props.modelController.getCurrentState())
+    }
+  }, [props.modelController])
 
   // Updating animation frame index
-  React.useEffect(
-    () => {
-      const frameDelay = (1 / props.modelData.sequences[modelState.activeAnimationIndex].fps) * 1000
-      const intervalId = setInterval(() => setModelState(props.modelController.getCurrentState()), frameDelay)
+  React.useEffect(() => {
+    const frameDelay = (1 / props.modelData.sequences[modelState.activeAnimationIndex].fps) * 1000
+    const intervalId = setInterval(() => setModelState(props.modelController.getCurrentState()), frameDelay)
 
-      return () => clearInterval(intervalId)
-    },
-    [props.modelData, modelState.activeAnimationIndex]
-  )
+    return () => clearInterval(intervalId)
+  }, [props.modelData, modelState.activeAnimationIndex])
 
   return (
     <React.Fragment>
@@ -48,7 +44,9 @@ export const ControllerContainer = (props: Props) => {
         togglePause:  () => setModelState(props.modelController.setPause(!modelState.isPaused)),
         setAnimation: seqIndex => setModelState(props.modelController.setAnimation(seqIndex)),
         showSubModel: (bodyPartIndex, subModelIndex) =>
-          setModelState(props.modelController.showSubModel(bodyPartIndex, subModelIndex))
+          setModelState(props.modelController.showSubModel(bodyPartIndex, subModelIndex)),
+        setPlaybackRate: rate => setModelState(props.modelController.setPlaybackRate(rate)),
+        setFrame:        frame => setModelState(props.modelController.setFrame(frame))
       })}
     </React.Fragment>
   )

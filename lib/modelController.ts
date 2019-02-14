@@ -115,7 +115,9 @@ export const createMeshController = (
      * Jump to specific time of the running animation
      */
     setTime: (time: number) => {
-      mixer.time = time
+      if (activeAction) {
+        activeAction.time = time
+      }
     },
 
     /**
