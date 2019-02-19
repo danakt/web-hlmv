@@ -83,44 +83,38 @@ export const calcBoneQuaternion = (
     const getValue = (index: number) => animValues.get(sequenceIndex, boneIndex, axis, index, ANIM_VALUE.VALUE)
     const getValid = (index: number) => animValues.get(sequenceIndex, boneIndex, axis, index, ANIM_VALUE.VALID)
 
-    if (animOffset[axis + 3] === 0) {
+    if (animOffset[axis + 3] == 0) {
       angle2[axis] = angle1[axis] = bone.value[axis + 3] // default;
     } else {
-      // Animation
       let i = 0
       let k = frame
 
-      // let loopBreaker = 1e6
-      // while (getTotal(i) <= k) {
-      //   k -= getTotal(i)
-      //   i += getValid(i) + 1
-
-      //   if (loopBreaker-- <= 0) {
-      //     throw new Error(`Infinity loop. Bone index: ${boneIndex}`)
-      //   }
-      // }
+      while (getTotal(i) <= k) {
+        k -= getTotal(i)
+        i += getValid(i) + 1
+      }
 
       // Bah, missing blend!
       if (getValid(i) > k) {
-        angle1[axis] = getValue(k + 1)
+        angle1[axis] = getValue(i + k + 1)
 
-        // if (getValid(i) > k + 1) {
-        //   angle2[axis] = getValue(k + 2)
-        // } else {
-        //   if (getTotal(i) > k + 1) {
-        //     angle2[axis] = angle1[axis]
-        //   } else {
-        //     angle2[axis] = getValue(getValid(i) + 2)
-        //   }
-        // }
+        if (getValid(i) > k + 1) {
+          angle2[axis] = getValue(i + k + 2)
+        } else {
+          if (getTotal(i) > k + 1) {
+            angle2[axis] = angle1[axis]
+          } else {
+            angle2[axis] = getValue(i + getValid(i) + 2)
+          }
+        }
       } else {
-        angle1[axis] = getValue(getValid(i))
+        angle1[axis] = getValue(i + getValid(i))
 
-        // if (getTotal(i) > k + 1) {
-        //   angle2[axis] = angle1[axis]
-        // } else {
-        //   angle2[axis] = getValue(getValid(i) + 2)
-        // }
+        if (getTotal(i) > k + 1) {
+          angle2[axis] = angle1[axis]
+        } else {
+          angle2[axis] = getValue(i + getValid(i) + 2)
+        }
       }
 
       angle1[axis] = bone.value[axis + 3] + angle1[axis] * bone.scale[axis + 3]
@@ -160,38 +154,35 @@ export const getBonePositions = (
 
     position[axis] = bone.value[axis] // default;
 
-    if (animOffset[axis] != 0) {
-      let i = 0
-      let k = frame
+    // if (animOffset[axis] != 0) {
+    //   let i = 0
+    //   let k = frame
 
-      // find span of values that includes the frame we want
-      let loopBreaker = 1e6
-      while (getTotal(i) <= k) {
-        k -= getTotal(i)
-        i += getValid(i) + 1
+    //   // find span of values that includes the frame we want
+    //   while (getTotal(i) <= k) {
+    //     k -= getTotal(i)
+    //     i += getValid(i) + 1
+    //   }
 
-        if (loopBreaker-- <= 0) {
-          throw new Error(`Infinity loop. Bone index: ${boneIndex}`)
-        }
-      }
+    //   // if we're inside the span
+    //   if (getValid(i) > k) {
+    //     // and there's more data in the span
+    //     if (getValid(i) > k + 1) {
+    //       position[axis] += (getValue(i + k + 1) * (1.0 - s) + s * getValue(i + k + 2)) * bone.scale[axis]
+    //     } else {
+    //       position[axis] += getValue(i + k + 1) * bone.scale[axis]
+    //     }
+    //   } else {
+    //     // are we at the end of the repeating values section and there's another section with data?
+    //     if (getTotal(i) <= k + 1) {
+    //       position[axis]
+    //         += (getValue(i + getValid(i)) * (1.0 - s) + s * getValue(i + getValid(i) + 2)) * bone.scale[axis]
+    //     } else {
+    //       position[axis] += getValue(i + getValid(i)) * bone.scale[axis]
+    //     }
+    //   }
+    // }
 
-      // if we're inside the span
-      if (getValid(i) > k) {
-        // and there's more data in the span
-        // if (getValid(i) > k + 1) {
-        //   position[axis] += getValue(k + 1) * bone.scale[axis]
-        // } else {
-        //   position[axis] += getValue(k + 1) * bone.scale[axis]
-        // }
-      } else {
-        // 			// are we at the end of the repeating values section and there's another section with data?
-        // if (getTotal(i) <= k + 1) {
-        //   position[axis] += (getValue(getValid(i)) * (1.0 - s) + s * getValue(getValid(i) + 2)) * bone.scale[axis]
-        // } else {
-        //   position[axis] += getValue(getValid(i)) * bone.scale[axis]
-        // }
-      }
-    }
     // 	if (bone.bonecontroller[j] != -1)
     // 	{
     // 		positions[j] += BoneAdj[bone.bonecontroller[j]];
