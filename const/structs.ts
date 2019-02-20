@@ -46,7 +46,7 @@ export const header = {
   /** Number of complex bounding boxes */
   numHitboxes:         int,
   /** Offset of hit boxes */
-  hitBoxindex:         int,
+  hitBoxIndex:         int,
   /** Number of sequences */
   numSeq:              int,
   /** Offset of sequences */

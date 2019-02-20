@@ -20,12 +20,7 @@ export const readStruct = function<T, S extends Struct<T>> (
   const structResult = {} as StructResult<S>
 
   for (const key in struct) {
-    const value = struct[key].getValue(dataView, offset)
-
-    // Skipping item
-    if (value !== undefined) {
-      ;(structResult as any)[key] = value
-    }
+    ;(structResult as any)[key] = struct[key].getValue(dataView, offset)
 
     offset += struct[key].byteLength
   }
@@ -57,12 +52,7 @@ export const readStructMultiple = function<T, S extends Struct<T>> (
     const structResult = {} as StructResult<S>
 
     for (const key in struct) {
-      const value = struct[key].getValue(dataView, offset)
-
-      // Skipping item
-      if (value !== undefined) {
-        ;(structResult as any)[key] = value
-      }
+      ;(structResult as any)[key] = struct[key].getValue(dataView, offset)
 
       offset += struct[key].byteLength
     }
@@ -71,27 +61,6 @@ export const readStructMultiple = function<T, S extends Struct<T>> (
   }
 
   return result
-}
-
-/**
- * Reads values of a structure in binary buffer without creating object
- * @param dataView The DataView object
- * @param struct Structure description
- * @param byteOffset Offset in buffer to read, "0" by default
- * @returns Iterator of struct values
- */
-export const readStructValues = function * <T, S extends Struct<T>>(
-  dataView: DataView,
-  struct: S,
-  byteOffset: number = 0
-): IterableIterator<T> {
-  let offset: number = byteOffset
-
-  for (const key in struct) {
-    yield struct[key].getValue(dataView, offset)
-
-    offset += struct[key].byteLength
-  }
 }
 
 /**

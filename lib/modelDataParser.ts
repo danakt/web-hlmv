@@ -4,7 +4,7 @@ import * as structs                                     from '../const/structs'
 import { MAX_SRCBONES, AXLES_NUM, ANIM_VALUE, VERSION } from '../const/constants'
 import * as BinaryReader                                from './binaryReader'
 // eslint-disable-next-line no-unused-vars
-import { Struct, StructResult, short, byte, ubyte }     from './dataTypes'
+import { Struct, StructResult, short, ubyte }           from './dataTypes'
 
 /**
  * Creates multiple reader
@@ -202,7 +202,7 @@ export const parseModel = (modelBuffer: ArrayBuffer) => {
     /** Model attachments */
     attachments:     parseAttachments(dataView, header.attachmentIndex, header.numAttachments),
     /** Model hitboxes */
-    hitBoxes:        parseHitboxes(dataView, header.hitBoxindex, header.numHitboxes),
+    hitBoxes:        parseHitboxes(dataView, header.hitBoxIndex, header.numHitboxes),
     /** Model sequences info */
     sequences,
     /** Sequences groups */

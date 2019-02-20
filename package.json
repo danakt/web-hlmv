@@ -26,8 +26,7 @@
     ],
     "collectCoverage": true,
     "collectCoverageFrom": [
-      "lib/**",
-      "ui/**"
+      "lib/**/*.ts"
     ]
   },
   "devDependencies": {
