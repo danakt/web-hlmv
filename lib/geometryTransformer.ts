@@ -29,40 +29,6 @@ export function anglesToQuaternion(angles: vec3): quat {
 }
 
 /**
- * Returns bone quaternions
- * @param sequence
- * @param frame Frame
- * @param s Interpolation amount
- * @param bones Bones list
- */
-export const getBoneQuaternions = (
-  bones: structs.Bone[],
-  animations: structs.Animation[],
-  animationValues: MultiArrayView<number>,
-  sequenceIndex: number,
-  frame: number,
-  s: number = 0
-): quat[] => {
-  const quaternions: quat[] = []
-
-  for (let boneIndex = 0; boneIndex < bones.length; boneIndex++) {
-    quaternions.push(
-      calcBoneQuaternion(
-        frame,
-        bones[boneIndex],
-        animations[boneIndex].offset,
-        animationValues,
-        boneIndex,
-        sequenceIndex,
-        s
-      )
-    )
-  }
-
-  return quaternions
-}
-
-/**
  * Calculates bone angle
  */
 export const calcBoneQuaternion = (
@@ -70,22 +36,21 @@ export const calcBoneQuaternion = (
   bone: structs.Bone,
   animOffset: Uint16Array,
   animValues: MultiArrayView<number>,
-  // TODO: Swap boneIndex and sequenceIndex
-  boneIndex: number,
   sequenceIndex: number,
+  boneIndex: number,
   s: number
 ): quat => {
-  let angle1: vec3 = vec3.create()
-  let angle2: vec3 = vec3.create()
+  const angle1: vec3 = vec3.create()
+  const angle2: vec3 = vec3.create()
 
   for (let axis = 0; axis < 3; axis++) {
-    const getTotal = (index: number) => animValues.get(sequenceIndex, boneIndex, axis, index, ANIM_VALUE.TOTAL)
-    const getValue = (index: number) => animValues.get(sequenceIndex, boneIndex, axis, index, ANIM_VALUE.VALUE)
-    const getValid = (index: number) => animValues.get(sequenceIndex, boneIndex, axis, index, ANIM_VALUE.VALID)
-
     if (animOffset[axis + 3] == 0) {
       angle2[axis] = angle1[axis] = bone.value[axis + 3] // default;
     } else {
+      const getTotal = (index: number) => animValues.get(sequenceIndex, boneIndex, axis, index, ANIM_VALUE.TOTAL)
+      const getValue = (index: number) => animValues.get(sequenceIndex, boneIndex, axis, index, ANIM_VALUE.VALUE)
+      const getValid = (index: number) => animValues.get(sequenceIndex, boneIndex, axis, index, ANIM_VALUE.VALID)
+
       let i = 0
       let k = frame
 
@@ -136,25 +101,28 @@ export const calcBoneQuaternion = (
  * Returns bone positions
  */
 export const getBonePositions = (
+  frame: number,
   bone: structs.Bone,
-  boneIndex: number,
   animOffset: Uint16Array,
   animValues: MultiArrayView<number>,
   sequenceIndex: number,
-  frame: number,
-  s = 0 // TODO: Do something about it
+  boneIndex: number,
+  // TODO: Do something about it
+  s: number
 ): vec3 => {
   // List of bone positions
-  const position: vec3 = vec3.fromValues(bone.value[0], bone.value[1], bone.value[2])
+  const position: vec3 = vec3.create()
 
-  for (let axis = 0; axis < 3; ++axis) {
-    const getTotal = (index: number) => animValues.get(sequenceIndex, boneIndex, axis, index, ANIM_VALUE.TOTAL)
-    const getValue = (index: number) => animValues.get(sequenceIndex, boneIndex, axis, index, ANIM_VALUE.VALUE)
-    const getValid = (index: number) => animValues.get(sequenceIndex, boneIndex, axis, index, ANIM_VALUE.VALID)
-
+  for (let axis = 0; axis < 3; axis++) {
     position[axis] = bone.value[axis] // default;
 
+    // TOD: fix this part
+
     // if (animOffset[axis] != 0) {
+    //   const getTotal = (index: number) => animValues.get(sequenceIndex, boneIndex, axis, index, ANIM_VALUE.TOTAL)
+    //   const getValue = (index: number) => animValues.get(sequenceIndex, boneIndex, axis, index, ANIM_VALUE.VALUE)
+    //   const getValid = (index: number) => animValues.get(sequenceIndex, boneIndex, axis, index, ANIM_VALUE.VALID)
+
     //   let i = 0
     //   let k = frame
 
@@ -182,11 +150,6 @@ export const getBonePositions = (
     //     }
     //   }
     // }
-
-    // 	if (bone.bonecontroller[j] != -1)
-    // 	{
-    // 		positions[j] += BoneAdj[bone.bonecontroller[j]];
-    // 	}
   }
 
   return position
@@ -221,29 +184,31 @@ export const calcRotations = (
   modelData: ModelData,
   sequenceIndex: number,
   frame: number,
-  s = 0 // TODO: Do something about it
+  // TODO: Do something about it
+  s = 0
 ): mat4[] => {
-  const boneQuaternions: quat[] = modelData.bones.map((_, boneIndex) =>
-    calcBoneQuaternion(
-      frame,
-      modelData.bones[boneIndex],
-      modelData.animations[sequenceIndex][boneIndex].offset,
-      modelData.animValues,
-      boneIndex,
-      sequenceIndex,
-      s
-    )
-  )
-
-  const bonesPositions: vec3[] = modelData.bones.map(
-    (bone, boneIndex): vec3 =>
-      getBonePositions(
-        bone,
-        boneIndex,
+  const boneQuaternions: quat[] = modelData.bones.map(
+    (_, boneIndex): quat =>
+      calcBoneQuaternion(
+        frame,
+        modelData.bones[boneIndex],
         modelData.animations[sequenceIndex][boneIndex].offset,
         modelData.animValues,
         sequenceIndex,
+        boneIndex,
+        s
+      )
+  )
+
+  const bonesPositions: vec3[] = modelData.bones.map(
+    (_, boneIndex): vec3 =>
+      getBonePositions(
         frame,
+        modelData.bones[boneIndex],
+        modelData.animations[sequenceIndex][boneIndex].offset,
+        modelData.animValues,
+        sequenceIndex,
+        boneIndex,
         s
       )
   )
