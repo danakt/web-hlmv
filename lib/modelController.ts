@@ -4,6 +4,12 @@ import { ModelData }      from './modelDataParser'
 import { MeshRenderData } from './modelRenderer'
 
 /**
+ * Calculates frame index by animation time, fps and frames number
+ */
+const getCurrentFrame = (time: number, fps: number, numFrames: number) =>
+  Math.floor((time % (numFrames / fps)) / (1 / fps))
+
+/**
  * Returns the mesh's animation clips
  */
 export const prepareAnimationClips = (meshData: MeshRenderData, modelData: ModelData): THREE.AnimationClip[] =>
@@ -178,16 +184,38 @@ export const createModelController = (
     bodyPart.forEach(subModel => subModel.forEach(controller => controller.setAnimation(activeSequenceIndex)))
   )
 
-  const getCurrentFrame = (time: number, fps: number, numFrames: number) =>
-    Math.floor((time % (numFrames / fps)) / (1 / fps))
+  const getAnimationTime = () =>
+    R.converge(R.divide, [R.sum, R.length])(
+      meshControllers.reduce(
+        (acc, bodyPart) =>
+          acc.concat(
+            bodyPart.reduce(
+              (acc, subModel) => acc.concat(subModel.map(controller => controller.getCurrentTime())),
+              [] as number[]
+            )
+          ),
+        [] as number[]
+      )
+    )
+
+  const areSubModelsPaused = () =>
+    meshControllers.reduce(
+      (acc, bodyPart) =>
+        acc
+        && bodyPart.reduce(
+          (acc, subModel) => acc && subModel.reduce((acc, controller) => acc && controller.isPaused, true),
+          true
+        ),
+      true
+    )
 
   /** Returns current state of the model */
   const getCurrentState = (): ModelState => ({
-    isPaused:             meshControllers[0][0][0].isPaused,
+    isPaused:             areSubModelsPaused(),
     activeAnimationIndex: activeSequenceIndex,
     showedSubModels,
     frame:                getCurrentFrame(
-      meshControllers[0][0][0].getCurrentTime(),
+      getAnimationTime(),
       modelData.sequences[activeSequenceIndex].fps,
       modelData.sequences[activeSequenceIndex].numFrames
     ),
