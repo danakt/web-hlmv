@@ -8,9 +8,11 @@ https://danakt.github.io/web-hlmv?demo
 
 ## Todo
 
-- Fix bone positions calculation
-- Viewing textures
-- Parsing and processing models in worker
+- Fix bone positions calculation (resolve problems with weapons rendering)
+- Add first person weapons viewing
+- Add viewing textures
+- Make parsing and processing models in worker
+- Make mobile interface
 
 Create an [issue](https://github.com/danakt/web-hlmv/issues) to offer new features.
 
