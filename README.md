@@ -8,7 +8,7 @@ https://danakt.github.io/web-hlmv?demo
 
 ## Todo
 
-- Fix models rendering
+- Fix bone positions calculation
 - Viewing textures
 - Parsing and processing models in worker
 
