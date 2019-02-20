@@ -4,7 +4,7 @@ import * as structs                                     from '../const/structs'
 import { MAX_SRCBONES, AXLES_NUM, ANIM_VALUE, VERSION } from '../const/constants'
 import * as BinaryReader                                from './binaryReader'
 // eslint-disable-next-line no-unused-vars
-import { Struct, StructResult, short, byte, ubyte }     from './dataTypes'
+import { Struct, StructResult, short, ubyte }           from './dataTypes'
 
 /**
  * Creates multiple reader
