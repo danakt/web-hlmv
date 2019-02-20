@@ -1,6 +1,79 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`should parse multiple structs in binary file: leet texture info 1`] = `
+exports[`should parse multiple structs in binary file with offset: leet header 1`] = `
+Object {
+  "attachmentIndex": 6428,
+  "bbmax": Float32Array [
+    0,
+    0,
+    0,
+  ],
+  "bbmin": Float32Array [
+    0,
+    0,
+    0,
+  ],
+  "bodyPartIndex": 2094732,
+  "boneControllerIndex": 6404,
+  "boneIndex": 244,
+  "eyePosition": Float32Array [
+    0,
+    0,
+    0,
+  ],
+  "flags": 0,
+  "hitBoxIndex": 6604,
+  "id": 1414743113,
+  "length": 2401992,
+  "max": Float32Array [
+    0,
+    0,
+    0,
+  ],
+  "min": Float32Array [
+    0,
+    0,
+    0,
+  ],
+  "name": "leet\\\\leet.mdl",
+  "numAttachments": 2,
+  "numBodyParts": 2,
+  "numBoneControllers": 1,
+  "numBones": 55,
+  "numHitboxes": 21,
+  "numSeq": 111,
+  "numSeqGroups": 1,
+  "numSkinFamilies": 1,
+  "numSkinRef": 3,
+  "numTextures": 3,
+  "numTransitions": 0,
+  "seqGroupIndex": 2094628,
+  "seqIndex": 2072508,
+  "skinIndex": 2117056,
+  "soundGroupIndex": 0,
+  "soundGroups": 0,
+  "soundIndex": 0,
+  "soundTable": 0,
+  "textureDataIndex": 2117064,
+  "textureIndex": 2116816,
+  "transitionIndex": 2094732,
+  "version": 10,
+}
+`;
+
+exports[`should parse multiple structs in binary file with offset: leet texture info 1`] = `
+Array [
+  Object {
+    "flags": 0,
+    "height": 512,
+    "index": 2117064,
+    "name": "Arab_dmbase1.bmp",
+    "width": 512,
+  },
+]
+`;
+
+exports[`should parse multiple structs in binary file: leet textures info 1`] = `
 Array [
   Object {
     "flags": 0,
@@ -26,6 +99,23 @@ Array [
 ]
 `;
 
+exports[`should parse some struct in binary file with offset: some hitbox 1`] = `
+Object {
+  "bbmax": Float32Array [
+    4,
+    5.559999942779541,
+    6.75,
+  ],
+  "bbmin": Float32Array [
+    -4.690000057220459,
+    -4.440000057220459,
+    -6.75,
+  ],
+  "bone": 1,
+  "group": 3,
+}
+`;
+
 exports[`should parse some struct in binary file: leet header 1`] = `
 Object {
   "attachmentIndex": 6428,
@@ -48,7 +138,7 @@ Object {
     0,
   ],
   "flags": 0,
-  "hitBoxindex": 6604,
+  "hitBoxIndex": 6604,
   "id": 1414743113,
   "length": 2401992,
   "max": Float32Array [

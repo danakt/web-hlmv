@@ -36,12 +36,24 @@ test('should parse some struct in binary file', () => {
   expect(header).toMatchSnapshot('leet header')
 })
 
+test('should parse some struct in binary file with offset', () => {
+  const dataView = new FastDataView(leetBuffer)
+  const header = readStruct(dataView, structs.header)
+  const hitBox = readStruct(dataView, structs.boundingBox, header.hitBoxIndex)
+  expect(hitBox).toMatchSnapshot('some hitbox')
+})
+
 test('should parse multiple structs in binary file', () => {
   const dataView = new FastDataView(leetBuffer)
   const header = readStruct(dataView, structs.header)
   const texturesInfo = readStructMultiple(dataView, structs.texture, header.textureIndex, header.numTextures)
+  expect(texturesInfo).toMatchSnapshot('leet textures info')
+})
 
-  expect(texturesInfo).toMatchSnapshot('leet texture info')
+test('should parse multiple structs in binary file with offset', () => {
+  const dataView = new FastDataView(leetBuffer)
+  const header = readStructMultiple(dataView, structs.header)[0]
+  expect(header).toMatchSnapshot('leet header')
 })
 
 test('should get byte from buffer', () => {

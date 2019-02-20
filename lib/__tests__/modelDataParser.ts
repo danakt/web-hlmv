@@ -40,7 +40,7 @@ describe('parsing model parts', () => {
   })
 
   test('should parse hitboxes', () => {
-    const hitBoxes = ModelParser.parseHitboxes(dataView, header.hitBoxindex, header.numHitboxes)
+    const hitBoxes = ModelParser.parseHitboxes(dataView, header.hitBoxIndex, header.numHitboxes)
     expect(hitBoxes).toMatchSnapshot('leet hitboxes')
   })
 

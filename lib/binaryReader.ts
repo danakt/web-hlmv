@@ -20,12 +20,7 @@ export const readStruct = function<T, S extends Struct<T>> (
   const structResult = {} as StructResult<S>
 
   for (const key in struct) {
-    const value = struct[key].getValue(dataView, offset)
-
-    // Skipping item
-    if (value !== undefined) {
-      ;(structResult as any)[key] = value
-    }
+    ;(structResult as any)[key] = struct[key].getValue(dataView, offset)
 
     offset += struct[key].byteLength
   }
@@ -57,12 +52,7 @@ export const readStructMultiple = function<T, S extends Struct<T>> (
     const structResult = {} as StructResult<S>
 
     for (const key in struct) {
-      const value = struct[key].getValue(dataView, offset)
-
-      // Skipping item
-      if (value !== undefined) {
-        ;(structResult as any)[key] = value
-      }
+      ;(structResult as any)[key] = struct[key].getValue(dataView, offset)
 
       offset += struct[key].byteLength
     }

@@ -202,7 +202,7 @@ export const parseModel = (modelBuffer: ArrayBuffer) => {
     /** Model attachments */
     attachments:     parseAttachments(dataView, header.attachmentIndex, header.numAttachments),
     /** Model hitboxes */
-    hitBoxes:        parseHitboxes(dataView, header.hitBoxindex, header.numHitboxes),
+    hitBoxes:        parseHitboxes(dataView, header.hitBoxIndex, header.numHitboxes),
     /** Model sequences info */
     sequences,
     /** Sequences groups */
