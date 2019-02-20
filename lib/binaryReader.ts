@@ -74,27 +74,6 @@ export const readStructMultiple = function<T, S extends Struct<T>> (
 }
 
 /**
- * Reads values of a structure in binary buffer without creating object
- * @param dataView The DataView object
- * @param struct Structure description
- * @param byteOffset Offset in buffer to read, "0" by default
- * @returns Iterator of struct values
- */
-export const readStructValues = function * <T, S extends Struct<T>>(
-  dataView: DataView,
-  struct: S,
-  byteOffset: number = 0
-): IterableIterator<T> {
-  let offset: number = byteOffset
-
-  for (const key in struct) {
-    yield struct[key].getValue(dataView, offset)
-
-    offset += struct[key].byteLength
-  }
-}
-
-/**
  * Returns length of a structure
  * @param struct Structure description
  */
