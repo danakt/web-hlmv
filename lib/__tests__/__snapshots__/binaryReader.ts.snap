@@ -61,18 +61,6 @@ Object {
 }
 `;
 
-exports[`should parse multiple structs in binary file with offset: leet texture info 1`] = `
-Array [
-  Object {
-    "flags": 0,
-    "height": 512,
-    "index": 2117064,
-    "name": "Arab_dmbase1.bmp",
-    "width": 512,
-  },
-]
-`;
-
 exports[`should parse multiple structs in binary file: leet textures info 1`] = `
 Array [
   Object {
