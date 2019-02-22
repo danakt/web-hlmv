@@ -15,8 +15,12 @@ const Text = styled.div`
   transform: translate(-50%, -50%);
 `
 
-export const LoadingScreen = () => (
+type Props = {
+  children: React.ReactNode
+}
+
+export const LoadingScreen = (props: Props) => (
   <Wrapper>
-    <Text>Loading...</Text>
+    <Text>{props.children}</Text>
   </Wrapper>
 )

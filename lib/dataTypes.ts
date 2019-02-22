@@ -161,8 +161,10 @@ export const float32: DataType<number, Float32Array> = {
   arrayConstructor: Float32Array
 }
 
-/** Alias for float32. Creates reader of the Float32 value at the specified
- * byte offset from the start of the DataView object. */
+/**
+ * Alias for float32. Creates reader of the Float32 value at the specified
+ * byte offset from the start of the DataView object.
+ */
 export const float = float32
 
 /**
