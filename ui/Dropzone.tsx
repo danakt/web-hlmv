@@ -1,12 +1,11 @@
-import * as React                                from 'react'
-import styled                                    from 'styled-components'
-import { DropzoneRootProps, DropzoneInputProps } from 'react-dropzone'
+import * as React             from 'react'
+import styled                 from 'styled-components'
+import { DropzoneInputProps } from 'react-dropzone'
 
 const Wrapper = styled.div<{ color: string; isDragActive: boolean }>`
   position: relative;
   width: 100vw;
   height: 100vh;
-  cursor: pointer;
   background-color: ${props => props.color};
   z-index: ${props => (props.isDragActive ? 5 : 'auto')};
 `
@@ -43,34 +42,28 @@ type Props = {
   inputProps: DropzoneInputProps
   onClick?: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void
   onFileLoad: (file: File) => void
+  children: React.ReactNode
 }
 
 /**
  * Dropzone
  */
 export const Dropzone = (props: Props) => {
-  const transparentColor = React.useMemo(
-    () => {
-      const r = parseInt(props.backgroundColor.substring(1, 3), 16)
-      const g = parseInt(props.backgroundColor.substring(3, 5), 16)
-      const b = parseInt(props.backgroundColor.substring(5, 7), 16)
+  const transparentColor = React.useMemo(() => {
+    const r = parseInt(props.backgroundColor.substring(1, 3), 16)
+    const g = parseInt(props.backgroundColor.substring(3, 5), 16)
+    const b = parseInt(props.backgroundColor.substring(5, 7), 16)
 
-      // Setting half-opacity
-      return `rgba(${r}, ${g}, ${b}, ${0.7})`
-    },
-    [props.backgroundColor]
-  )
+    // Setting half-opacity
+    return `rgba(${r}, ${g}, ${b}, ${0.7})`
+  }, [props.backgroundColor])
 
   return (
     <Wrapper color={transparentColor} isDragActive={props.isDragActive} onClick={props.onClick}>
       {!props.isDragActive && <Input {...props.inputProps} />}
 
       <BorderedBox>
-        <Description>
-          {props.isDragActive
-            ? 'Drop model here...' //
-            : 'Try dropping some model here, or click to select model to upload.'}
-        </Description>
+        <Description>{props.children}</Description>
       </BorderedBox>
     </Wrapper>
   )

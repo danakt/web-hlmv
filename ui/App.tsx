@@ -12,17 +12,18 @@ import { Dropzone }            from './Dropzone'
 import { BackgroundContainer } from './BackgroundContainer'
 import { FileContainer }       from './FileContainer'
 import { GithubButton }        from './GithubButton'
+import { StartScreen }         from './StartScreen'
 
 /** Is need to show demo */
-const IS_DEMO_SHOWED = location.search.indexOf('?demo') === 0
-
 export const App = hot(module)(() => {
   const [modelController, setModelController] = React.useState<ModelController | undefined>(undefined)
   const [modelData, setModelData] = React.useState<ModelData | undefined>(undefined)
+  const [isDemoShowed] = React.useState(location.search.indexOf('?demo') === 0)
+  const [demoFileUrl] = React.useState(leetModel)
 
   return (
-    <FileContainer defaultFileUrl={IS_DEMO_SHOWED ? leetModel : null}>
-      {({ buffer, isLoading }, { setFile }) => (
+    <FileContainer defaultFileUrl={isDemoShowed ? demoFileUrl : null}>
+      {({ buffer, isLoading }, { setFile, setFileUrl }) => (
         <DropzoneContainer onDrop={files => setFile(files[0])}>
           {({ getRootProps, getInputProps, isDragActive }) => (
             <div {...getRootProps()} onClick={undefined}>
@@ -44,15 +45,25 @@ export const App = hot(module)(() => {
 
                     {(isDragActive || (!buffer && !isLoading)) && (
                       <Dropzone
-                        onClick={getRootProps().onClick}
+                        // onClick={getRootProps().onClick}
                         backgroundColor={backgroundColor}
                         onFileLoad={file => setFile(file)}
                         isDragActive={isDragActive}
                         inputProps={getInputProps()}
-                      />
+                      >
+                        {isDragActive ? (
+                          'Drop model here...'
+                        ) : (
+                          <StartScreen
+                            demoFileUrl={demoFileUrl}
+                            selectFile={getRootProps().onClick}
+                            setFileUrl={setFileUrl}
+                          />
+                        )}
+                      </Dropzone>
                     )}
 
-                    {isLoading && <LoadingScreen />}
+                    {isLoading && <LoadingScreen>Loading...</LoadingScreen>}
 
                     {buffer && !isLoading && (
                       <React.Fragment>

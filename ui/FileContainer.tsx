@@ -7,6 +7,7 @@ type Data = {
 
 type Actions = {
   setFile: (file: File) => void
+  setFileUrl: (fileUrl: string) => void
 }
 
 type Props = {
@@ -18,7 +19,8 @@ type Props = {
  * Manages the model buffer
  */
 export const FileContainer = (props: Props) => {
-  const [isLoading, setLoadingState] = React.useState(typeof props.defaultFileUrl === 'string')
+  const [fileUrl, setFileUrl] = React.useState<string | undefined>(props.defaultFileUrl)
+  const [isLoading, setLoadingState] = React.useState(typeof fileUrl === 'string')
   const [buffer, setBuffer] = React.useState<null | ArrayBuffer>(null)
 
   /** Loads default model file and saves it to state */
@@ -43,21 +45,19 @@ export const FileContainer = (props: Props) => {
     setLoadingState(true)
   }
 
-  React.useEffect(
-    () => {
-      if (typeof props.defaultFileUrl === 'string') {
-        loadingDemo(props.defaultFileUrl)
-      }
-    },
-    [props.defaultFileUrl]
-  )
+  React.useEffect(() => {
+    if (typeof fileUrl === 'string') {
+      loadingDemo(fileUrl)
+    }
+  }, [fileUrl])
 
   return (
     <React.Fragment>
       {props.children(
         { buffer, isLoading },
         {
-          setFile: loadFile
+          setFile: loadFile,
+          setFileUrl
         }
       )}
     </React.Fragment>

@@ -82,4 +82,8 @@ export const GlobalStyles = createGlobalStyle<Props>`
     font-family: 'Inconsolata', monospace;
     font-size: 14px;
   }
+
+  a {
+    color: #fff
+  }
 `
