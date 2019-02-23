@@ -2,6 +2,10 @@
 
 This repo contains the source code powering [danakt.github.io/web-hlmv](https://danakt.github.io/web-hlmv). The tool was made as a simple multiplatform alternative to [Half-Life Model Viewer](https://github.com/ValveSoftware/halflife/tree/master/utils/mdlviewer).
 
+<div style="text-align:center">
+  <img src ="./screenshot.png" width="100%"/>
+</div>
+
 ## Todo
 
 - Fix bone positions calculation (resolve problems with weapons rendering)
