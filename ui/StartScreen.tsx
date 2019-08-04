@@ -8,7 +8,7 @@ type Props = {
 
 export const StartScreen = (props: Props) => (
   <React.Fragment>
-    Try dropping some model here, or{' '}
+    Try to drop some model here, or{' '}
     <a
       href="#"
       onClick={event => {
@@ -21,7 +21,7 @@ export const StartScreen = (props: Props) => (
     >
       click here
     </a>{' '}
-    to select model to upload.
+    to select a model to upload.
     <br /> Also, you can{' '}
     <a
       href="#"
