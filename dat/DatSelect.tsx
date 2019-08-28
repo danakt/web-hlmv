@@ -22,6 +22,7 @@ export const DatSelect = (props: Props) => (
       value={props.activeItemIndex}
       style={{ width: '60%' }}
       onChange={event => props.onChange(parseInt(event.target.value))}
+      onFocus={e => e.target.blur()}
     >
       {props.items.map((item, i) => (
         <option key={i} value={i}>
