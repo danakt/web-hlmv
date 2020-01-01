@@ -21,12 +21,9 @@ type Props = {
 export const BackgroundContainer = (props: Props) => {
   const [color, setColor] = React.useState(() => localStorage.getItem(LOCAL_STORAGE_KEY) || INITIAL_UI_BACKGROUND)
 
-  React.useEffect(
-    () => {
-      localStorage.setItem(LOCAL_STORAGE_KEY, color)
-    },
-    [color]
-  )
+  React.useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, color)
+  }, [color])
 
   return <React.Fragment>{props.children({ backgroundColor: color }, { setBackgroundColor: setColor })}</React.Fragment>
 }

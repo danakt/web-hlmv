@@ -11,7 +11,7 @@ module.exports = {
     'comma-dangle': 'off',
     'key-spacing': ['error', { align: 'value' }],
     'operator-linebreak': ['error', 'before'],
-    'no-unused-vars': 'error',
+    'no-unused-vars': 'off',
     'typescript/no-unused-vars': 'error',
     'arca/import-align': 'error',
     'no-multi-spaces': ['error', { exceptions: { ImportDeclaration: true } }],

@@ -94,20 +94,17 @@ export const Renderer = (props: Props) => {
   const container = React.useMemo(() => createContainer(meshes), [meshes])
 
   // Updating scene objects
-  React.useEffect(
-    () => {
-      if (scene) {
-        scene.add(container)
-        scene.add(...lights)
+  React.useEffect(() => {
+    if (scene) {
+      scene.add(container)
+      scene.add(...lights)
 
-        return () => {
-          scene.remove(container)
-          scene.remove(...lights)
-        }
+      return () => {
+        scene.remove(container)
+        scene.remove(...lights)
       }
-    },
-    [container, scene, lights]
-  )
+    }
+  }, [container, scene, lights])
 
   // Update model data
   React.useEffect(() => props.setModelData(modelData), [modelData])
