@@ -44,12 +44,16 @@ export const createLights = (color: number = 0xffffff): THREE.Light[] => {
  */
 export const createRenderer = (canvas: HTMLCanvasElement): THREE.WebGLRenderer => {
   const renderer = new THREE.WebGLRenderer({
-    canvas:     canvas,
-    antialias:  true,
-    alpha:      true,
-    clearColor: 0x0,
-    clearAlpha: 0
+    canvas:    canvas,
+    antialias: true,
+    alpha:     true
   })
+
+  // Clear color
+  renderer.setClearColor(0x0)
+
+  // Clear alpha
+  renderer.setClearAlpha(0)
 
   // Pixel ration setting
   renderer.setPixelRatio(window.devicePixelRatio)

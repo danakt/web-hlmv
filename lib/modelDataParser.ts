@@ -3,14 +3,13 @@ import * as MultiArrayView                              from 'multi-array-view'
 import * as structs                                     from '../const/structs'
 import { MAX_SRCBONES, AXLES_NUM, ANIM_VALUE, VERSION } from '../const/constants'
 import * as BinaryReader                                from './binaryReader'
-// eslint-disable-next-line no-unused-vars
 import { Struct, StructResult, short, ubyte }           from './dataTypes'
 
 /**
  * Creates multiple reader
  * @internal
  */
-const createMultipleParser = <T, S extends Struct<T>>(struct: S) => (
+const createMultipleParser = <S extends Struct>(struct: S) => (
   dataView: DataView,
   offsetIndex: number,
   number: number

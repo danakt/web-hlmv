@@ -11,7 +11,7 @@ import { Struct, StructResult } from './dataTypes' // FIXME
  * @param byteOffset Offset in buffer to read, "0" by default
  * @returns The structure applying result
  */
-export const readStruct = function<T, S extends Struct<T>> (
+export const readStruct = function<S extends Struct> (
   dataView: DataView,
   struct: S,
   byteOffset: number = 0
@@ -39,7 +39,7 @@ export const readStruct = function<T, S extends Struct<T>> (
  * @param times Times of structure repeating
  * @returns The array of structure applying result
  */
-export const readStructMultiple = function<T, S extends Struct<T>> (
+export const readStructMultiple = function<S extends Struct> (
   dataView: DataView,
   struct: S,
   byteOffset: number = 0,
@@ -67,7 +67,7 @@ export const readStructMultiple = function<T, S extends Struct<T>> (
  * Returns length of a structure
  * @param struct Structure description
  */
-export const getStructLength = (struct: Struct<any>): number => {
+export const getStructLength = <S extends Struct>(struct: S): number => {
   let length: number = 0
 
   for (const key in struct) {
