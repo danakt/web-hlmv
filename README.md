@@ -11,7 +11,7 @@ This repo contains the source code powering [danakt.com/web-hlmv](https://danakt
 - Fix bone positions calculation (resolve problems with weapons rendering)
 - Add first person weapons viewing and mirroring model
 - Add viewing textures
-— Add chrome textures
+- Add chrome textures
 - Make parsing and processing models in worker
 - Make mobile interface
 
@@ -19,6 +19,4 @@ Create an [issue](https://github.com/danakt/web-hlmv/issues) to offer new featur
 
 ## License
 
-[MIT](LICENSE) © 2019  
-This product was made using technologies licensed from id Software and Valve
-Corporation.
+[MIT](LICENSE) © 2019
