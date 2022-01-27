@@ -4,7 +4,7 @@
     "build": "webpack --p",
     "test": "jest"
   },
-  "author": "Danakt Frost <danakt@protonmail.com>",
+  "author": "Danakt Saushkin <danakt@danakt.com>",
   "license": "MIT",
   "jest": {
     "moduleFileExtensions": [
