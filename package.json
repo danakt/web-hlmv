@@ -2,7 +2,8 @@
   "scripts": {
     "start": "webpack-dev-server --mode development --host 0.0.0.0",
     "build": "webpack --p",
-    "test": "jest"
+    "test": "jest",
+    "prettier": "prettier -c --write ./src/**/*"
   },
   "author": "Danakt Saushkin <danakt@danakt.com>",
   "license": "MIT",
