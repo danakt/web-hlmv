@@ -11,7 +11,7 @@ const leetModelData = parseModel(leetBuffer);
 const meshDataPath = [
   [0, 0, 0],
   [0, 0, 1],
-  [1, 1, 0],
+  [1, 1, 0]
 ];
 
 describe('test geometry building', () => {

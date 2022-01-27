@@ -184,7 +184,8 @@ export const createModelController = (
     bodyPart.forEach(subModel => subModel.forEach(controller => controller.setAnimation(activeSequenceIndex)))
   );
 
-  const getAnimationTime = () =>
+  const getAnimationTime = (): number =>
+    // @ts-ignore
     R.converge(R.divide, [R.sum, R.length])(
       meshControllers.reduce(
         (acc, bodyPart) =>

@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import * as FastDataView from 'fast-dataview';
+import FastDataView from 'fast-dataview';
 import * as structs from '../../const/structs';
 import { readStruct, readStructMultiple } from '../binaryReader';
 import {
@@ -23,7 +23,7 @@ import {
   string,
   array,
   vec3,
-  skip,
+  skip
 } from '../dataTypes';
 
 // Loading model for testing

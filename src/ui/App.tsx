@@ -1,4 +1,4 @@
-import * as leetModel from '../__mock__/leet.mdl';
+import leetModel from '../__mock__/leet.mdl';
 import * as React from 'react';
 import { hot } from 'react-hot-loader';
 import DropzoneContainer from 'react-dropzone';

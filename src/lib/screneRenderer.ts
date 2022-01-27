@@ -1,10 +1,10 @@
 import * as THREE from 'three';
-import * as orbitControlsCreator from 'three-orbit-controls';
+import orbitControlsCreator from 'three-orbit-controls';
 
 /*
  * Allow the camera to orbit around a target
  */
-const OrbitControls: typeof THREE.OrbitControls = orbitControlsCreator(THREE);
+const OrbitControls = orbitControlsCreator(THREE);
 
 /**
  * Creates orbit controller
