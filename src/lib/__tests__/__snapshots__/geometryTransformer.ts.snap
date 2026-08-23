@@ -1,7 +1,7 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`should calculate rotations of a #0 sequence of #0 frame 1`] = `
-Array [
+[
   Float32Array [
     0.9529675245285034,
     0.03582799434661865,
@@ -996,7 +996,7 @@ Array [
 `;
 
 exports[`should calculate rotations of a #2 sequence of #23 frame 1`] = `
-Array [
+[
   Float32Array [
     0.613254725933075,
     -0.6249901056289673,
@@ -1991,7 +1991,7 @@ Array [
 `;
 
 exports[`should calculate rotations of a #55 sequence of #10 frame 1`] = `
-Array [
+[
   Float32Array [
     1,
     -0.00007917818584246561,

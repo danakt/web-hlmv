@@ -3,7 +3,8 @@ import { ModelData } from '../modelDataParser';
 import { MeshRenderData } from '../modelRenderer';
 import { createMeshController } from '../modelController';
 
-const sequenceFrames = [3, 2];
+// Equal frame counts: three's morph texture cache keys on count alone, so this is the case it fails to evict
+const sequenceFrames = [2, 2];
 
 const createModelData = (): ModelData =>
   ({
@@ -23,8 +24,7 @@ const createMeshRenderData = (): MeshRenderData => ({
 
 const createMesh = (): THREE.Mesh => {
   const geometry = new THREE.BufferGeometry();
-  // `@types/three` is pinned to r93, which still calls `setAttribute` `addAttribute`
-  (geometry as any).setAttribute('position', new THREE.BufferAttribute(new Float32Array(9), 3));
+  geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(9), 3));
 
   return new THREE.Mesh(geometry, new THREE.MeshBasicMaterial());
 };
@@ -45,6 +45,19 @@ describe('test mesh controller', () => {
     expect(mesh.morphTargetDictionary).toBeDefined();
     expect(mesh.morphTargetDictionary!['0']).toBe(0);
     expect(mesh.morphTargetDictionary!['1']).toBe(1);
+  });
+
+  test('should dispose the geometry on every animation switch to evict the morph texture cache', () => {
+    const mesh = createMesh();
+    const controller = createMeshController(mesh, createMeshRenderData(), createModelData());
+    const onDispose = jest.fn();
+
+    mesh.geometry.addEventListener('dispose', onDispose);
+
+    controller.setAnimation(0);
+    controller.setAnimation(1);
+
+    expect(onDispose).toHaveBeenCalledTimes(2);
   });
 
   test('should switch between animations without throwing', () => {

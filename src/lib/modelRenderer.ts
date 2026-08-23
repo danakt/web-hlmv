@@ -13,28 +13,6 @@ export type MeshRenderData = {
 };
 
 /**
- * Creates THREE.Texture instance with presets
- */
-export const createTexture = (skinBuffer: Uint8ClampedArray, width: number, height: number): THREE.Texture => {
-  const imageData = new ImageData(skinBuffer, width, height);
-
-  const texture = new THREE.Texture(
-    imageData as any,
-    THREE.UVMapping,
-    THREE.ClampToEdgeWrapping,
-    THREE.ClampToEdgeWrapping,
-    THREE.LinearFilter,
-    THREE.LinearFilter,
-    THREE.RGBAFormat,
-    THREE.UnsignedByteType
-  );
-
-  texture.needsUpdate = true;
-
-  return texture;
-};
-
-/**
  * Applies bone transforms to a position array and returns it
  */
 export const applyBoneTransforms = (
@@ -131,16 +109,14 @@ export const createMesh = (
     map: texture,
     side: THREE.DoubleSide,
     transparent: true,
-    alphaTest: 0.5,
-    morphTargets: true,
-    skinning: true
+    alphaTest: 0.5
     // color:        0xffffff
   });
 
   // Prepare geometry
   const geometry = new THREE.BufferGeometry();
-  geometry.addAttribute('position', geometryBuffer);
-  geometry.addAttribute('uv', uvMap);
+  geometry.setAttribute('position', geometryBuffer);
+  geometry.setAttribute('uv', uvMap);
 
   // Prepare mesh
   return new THREE.Mesh(geometry, material);
@@ -152,7 +128,7 @@ export const createMesh = (
 export const createModelMeshes = (
   meshesRenderData: MeshRenderData[][][],
   modelData: ModelData,
-  textureBuffers: Uint8ClampedArray[]
+  textureBuffers: Uint8ClampedArray<ArrayBuffer>[]
 ): THREE.Mesh[][][] => {
   const textures: THREE.Texture[] = textureBuffers.map((textureBuffer, textureIndex) => {
     const texture = new THREE.Texture(
@@ -160,7 +136,7 @@ export const createModelMeshes = (
         textureBuffer,
         modelData.textures[textureIndex].width,
         modelData.textures[textureIndex].height
-      ) as any,
+      ),
       THREE.UVMapping,
       THREE.ClampToEdgeWrapping,
       THREE.ClampToEdgeWrapping,
@@ -170,6 +146,8 @@ export const createModelMeshes = (
       THREE.UnsignedByteType
     );
 
+    // Half-Life skins are sRGB, and three treats untagged data as linear
+    texture.colorSpace = THREE.SRGBColorSpace;
     texture.needsUpdate = true;
 
     return texture;
@@ -211,8 +189,8 @@ export const createContainer = (meshes: THREE.Mesh[][][]) => {
   );
 
   // Sets to display the front of the model
-  container.rotation.x = THREE.Math.degToRad(-90);
-  container.rotation.z = THREE.Math.degToRad(-90);
+  container.rotation.x = THREE.MathUtils.degToRad(-90);
+  container.rotation.z = THREE.MathUtils.degToRad(-90);
 
   // Sets to display model on the center of camera
   const boundingBox = new THREE.Box3().setFromObject(container);

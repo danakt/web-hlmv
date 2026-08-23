@@ -1,4 +1,6 @@
 import * as React from 'react';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { WindowSizeSensor } from 'libreact/lib/WindowSizeSensor';
 import { ModelData, parseModel } from '../lib/modelDataParser';
 import { buildTexture } from '../lib/textureBuilder';
@@ -56,7 +58,7 @@ export const Renderer = (props: Props) => {
   );
 
   // Orbit controller
-  const orbitControls: THREE.OrbitControls | null = React.useMemo(
+  const orbitControls: OrbitControls | null = React.useMemo(
     () => canvasRef.current && createOrbitControls(camera, canvasRef.current),
     [camera, canvasRef.current]
   );

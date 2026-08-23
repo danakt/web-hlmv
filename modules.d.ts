@@ -1,10 +1,8 @@
 // Allowing import MDL-files
 declare module '*.mdl';
 
-declare module 'three-orbit-controls';
-
 declare module 'fast-dataview' {
-  class FastDataView extends DataView {}
+  class FastDataView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> extends DataView<TArrayBuffer> {}
 
   // prettier-ignore
   namespace FastDataView {}

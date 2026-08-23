@@ -110,6 +110,9 @@ export const createMeshController = (
         // mesh.updateMorphTargets()
 
         geometry.morphAttributes.position = meshRenderData.geometryBuffers[sequenceIndex];
+
+        // three caches the morph texture by frame count, so a same-length sequence would keep the previous vertices
+        geometry.dispose();
       }
 
       activeAction.reset().play();

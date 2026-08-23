@@ -6,10 +6,10 @@ import * as ModelParser from '../modelDataParser';
 
 // Loading model for testing
 const leetPath = path.resolve(__dirname, '../../__mock__/leet.mdl');
-const leetBuffer: ArrayBuffer = fs.readFileSync(leetPath).buffer;
+const leetBuffer = fs.readFileSync(leetPath).buffer as ArrayBuffer;
 
 const ratamahattaPath = path.resolve(__dirname, '../../__mock__/ratamahatta.md2');
-const ratamahattaBuffer: ArrayBuffer = fs.readFileSync(ratamahattaPath).buffer;
+const ratamahattaBuffer = fs.readFileSync(ratamahattaPath).buffer as ArrayBuffer;
 
 const dataView = new FastDataView(leetBuffer);
 const header = ModelParser.parseHeader(dataView);
@@ -133,7 +133,7 @@ describe('parsing whole model', () => {
   test('just parsing without errors', () => {
     expect(() => {
       ModelParser.parseModel(leetBuffer);
-    }).not.toThrowError();
+    }).not.toThrow();
   });
 
   test('should have all keys in model data', () => {
@@ -164,6 +164,6 @@ describe('parsing whole model', () => {
   test('should detect invalid version of model', () => {
     expect(() => {
       ModelParser.parseModel(ratamahattaBuffer);
-    }).toThrowError('Unsupported version of the MDL file');
+    }).toThrow('Unsupported version of the MDL file');
   });
 });
