@@ -31,7 +31,7 @@
     ]
   },
   "devDependencies": {
-    "@babel/core": "^7.16.12",
+    "@babel/core": "^7.29.6",
     "@types/gl-matrix": "^3.2.0",
     "@types/html-webpack-plugin": "^3.2.6",
     "@types/jest": "^27.4.0",
