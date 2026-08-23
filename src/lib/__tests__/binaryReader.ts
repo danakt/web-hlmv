@@ -28,7 +28,7 @@ import {
 
 // Loading model for testing
 const leetPath = path.resolve(__dirname, '../../__mock__/leet.mdl');
-const leetBuffer: ArrayBuffer = fs.readFileSync(leetPath).buffer;
+const leetBuffer = fs.readFileSync(leetPath).buffer as ArrayBuffer;
 
 test('should parse some struct in binary file', () => {
   const dataView = new FastDataView(leetBuffer);

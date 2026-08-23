@@ -1,19 +1,13 @@
 import * as THREE from 'three';
-import orbitControlsCreator from 'three-orbit-controls';
-
-/*
- * Allow the camera to orbit around a target
- */
-const OrbitControls = orbitControlsCreator(THREE);
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 /**
  * Creates orbit controller
  * @param domElement HTML canvas element
  */
-export const createOrbitControls = (camera: THREE.Camera, domElement?: HTMLElement) => {
+export const createOrbitControls = (camera: THREE.PerspectiveCamera, domElement: HTMLElement) => {
   const orbit = new OrbitControls(camera, domElement);
 
-  orbit.enableKeys = true;
   orbit.enableZoom = true;
 
   return orbit;

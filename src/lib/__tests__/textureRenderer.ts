@@ -16,7 +16,7 @@ Object.defineProperty(global, 'ImageData', {
 });
 
 const leetPath = path.resolve(__dirname, '../../__mock__/leet.mdl');
-const leetBuffer: ArrayBuffer = fs.readFileSync(leetPath).buffer;
+const leetBuffer = fs.readFileSync(leetPath).buffer as ArrayBuffer;
 const leetModelData = parseModel(leetBuffer);
 
 describe('test textures building', () => {

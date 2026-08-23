@@ -7,7 +7,7 @@ import { NF_MASKED, PALETTE_SIZE, PALETTE_ALPHA_INDEX, RGB_SIZE, RGBA_SIZE } fro
  * @param texture Texture description
  * @returns Uint8ClampedArray with unpacked RGBA data of a texture
  */
-export const buildTexture = (buffer: ArrayBuffer, texture: structs.Texture): Uint8ClampedArray => {
+export const buildTexture = (buffer: ArrayBuffer, texture: structs.Texture): Uint8ClampedArray<ArrayBuffer> => {
   const textureArea: number = texture.width * texture.height;
   const isTextureMasked: number = texture.flags & NF_MASKED;
 
