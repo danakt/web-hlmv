@@ -48,6 +48,14 @@ export const createMeshController = (
   const framesSum = modelData.sequences.reduce((acc, item) => acc + item.numFrames, 0);
   mesh.morphTargetInfluences = Array(framesSum).fill(0);
 
+  // Three.js binds animation tracks through this dictionary, and `prepareAnimationClips` names frames by index
+  const morphTargetDictionary: { [name: string]: number } = {};
+  for (let frameIndex = 0; frameIndex < framesSum; frameIndex++) {
+    morphTargetDictionary[frameIndex.toString()] = frameIndex;
+  }
+
+  mesh.morphTargetDictionary = morphTargetDictionary;
+
   const animationClips: THREE.AnimationClip[] = prepareAnimationClips(meshRenderData, modelData);
   const mixer = new THREE.AnimationMixer(mesh);
 
