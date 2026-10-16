@@ -68,7 +68,7 @@ export const createMeshController = (
      * @param rate
      */
     setPlaybackRate: (rate: number) => {
-      mixer.timeScale = rate !== 0 ? 1 / rate : 0;
+      mixer.timeScale = rate;
     },
 
     /**
